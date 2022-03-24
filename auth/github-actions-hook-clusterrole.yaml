@@ -1,0 +1,18 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: github-actions-hook
+  annotations:
+    description: |
+      To be bound on a (bot) User and a namespace so it can run kubectl rollout restart deployments.
+      Supports rollout history and pods/deployments listing for debugging purposes.
+rules:
+- apiGroups: [""]
+  resources: ["pods", "deployments"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["apps"]
+  resources: ["deployments"]
+  verbs: ["get", "watch", "list", "patch"]
+- apiGroups: ["apps"]
+  resources: ["replicasets"]
+  verbs: ["get", "watch", "list"]
