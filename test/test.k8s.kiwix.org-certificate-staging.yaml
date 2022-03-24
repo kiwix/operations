@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: test-k8s-kiwix-org-staging
+  namespace: test
+spec:
+  secretName: test-k8s-kiwix-org-staging-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-staging
+  commonName: test.k8s.kiwix.org
+  dnsNames:
+  - test.k8s.kiwix.org

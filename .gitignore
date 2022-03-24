@@ -1,0 +1,9 @@
+# personnal credentials generated via script
+cluster-mgmt/users/*.config
+cluster-mgmt/users/*.crt
+cluster-mgmt/users/*.csr
+cluster-mgmt/users/*.key
+
+# any kubconfig
+*.config
+kubeconfig-*.yaml

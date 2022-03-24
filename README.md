@@ -1,2 +1,3 @@
 # k8s
-Kiwix Kubernetes Platorm
+
+Kiwix Kubernetes Cluster

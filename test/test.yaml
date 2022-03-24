@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: test
+  labels:
+    app: test-app
+  name: test-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-app
+  template:
+    metadata:
+      labels:
+        app: test-app
+    spec:
+      securityContext:
+        fsGroup: 1001
+        runAsUser: 1001
+        # runAsGroup: 33
+        fsGroupChangePolicy: "OnRootMismatch"
+      initContainers:
+      - image: bitnami/minideb
+        name: initer
+        command: ["/bin/sh", "-c", "echo '<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>k8s test</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><style type=\"text/css\">body { background: #333333; color: white; }</style></head><body><h1>hello kubernetes ⎈ </h1></body></html>' > /app/index.html"]
+        volumeMounts:
+        - mountPath: "/app"
+          name: test-webroot-volume
+        resources:
+          requests:
+            memory: "16Mi"
+            cpu: "1m"
+          limits:
+            memory: "16Mi"
+            cpu: "1m"
+      containers:
+      - image: bitnami/nginx:1.21
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        ports:
+        - containerPort: 8080
+        volumeMounts:
+        - mountPath: "/app"
+          name: test-webroot-volume
+        resources:
+          requests:
+            memory: "16Mi"
+            cpu: "1m"
+          limits:
+            memory: "16Mi"
+            cpu: "1m"
+      volumes:
+      - name: test-webroot-volume
+        persistentVolumeClaim:
+          claimName: test-webroot-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+    namespace: test
+    name: test-service
+    labels:
+        app: test-app
+spec:
+    selector:
+        app: test-app
+    ports:
+        - protocol: TCP
+          port: 80
+          targetPort: 8080
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: test-ingress
+  namespace: test
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - test.k8s.kiwix.org
+      secretName: test-k8s-kiwix-org-tls
+  rules:
+  - host: test.k8s.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: test-service
+            port:
+              number: 80
