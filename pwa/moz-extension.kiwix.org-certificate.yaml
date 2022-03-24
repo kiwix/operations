@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: moz-extension-kiwix-org
+  namespace: pwa
+spec:
+  secretName: moz-extension-kiwix-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: moz-extension.kiwix.org
+  dnsNames:
+  - moz-extension.kiwix.org

@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: pwa
+  annotations:
+    k8s.kiwix.org/client: https://github.com/Jaifroid
+    k8s.kiwix.org/source_repo: https://github.com/kiwix/kiwix-js-windows https://github.com/kiwix/kiwix-js

@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: pwa-test-k8s-kiwix-org
+  namespace: pwa
+spec:
+  secretName: pwa-test-k8s-kiwix-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: pwa.test.k8s.kiwix.org
+  dnsNames:
+  - pwa.test.k8s.kiwix.org

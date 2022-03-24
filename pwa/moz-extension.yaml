@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: pwa
+  labels:
+    app: mozext-app
+  name: mozext-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mozext-app
+  template:
+    metadata:
+      labels:
+        app: mozext-app
+    spec:
+      containers:
+      - image: kiwix/kiwix-moz-extension:latest
+        imagePullPolicy: Always
+        name: moz-extension
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "16Mi"
+            cpu: "1m"
+          limits:
+            memory: "16Mi"
+            cpu: "1m"
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+    namespace: pwa
+    name: mozext-service
+    labels:
+        app: mozext-app
+spec:
+    selector:
+        app: mozext-app
+    ports:
+        - protocol: TCP
+          port: 80
+          targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mozext-ingress
+  namespace: pwa
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+      - moz-extension.kiwix.org
+      secretName: moz-extension-kiwix-org-tls
+  rules:
+  - host: moz-extension.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mozext-service
+            port:
+              number: 80
