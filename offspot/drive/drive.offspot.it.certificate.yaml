@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: drive-offspot-it
+  namespace: offspot
+spec:
+  secretName: drive-offspot-it-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: drive.offspot.it
+  dnsNames:
+  - drive.offspot.it
