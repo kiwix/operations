@@ -1,3 +1,5 @@
+.DS_Store
+
 # personnal credentials generated via script
 cluster-mgmt/users/*.config
 cluster-mgmt/users/*.crt
@@ -7,3 +9,7 @@ cluster-mgmt/users/*.key
 # any kubconfig
 *.config
 kubeconfig-*.yaml
+
+# any secret
+*.secret.yaml
+*.secrets.yaml
