@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zimfarm
+  labels:
+    app: drive-app
+  name: drive-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drive-app
+  template:
+    metadata:
+      labels:
+        app: drive-app
+    spec:
+      containers:
+      - image: ghcr.io/openzim/surfer:latest
+        imagePullPolicy: Always
+        name: surfer
+        env:
+          - name: PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: drive-password
+                key: value
+                optional: false
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/data"
+          readOnly: false
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: drive-local-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
+---
+apiVersion: v1
+kind: Service
+metadata:
+    namespace: zimfarm
+    name: drive-service
+    labels:
+        app: drive-app
+spec:
+    selector:
+        app: drive-app
+    ports:
+        - protocol: TCP
+          port: 80
+          targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: drive-ingress
+  namespace: zimfarm
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+      - drive.farm.openzim.org
+      secretName: drive-farm-openzim-org-tls
+  rules:
+  - host: drive.farm.openzim.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: drive-service
+            port:
+              number: 80
