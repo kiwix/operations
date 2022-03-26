@@ -9,8 +9,6 @@ kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: cluster-viewer
-  namespace: cluster-backup
-rules:
 rules:
 - apiGroups:
   - '*'
@@ -31,7 +29,6 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: cluster-backuper_cluster-viewer
-  namespace: cluster-backup
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
