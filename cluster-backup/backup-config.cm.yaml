@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backup-config
+  namespace: cluster-backup
+data:
+  bitwarden-email: "contact+bitwarden-slave@kiwix.org"
+  borg-name: "kubernetes-cluster"
