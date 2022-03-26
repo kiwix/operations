@@ -8,7 +8,7 @@ echo -n "comparing scripts…"
 remote_url=https://scwcontainermulticloud.s3.fr-par.scw.cloud/multicloud-init.sh
 remote_digest=$(curl -s -L $remote_url | md5sum)
 
-repo_digest=$(cat multicloud-init.sh.orig | md5sum)
+repo_digest=$(md5sum < multicloud-init.sh.orig)
 
 
 if [ "$remote_digest" != "$repo_digest" ] ; then

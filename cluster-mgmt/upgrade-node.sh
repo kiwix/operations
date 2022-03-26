@@ -15,7 +15,7 @@ if [ -z "${kubernetes_version}" ] ; then
 fi
 
 echo "Your are about to shutdown kubelet for upgrade. You should have cordon'd the node."
-read -p "Continue (y/n)?" confirm
+read -r -n 1 -p "Continue (y/n)? " confirm
 if [ "$confirm" != "y" ]; then
   exit
 fi

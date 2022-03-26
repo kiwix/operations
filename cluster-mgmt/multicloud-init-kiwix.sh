@@ -130,6 +130,7 @@ function scaleway_multicloud {
     -X POST \
     ${scw_api}/k8s-private/v1beta2/regions/${region}/pools/${pool_id}/node > /tmp/call
 
+  # shellcheck disable=SC2181
   if [[ ${?} -ne 0 ]]; then
     log "scaleway api call" "Error calling scw api" 255
     cat /tmp/call
@@ -137,16 +138,16 @@ function scaleway_multicloud {
   fi
 
   # cluster version
-  cluster_version=$(cat /tmp/call | jq -r ".cluster_version")
+  cluster_version=$(jq -r ".cluster_version" < /tmp/call)
 
   # kube node token
-  node_token=$(cat /tmp/call | jq -r ".kube_token")
+  node_token=$(jq -r ".kube_token" < /tmp/call)
 
   # cluster url
-  cluster_url=$(cat /tmp/call | jq -r ".cluster_url")
+  cluster_url=$(jq -r ".cluster_url" < /tmp/call)
 
   # node name
-  NODE_NAME=$(cat /tmp/call | jq -r ".name")
+  NODE_NAME=$(jq -r ".name" < /tmp/call)
 
   # kube-proxy dir
   if [[ ! -d ${kubeproxy_dir} ]]; then
@@ -157,16 +158,16 @@ function scaleway_multicloud {
   if [[ ! -d ${kubelet_dir} ]]; then
     mkdir ${kubelet_dir}
   fi
-  cat /tmp/call | jq -r ".kubelet_config" | base64 --decode > ${kubelet_dir}/kubelet.conf
+  jq -r ".kubelet_config" < /tmp/call | base64 --decode > ${kubelet_dir}/kubelet.conf
 
   # ca
   if [[ ! -d ${kubelet_dir}/pki ]]; then
     mkdir -p ${kubelet_dir}/pki
   fi
-  cat /tmp/call | jq -r ".cluster_ca" | base64 --decode > ${kubelet_dir}/pki/ca.crt
+  jq -r ".cluster_ca" < /tmp/call | base64 --decode > ${kubelet_dir}/pki/ca.crt
 
   # kubelet env
-  node_name=$(cat /tmp/call | jq -r ".name")
+  node_name=$(jq -r ".name" < /tmp/call)
   echo "NODE_NAME=${NODE_NAME}" > ${kubelet_dir}/kubelet.env
 
   # kilo label

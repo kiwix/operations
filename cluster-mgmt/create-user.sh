@@ -16,8 +16,7 @@ if [ -z "$USERNAME" ] ; then
   exit 1
 fi
 
-echo "Ready for User creation with username=${USERNAME}, namespace=${NAMESPACE}, groupname=${GROUPNAME}. OK ?"
-read
+read -r -n 1 -p "Ready for User creation with username=${USERNAME}, namespace=${NAMESPACE}, groupname=${GROUPNAME}. OK ? ^C if not. "
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 CA_CERT="${SCRIPT_DIR}/users/ca.crt"
