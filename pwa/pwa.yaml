@@ -16,7 +16,7 @@ spec:
         app: pwa-app
     spec:
       containers:
-      - image: kiwix/kiwix-pwa:latest
+      - image: ghcr.io/kiwix/kiwix-pwa:latest
         imagePullPolicy: Always
         name: pwa
         ports:

@@ -16,7 +16,7 @@ spec:
         app: mozext-app
     spec:
       containers:
-      - image: kiwix/kiwix-moz-extension:latest
+      - image: ghcr.io/kiwix/kiwix-moz-extension:latest
         imagePullPolicy: Always
         name: moz-extension
         ports:
