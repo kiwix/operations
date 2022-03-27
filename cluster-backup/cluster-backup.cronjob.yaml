@@ -5,6 +5,8 @@ metadata:
   namespace: cluster-backup
 spec:
   schedule: "0 1 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
   jobTemplate:
     spec:
       template:
