@@ -1,0 +1,108 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: php-configs
+  namespace: stats
+data:
+  memory-limit.ini: |
+    memory_limit = 512M
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: php-fpm-configs
+  namespace: stats
+data:
+  listen.conf: |
+    [www]
+    ; The address on which to accept FastCGI requests.
+    ; Valid syntaxes are:
+    ;   'ip.add.re.ss:port'    - to listen on a TCP socket to a specific IPv4 address on
+    ;                            a specific port;
+    ;   '[ip:6:addr:ess]:port' - to listen on a TCP socket to a specific IPv6 address on
+    ;                            a specific port;
+    ;   'port'                 - to listen on a TCP socket to all addresses
+    ;                            (IPv6 and IPv4-mapped) on a specific port;
+    ;   '/path/to/unix/socket' - to listen on a unix socket.
+    ; Note: This value is mandatory.
+    listen = 9000
+    pm.status_path = /status
+    ping.path = /ping
+    ping.response = pong
+    access.log = /tmp/$pool.access.log
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: stats
+  labels:
+    app: matomo-app
+  name: matomo-app-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matomo-app
+  template:
+    metadata:
+      labels:
+        app: matomo-app
+    spec:
+      containers:
+      - image: docker.io/matomo:3.9.1-fpm
+        imagePullPolicy: IfNotPresent
+        name: matomo
+        env:
+          # URL to internal web service for cron upload
+          - name: MATOMO_URL
+            value: "http://matomo-web-service"
+        volumeMounts:
+        - name: files-volume
+          mountPath: "/var/www/html/misc/user"
+          subPath: branding
+          readOnly: true
+        - name: files-volume
+          mountPath: "/var/www/html"
+          subPath: webroot
+          readOnly: false
+        - name: files-volume
+          mountPath: "/var/www/html/config/config.ini.php"
+          subPath: config.ini.php
+          readOnly: false
+        - name: php-configs
+          mountPath: "/usr/local/etc/php/conf.d/memory-limit.ini"
+          subPath: memory-limit.ini
+          readOnly: true
+        ports:
+        - containerPort: 9000
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "300m"
+          limits:
+            memory: "512Mi"
+            cpu: "300m"
+      volumes:
+      - name: files-volume
+        persistentVolumeClaim:
+          claimName: matomo-files-pvc
+      - name: php-configs
+        configMap:
+          name: php-configs
+      nodeSelector:
+        k8s.kiwix.org/role: "stats"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: stats
+  name: matomo-app-service
+  labels:
+    app: matomo-app
+spec:
+  selector:
+    app: matomo-app
+  ports:
+  - protocol: TCP
+    port: 9000
+    targetPort: 9000

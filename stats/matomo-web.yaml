@@ -1,0 +1,149 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nginx-configs
+  namespace: stats
+data:
+  matomo.conf: |
+    server {
+      listen 80;
+      client_body_buffer_size 1M;  # was 16k
+
+      root /var/www/html/;
+      index index.php index.html index.htm;
+
+      # location ~ ^/(index|matomo|piwik|js/index).php {
+      location / {
+        fastcgi_index index.php;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+        fastcgi_read_timeout 600;
+        fastcgi_pass matomo-app-service:9000;
+      }
+
+      # location ~* ^.+\.php$ {
+      #   deny all;
+      #   return 403;
+      # }
+
+      location /ssss {
+        try_files $uri $uri/ =404;
+      }
+
+      location ~ /(config|tmp|core|lang) {
+        deny all;
+        return 403;
+      }
+
+      location ~ \.(gif|ico|jpg|png|svg|js|css|htm|html|mp3|mp4|wav|ogg|avi|ttf|eot|woff|woff2|json)$ {
+        allow all;
+      }
+
+      location ~ /(libs|vendor|plugins|misc/user) {
+        deny all;
+        return 403;
+      }
+      error_page 404 /404.html;
+      error_page 500 502 503 504 /50x.html;
+      location = /50x.html {
+        root /usr/share/nginx/html;
+      }
+
+      location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: stats
+  labels:
+    app: matomo-web
+  name: matomo-web-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matomo-web
+  template:
+    metadata:
+      labels:
+        app: matomo-web
+    spec:
+      containers:
+      - image: docker.io/nginx:1.21
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        volumeMounts:
+        - name: files-volume
+          mountPath: "/var/www/html"
+          subPath: webroot
+          readOnly: true
+        - name: files-volume
+          mountPath: "/var/www/html/misc/user"
+          subPath: branding
+          readOnly: true
+        - name: nginx-configs
+          mountPath: "/etc/nginx/conf.d/default.conf"
+          subPath: matomo.conf
+          readOnly: true
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "300m"
+          limits:
+            memory: "512Mi"
+            cpu: "300m"
+      volumes:
+      - name: files-volume
+        persistentVolumeClaim:
+          claimName: matomo-files-pvc
+      - name: nginx-configs
+        configMap:
+          name: nginx-configs
+      nodeSelector:
+        k8s.kiwix.org/role: "stats"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: stats
+  name: matomo-web-service
+  labels:
+    app: matomo-web
+spec:
+  selector:
+    app: matomo-web
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: matomo-ingress
+  namespace: stats
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+      - stats.kiwix.org
+      secretName: stats-kiwix-org-tls
+  rules:
+  - host: stats.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: matomo-web-service
+            port:
+              number: 80

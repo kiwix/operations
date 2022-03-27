@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-configs
+  namespace: stats
+data:
+  timeout.cnf: |
+    [mysqld]
+    net_read_timeout    = 43200
+    net_write_timeout   = 43200
+  pool.cnf: |
+    [mysqld]
+    innodb_buffer_pool_size=16G
+    innodb_lru_scan_depth=256
+    max_allowed_packet=512M
+    innodb_page_cleaners=8
+    innodb_buffer_pool_instances=8
+    innodb_io_capacity=100
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: stats
+  labels:
+    app: matomo-db
+  name: matomo-db-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matomo-db
+  template:
+    metadata:
+      labels:
+        app: matomo-db
+    spec:
+      containers:
+      - image: docker.io/mysql:5
+        imagePullPolicy: IfNotPresent
+        name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: "root"
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/var/lib/mysql"
+          readOnly: false
+        - name: mysql-configs
+          mountPath: "/etc/mysql/conf.d"
+          readOnly: true
+        ports:
+        - containerPort: 3306
+        resources:
+          requests:
+            memory: "8Gi"
+            cpu: "2000m"
+          limits:
+            memory: "8Gi"
+            cpu: "2000m"
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: stats-db-pvc
+      - name: mysql-configs
+        configMap:
+          name: mysql-configs
+      nodeSelector:
+        k8s.kiwix.org/role: "stats"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: stats
+  name: matomo-db-service
+  labels:
+      app: matomo-db
+spec:
+  selector:
+    app: matomo-db
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306

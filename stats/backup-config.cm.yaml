@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backup-config
+  namespace: stats
+data:
+  bitwarden-email: "contact+bitwarden-slave@kiwix.org"
+  borg-name: "stats"
+  databases: "mysql://root:root@matomo-db-service:3306/all"

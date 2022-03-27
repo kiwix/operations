@@ -1,0 +1,53 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: matomo-archive
+  namespace: stats
+spec:
+  schedule: "5 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: matomo
+              image: docker.io/matomo:3.9.1-fpm
+              imagePullPolicy: IfNotPresent
+              env:
+              # URL to internal web service
+              - name: MATOMO_URL
+                value: "http://matomo-web-service"
+              volumeMounts:
+              - name: files-volume
+                mountPath: "/var/www/html"
+                subPath: webroot
+                readOnly: false
+              - name: files-volume
+                mountPath: "/var/www/html/config/config.ini.php"
+                subPath: config.ini.php
+                readOnly: false
+              - name: php-configs
+                mountPath: "/usr/local/etc/php/conf.d/memory-limit.ini"
+                subPath: memory-limit.ini
+                readOnly: true
+              command: ["/usr/local/bin/php", "/var/www/html/console", "core:archive", "--url", "http://matomo-web-service"]
+              resources:
+                requests:
+                  memory: "512Mi"
+                  cpu: "200m"
+                limits:
+                  memory: "512Mi"
+                  cpu: "200m"
+          volumes:
+          - name: files-volume
+            persistentVolumeClaim:
+              claimName: matomo-files-pvc
+          - name: php-configs
+            configMap:
+              name: php-configs
+          restartPolicy: OnFailure
+          nodeSelector:
+            k8s.kiwix.org/role: "stats"

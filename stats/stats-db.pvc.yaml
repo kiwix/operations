@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: stats-db-pvc
+  namespace: stats
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 85Gi
+  storageClassName: ""
+  volumeName: stats-db-local-pv

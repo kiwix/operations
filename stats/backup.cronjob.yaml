@@ -1,0 +1,68 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup
+  namespace: stats
+spec:
+  schedule: "0 1 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: borg-backup
+              image: ghcr.io/kiwix/borg-backup:latest
+              imagePullPolicy: Always
+              volumeMounts:
+              - name: files-volume
+                mountPath: "/storage"
+                readOnly: true
+              env:
+                - name: BW_CLIENTID
+                  valueFrom:
+                    secretKeyRef:
+                      name: backup-credentials
+                      key: bw-client-id
+                - name: BW_CLIENTSECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: backup-credentials
+                      key: bw-client-secret
+                - name: BW_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: backup-credentials
+                      key: bw-password
+                - name: BITWARDEN_EMAIL
+                  valueFrom:
+                    configMapKeyRef:
+                      name: backup-config
+                      key: bitwarden-email
+                - name: BORG_NAME
+                  valueFrom:
+                    configMapKeyRef:
+                      name: backup-config
+                      key: borg-name
+                - name: DATABASES
+                  valueFrom:
+                    configMapKeyRef:
+                      name: backup-config
+                      key: databases
+              command: ["single-backup"]
+              resources:
+                requests:
+                  cpu: 200m
+                  memory: 1Gi
+                limits:
+                  cpu: 200m
+                  memory: 1Gi
+          volumes:
+          - name: files-volume
+            persistentVolumeClaim:
+              claimName: matomo-files-pvc
+          restartPolicy: OnFailure
+          nodeSelector:
+            k8s.kiwix.org/role: "stats"
