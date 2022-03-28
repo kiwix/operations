@@ -10,6 +10,7 @@ spec:
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
+      backoffLimit: 2
       template:
         spec:
           containers:
@@ -41,7 +42,7 @@ spec:
                     configMapKeyRef:
                       name: backup-config
                       key: bitwarden-email
-                - name: BORG_NAME
+                - name: BORGBASE_NAME
                   valueFrom:
                     configMapKeyRef:
                       name: backup-config
