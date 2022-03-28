@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zimfarm
+  labels:
+    app: watcher-app
+  name: watcher-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: watcher-app
+  template:
+    metadata:
+      labels:
+        app: watcher-app
+    spec:
+      containers:
+      - image: ghcr.io/openzim/zimfarm-watcher:latest
+        imagePullPolicy: Always
+        name: zimfarm-watcher
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/data"
+          readOnly: false
+        - name: watcher-secrets
+          mountPath: "/run/secrets/s3_url"
+          subPath: s3_url
+          readOnly: true
+        - name: watcher-secrets
+          mountPath: "/run/secrets/zimfarm_username"
+          subPath: zimfarm_username
+          readOnly: true
+        - name: watcher-secrets
+          mountPath: "/run/secrets/zimfarm_password"
+          subPath: zimfarm_password
+          readOnly: true
+        command: ["entrypoint"]
+        args: ["watcher", "--debug", "--dir", "/data", "--threads", "10", "--dont-schedule-on-update", "--every", "1d"]
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: watcher-pvc
+      - name: watcher-secrets
+        secret:
+          secretName: watcher-secrets
+          optional: false
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
