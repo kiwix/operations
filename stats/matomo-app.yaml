@@ -7,30 +7,6 @@ data:
   memory-limit.ini: |
     memory_limit = 512M
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: php-fpm-configs
-  namespace: stats
-data:
-  listen.conf: |
-    [www]
-    ; The address on which to accept FastCGI requests.
-    ; Valid syntaxes are:
-    ;   'ip.add.re.ss:port'    - to listen on a TCP socket to a specific IPv4 address on
-    ;                            a specific port;
-    ;   '[ip:6:addr:ess]:port' - to listen on a TCP socket to a specific IPv6 address on
-    ;                            a specific port;
-    ;   'port'                 - to listen on a TCP socket to all addresses
-    ;                            (IPv6 and IPv4-mapped) on a specific port;
-    ;   '/path/to/unix/socket' - to listen on a unix socket.
-    ; Note: This value is mandatory.
-    listen = 9000
-    pm.status_path = /status
-    ping.path = /ping
-    ping.response = pong
-    access.log = /tmp/$pool.access.log
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
