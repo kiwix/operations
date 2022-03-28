@@ -21,7 +21,7 @@ spec:
         # runAsGroup: 33
         fsGroupChangePolicy: "OnRootMismatch"
       initContainers:
-      - image: bitnami/minideb
+      - image: docker.io/bitnami/minideb
         name: initer
         command: ["/bin/sh", "-c", "echo '<!DOCTYPE html><html><head><meta charset=\"utf-8\"><title>k8s test</title><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><style type=\"text/css\">body { background: #333333; color: white; }</style></head><body><h1>hello kubernetes ⎈ </h1></body></html>' > /app/index.html"]
         volumeMounts:
@@ -35,7 +35,7 @@ spec:
             memory: "16Mi"
             cpu: "1m"
       containers:
-      - image: bitnami/nginx:1.21
+      - image: docker.io/bitnami/nginx:1.21
         imagePullPolicy: IfNotPresent
         name: nginx
         ports:
