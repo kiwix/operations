@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: ftpd-app
+  name: ftpd-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ftpd-app
+  template:
+    metadata:
+      labels:
+        app: ftpd-app
+    spec:
+      containers:
+      - image: docker.io/gimoh/pureftpd:latest
+        imagePullPolicy: IfNotPresent
+        name: pureftpd
+        command: ["/usr/sbin/pure-ftpd", "-4", "-p", "2000:2025", "-c", "25", "-P", "storage.k8s.kiwix.org", "-S", "0.0.0.0,21"]
+        volumeMounts:
+        - mountPath: "/var/lib/ftp"
+          name: download-volume
+          readOnly: true
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "100m"
+        ports:
+          # using hostPort is reliable with any FTP client for passive mode
+          # using nodePort on all but :21 (hostPort) works with some but not all clients
+          # alternative would be for those client to use a different port…
+        - containerPort: 21
+          hostPort: 21
+        # k8s doesn't support ranges
+        # purposely not using ports above 30000 as those are k8s-reserved (nodePort)
+        - containerPort: 2000
+          hostPort: 2000
+        - containerPort: 2001
+          hostPort: 2001
+        - containerPort: 2002
+          hostPort: 2002
+        - containerPort: 2003
+          hostPort: 2003
+        - containerPort: 2004
+          hostPort: 2004
+        - containerPort: 2005
+          hostPort: 2005
+        - containerPort: 2006
+          hostPort: 2006
+        - containerPort: 2007
+          hostPort: 2007
+        - containerPort: 2008
+          hostPort: 2008
+        - containerPort: 2009
+          hostPort: 2009
+        - containerPort: 2010
+          hostPort: 2010
+        - containerPort: 2011
+          hostPort: 2011
+        - containerPort: 2012
+          hostPort: 2012
+        - containerPort: 2013
+          hostPort: 2013
+        - containerPort: 2014
+          hostPort: 2014
+        - containerPort: 2015
+          hostPort: 2015
+        - containerPort: 2016
+          hostPort: 2016
+        - containerPort: 2017
+          hostPort: 2017
+        - containerPort: 2018
+          hostPort: 2018
+        - containerPort: 2019
+          hostPort: 2019
+        - containerPort: 2020
+          hostPort: 2020
+        - containerPort: 2021
+          hostPort: 2021
+        - containerPort: 2022
+          hostPort: 2022
+        - containerPort: 2023
+          hostPort: 2023
+        - containerPort: 2024
+          hostPort: 2024
+        - containerPort: 2025
+          hostPort: 2025
+      volumes:
+      - name: download-volume
+        persistentVolumeClaim:
+          claimName: kiwix-download-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
