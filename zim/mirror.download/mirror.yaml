@@ -1,0 +1,119 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mirror-download-configs
+  namespace: zim
+data:
+  vhost.conf: |
+    server {
+      listen 80;
+      server_name _;
+      root /var/www/download.kiwix.org;
+      default_type application/octet-stream;
+      autoindex on;
+      autoindex_exact_size off;
+      autoindex_localtime off;
+      error_page   500 502 503 504  /50x.html;
+      location = /50x.html {
+          root   /usr/share/nginx/html;
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: mirror-download-app
+  name: mirror-download-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mirror-download-app
+  template:
+    metadata:
+      labels:
+        app: mirror-download-app
+    spec:
+      containers:
+      - image: docker.io/nginx:1.21
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: "/var/www/download.kiwix.org"
+          name: download-volume
+          readOnly: true
+        - name: configs
+          mountPath: "/etc/nginx/conf.d/default.conf"
+          subPath: vhost.conf
+          readOnly: true
+        - name: nginx-configs
+          mountPath: "/etc/nginx/mime.types"
+          subPath: mime.types
+          readOnly: true
+        - name: nginx-configs
+          mountPath: "/etc/nginx/conf.d/gzip.conf"
+          subPath: gzip.conf
+          readOnly: true
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "100m"
+      volumes:
+      - name: download-volume
+        persistentVolumeClaim:
+          claimName: kiwix-download-pvc
+      - name: configs
+        configMap:
+          name: mirror-download-configs
+      - name: nginx-configs
+        configMap:
+          name: nginx-configs
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
+---
+apiVersion: v1
+kind: Service
+metadata:
+    namespace: zim
+    name: mirror-download-service
+    labels:
+        app: mirror-download-app
+spec:
+    selector:
+        app: mirror-download-app
+    ports:
+        - protocol: TCP
+          port: 80
+          targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mirror-download-ingress
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  # tls:
+  #   - hosts:
+  #     - mirror.test.k8s.kiwix.org
+  #     secretName: mirror-test-k8s-kiwix-org-tls
+  rules:
+  - host: mirror.test.k8s.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mirror-download-service
+            port:
+              number: 80
