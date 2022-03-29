@@ -1,0 +1,141 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: download-openzim-configs
+  namespace: zim
+data:
+  vhost.conf: |
+    map_hash_max_size 2048;
+    map_hash_bucket_size 256;
+    map $uri $redirect_uri {
+        include /etc/nginx/maps/wp1.map;
+        include /etc/nginx/maps/openzim.map;
+    }
+
+    server {
+      listen 80;
+      server_name _;
+      root /var/www/download.openzim.org;
+      default_type application/octet-stream;
+      autoindex on;
+      autoindex_exact_size off;
+      autoindex_localtime off;
+      error_page   500 502 503 504  /50x.html;
+      location = /50x.html {
+          root   /usr/share/nginx/html;
+      }
+      location = /README {
+        types { } default_type "text/plain; charset=utf-8";
+      }
+      location / {
+        if ($redirect_uri) {
+          add_header Cache-Control "no-store, no-cache, must-revalidate";
+          rewrite ^ $redirect_uri permanent;
+        }
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: download-openzim-app
+  name: download-openzim-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: download-openzim-app
+  template:
+    metadata:
+      labels:
+        app: download-openzim-app
+    spec:
+      containers:
+      - image: docker.io/nginx:1.21
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: "/etc/nginx/maps"
+          name: openzim-maps-volume
+          readOnly: true
+        - mountPath: "/var/www/download.openzim.org"
+          name: openzim-volume
+          readOnly: true
+        - name: configs
+          mountPath: "/etc/nginx/conf.d/default.conf"
+          subPath: vhost.conf
+          readOnly: true
+        - name: nginx-configs
+          mountPath: "/etc/nginx/mime.types"
+          subPath: mime.types
+          readOnly: true
+        - name: nginx-configs
+          mountPath: "/etc/nginx/conf.d/gzip.conf"
+          subPath: gzip.conf
+          readOnly: true
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "100m"
+      volumes:
+      - name: openzim-volume
+        persistentVolumeClaim:
+          claimName: openzim-download-pvc
+      - name: openzim-maps-volume
+        persistentVolumeClaim:
+          claimName: openzim-maps-pvc
+      - name: configs
+        configMap:
+          name: download-openzim-configs
+      - name: nginx-configs
+        configMap:
+          name: nginx-configs
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
+---
+apiVersion: v1
+kind: Service
+metadata:
+    namespace: zim
+    name: download-openzim-service
+    labels:
+        app: download-openzim-app
+spec:
+    selector:
+        app: download-openzim-app
+    ports:
+        - protocol: TCP
+          port: 80
+          targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: download-openzim-ingress
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  # tls:
+  #   - hosts:
+  #     - download.openzim.org
+  #     secretName: download-openzim-org-tls
+  rules:
+  - host: openzim.test.k8s.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: download-openzim-service
+            port:
+              number: 80
