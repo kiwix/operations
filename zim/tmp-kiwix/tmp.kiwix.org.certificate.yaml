@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tmp-kiwix-org
+  namespace: zim
+spec:
+  secretName: tmp-kiwix-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: tmp.kiwix.org
+  dnsNames:
+  - tmp.kiwix.org

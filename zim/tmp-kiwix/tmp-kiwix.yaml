@@ -1,0 +1,131 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tmp-kiwix-configs
+  namespace: zim
+data:
+  vhost.conf: |
+    server {
+      listen 80;
+      server_name _;
+      access_log off;
+      root /var/www/tmp.kiwix.org;
+      autoindex on;
+      autoindex_exact_size off;
+      autoindex_localtime off;
+      error_page   500 502 503 504  /50x.html;
+      location = /50x.html {
+          root   /usr/share/nginx/html;
+      }
+      rewrite ^/zim/(.*)$ http://download.kiwix.org/zim/$1 permanent;
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: tmp-kiwix-app
+  name: tmp-kiwix-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tmp-kiwix-app
+  template:
+    metadata:
+      labels:
+        app: tmp-kiwix-app
+    spec:
+      containers:
+      - image: docker.io/nginx:1.21
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: "/var/www/tmp.kiwix.org"
+          name: tmp-kiwix-volume
+          readOnly: true
+        - name: configs
+          mountPath: "/etc/nginx/conf.d/default.conf"
+          subPath: vhost.conf
+          readOnly: true
+        - name: nginx-configs
+          mountPath: "/etc/nginx/mime.types"
+          subPath: mime.types
+          readOnly: true
+        - name: nginx-configs
+          mountPath: "/etc/nginx/conf.d/gzip.conf"
+          subPath: gzip.conf
+          readOnly: true
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "100m"
+      volumes:
+      - name: tmp-kiwix-volume
+        persistentVolumeClaim:
+          # /!\ name is inverted compared to this file
+          claimName: kiwix-tmp-pvc
+      - name: configs
+        configMap:
+          name: tmp-kiwix-configs
+      - name: nginx-configs
+        configMap:
+          name: nginx-configs
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
+---
+apiVersion: v1
+kind: Service
+metadata:
+    namespace: zim
+    name: tmp-kiwix-service
+    labels:
+        app: tmp-kiwix-app
+spec:
+    selector:
+        app: tmp-kiwix-app
+    ports:
+        - protocol: TCP
+          port: 80
+          targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tmp-kiwix-ingress
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  # tls:
+  #   - hosts:
+  #     - tmp.kiwix.org
+  #     secretName: tmp-kiwix-org-tls
+  rules:
+  - host: tmp.test.k8s.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: tmp-kiwix-service
+            port:
+              number: 80
+  - host: tmp.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: tmp-kiwix-service
+            port:
+              number: 80
