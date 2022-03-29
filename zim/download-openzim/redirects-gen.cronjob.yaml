@@ -14,7 +14,7 @@ spec:
       template:
         spec:
           containers:
-            - name: matomo
+            - name: alpine
               image: docker.io/alpine:3
               imagePullPolicy: IfNotPresent
               volumeMounts:

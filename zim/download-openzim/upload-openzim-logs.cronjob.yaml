@@ -1,0 +1,62 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: upload-openzim-logs
+  namespace: zim
+spec:
+  schedule: "@hourly"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            - name: matomo-uploader
+              image: ghcr.io/kiwix/matomo-log-analytics:latest
+              imagePullPolicy: Always
+              command: ["sh"]
+              args: ["import-logs"]
+              env:
+                - name: ID_SITE
+                  value: "6"
+                - name: URL
+                  value: "https://stats.kiwix.org"
+                - name: LOG
+                  value: "/var/log/nginx/access.log"
+                - name: HOST
+                  value: "download.openzim.org"
+                - name: MATOMO_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: matomo-credentials
+                      key: token
+              volumeMounts:
+              - mountPath: "/var/log/nginx/access.log"
+                name: nginx-logs-volume
+                subPath: download-openzim/access.log
+                readOnly: true
+              - mountPath: "/import-logs"
+                name: gen-scripts-volume
+                subPath: "import_logs.sh"
+                readOnly: true
+              resources:
+                requests:
+                  memory: "512Mi"
+                  cpu: "200m"
+                limits:
+                  memory: "512Mi"
+                  cpu: "200m"
+          volumes:
+            - name: gen-scripts-volume
+              configMap:
+                name: gen-scripts
+                defaultMode: 0755
+            - name: nginx-logs-volume
+              persistentVolumeClaim:
+                claimName: nginx-logs-pvc
+          restartPolicy: OnFailure
+          nodeSelector:
+            k8s.kiwix.org/role: "storage"

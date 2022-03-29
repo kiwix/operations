@@ -15,6 +15,8 @@ data:
     server {
       listen 80;
       server_name _;
+      access_log /var/log/nginx/access.log vhost;
+      access_log /dev/stdout vhost;
       root /var/www/download.openzim.org;
       default_type application/octet-stream;
       autoindex on;
@@ -77,6 +79,14 @@ spec:
           mountPath: "/etc/nginx/conf.d/gzip.conf"
           subPath: gzip.conf
           readOnly: true
+        - name: nginx-configs
+          mountPath: "/etc/nginx/conf.d/01vhost-logfmt.conf"
+          subPath: vhost-logfmt.conf
+          readOnly: true
+        - mountPath: "/var/log/nginx"
+          subPath: download-openzim
+          name: nginx-logs-volume
+          readOnly: false
         resources:
           requests:
             memory: "256Mi"
@@ -91,6 +101,9 @@ spec:
       - name: openzim-maps-volume
         persistentVolumeClaim:
           claimName: openzim-maps-pvc
+      - name: nginx-logs-volume
+        persistentVolumeClaim:
+          claimName: nginx-logs-pvc
       - name: configs
         configMap:
           name: download-openzim-configs
@@ -130,6 +143,16 @@ spec:
   #     secretName: download-openzim-org-tls
   rules:
   - host: openzim.test.k8s.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: download-openzim-service
+            port:
+              number: 80
+  - host: download.openzim.org
     http:
       paths:
       - path: /
