@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: mirror-download-kiwix-org
+  namespace: zim
+spec:
+  secretName: mirror-download-kiwix-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: mirror.download.kiwix.org
+  dnsNames:
+  - mirror.download.kiwix.org

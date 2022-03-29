@@ -104,8 +104,8 @@ spec:
   ingressClassName: nginx
   # tls:
   #   - hosts:
-  #     - mirror.test.k8s.kiwix.org
-  #     secretName: mirror-test-k8s-kiwix-org-tls
+  #     - mirror.download.kiwix.org
+  #     secretName: mirror-download-kiwix-org-tls
   rules:
   - host: mirror.test.k8s.kiwix.org
     http:
