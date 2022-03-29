@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: receiver-app
+  name: receiver-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: receiver-app
+  template:
+    metadata:
+      labels:
+        app: receiver-app
+    spec:
+      containers:
+      - image: ghcr.io/openzim/zimfarm-receiver:latest
+        imagePullPolicy: Always
+        name: receiver
+        env:
+          - name: VALIDATION_OPTION
+            value: "NO_CHECK"
+        volumeMounts:
+        - name: receiver-volume
+          subPath: "logs"
+          mountPath: "/jail/logs"
+          readOnly: false
+        - name: receiver-volume
+          subPath: "zim"
+          mountPath: "/jail/zim"
+          readOnly: false
+        - name: receiver-volume
+          subPath: "quarantine"
+          mountPath: "/mnt/quarantine"
+        - name: receiver-volume
+          subPath: "check-logs"
+          mountPath: "/mnt/check_logs"
+          readOnly: false
+        - name: download-volume
+          subPath: "zim"
+          mountPath: "/mnt/zim"
+          readOnly: false
+        ports:
+          - containerPort: 22
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+      volumes:
+      - name: download-volume
+        persistentVolumeClaim:
+          claimName: kiwix-download-pvc
+      - name: receiver-volume
+        persistentVolumeClaim:
+          claimName: zim-receiver-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: receiver-service
+  labels:
+    app: receiver-app
+spec:
+  type: NodePort
+  selector:
+    app: receiver-app
+  ports:
+    - protocol: TCP
+      port: 30022
+      targetPort: 22
+      nodePort: 30022
