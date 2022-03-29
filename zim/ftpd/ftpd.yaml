@@ -19,7 +19,7 @@ spec:
       - image: docker.io/gimoh/pureftpd:latest
         imagePullPolicy: IfNotPresent
         name: pureftpd
-        command: ["/usr/sbin/pure-ftpd", "-4", "-p", "2000:2025", "-c", "25", "-P", "storage.k8s.kiwix.org", "-S", "0.0.0.0,21"]
+        command: ["/usr/sbin/pure-ftpd", "-4", "-p", "2000:2050", "-c", "25", "-P", "master.download.kiwix.org", "-S", "0.0.0.0,21"]
         volumeMounts:
         - mountPath: "/var/lib/ftp"
           name: download-volume
@@ -91,6 +91,56 @@ spec:
           hostPort: 2024
         - containerPort: 2025
           hostPort: 2025
+        - containerPort: 2026
+          hostPort: 2026
+        - containerPort: 2027
+          hostPort: 2027
+        - containerPort: 2028
+          hostPort: 2028
+        - containerPort: 2029
+          hostPort: 2029
+        - containerPort: 2030
+          hostPort: 2030
+        - containerPort: 2031
+          hostPort: 2031
+        - containerPort: 2032
+          hostPort: 2032
+        - containerPort: 2033
+          hostPort: 2033
+        - containerPort: 2034
+          hostPort: 2034
+        - containerPort: 2035
+          hostPort: 2035
+        - containerPort: 2036
+          hostPort: 2036
+        - containerPort: 2037
+          hostPort: 2037
+        - containerPort: 2038
+          hostPort: 2038
+        - containerPort: 2039
+          hostPort: 2039
+        - containerPort: 2040
+          hostPort: 2040
+        - containerPort: 2041
+          hostPort: 2041
+        - containerPort: 2042
+          hostPort: 2042
+        - containerPort: 2043
+          hostPort: 2043
+        - containerPort: 2044
+          hostPort: 2044
+        - containerPort: 2045
+          hostPort: 2045
+        - containerPort: 2046
+          hostPort: 2046
+        - containerPort: 2047
+          hostPort: 2047
+        - containerPort: 2048
+          hostPort: 2048
+        - containerPort: 2049
+          hostPort: 2049
+        - containerPort: 2050
+          hostPort: 2050
       volumes:
       - name: download-volume
         persistentVolumeClaim:
