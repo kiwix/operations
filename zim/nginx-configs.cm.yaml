@@ -106,8 +106,11 @@ data:
       # our additions beyond nginx:1.26.1
       text/yaml                                        yml;
       application/vnd.android.package-archive          apk;
+      text/tab-separated-values                        tsv;
     }
   gzip.conf: |
     gzip on;
     gzip_proxied any;
     gzip_types application/rss+xml application/opensearchdescription+xml image/svg+xml application/vnd.ms-fontobject application/x-font-ttf font/opentype application/atom+xml text/yaml text/tab-separated-values;
+  limits.conf: |
+    limit_req_zone $binary_remote_addr zone=limit:10m rate=50r/s;
