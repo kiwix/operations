@@ -4,7 +4,7 @@ metadata:
   name: kiwix-download-local-pv
 spec:
   capacity:
-    # content is 10Ti+ ATM. using 1TB just so it's not mistaken with another one
+    # content is 8.6Ti+ ATM (Apr 2022). using 1TB just so it's not mistaken
     storage: 1Ti
   volumeMode: Filesystem
   accessModes:
