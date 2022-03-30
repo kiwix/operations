@@ -4,7 +4,7 @@ metadata:
   name: upload-openzim-logs
   namespace: zim
 spec:
-  schedule: "@hourly"
+  schedule: "0 2 * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
@@ -28,15 +28,17 @@ spec:
                   value: "/var/log/nginx/access.log"
                 - name: HOST
                   value: "download.openzim.org"
+                - name: USE_SUFFIXED_LOG
+                  value: "y"
                 - name: MATOMO_TOKEN
                   valueFrom:
                     secretKeyRef:
                       name: matomo-credentials
                       key: token
               volumeMounts:
-              - mountPath: "/var/log/nginx/access.log"
+              - mountPath: "/var/log/nginx"
                 name: nginx-logs-volume
-                subPath: download-openzim/access.log
+                subPath: archives/download-openzim
                 readOnly: true
               - mountPath: "/import-logs"
                 name: gen-scripts-volume

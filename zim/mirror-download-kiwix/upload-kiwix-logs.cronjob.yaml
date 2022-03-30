@@ -1,16 +1,15 @@
 apiVersion: batch/v1
-# kind: CronJob
-kind: Job
+kind: CronJob
 metadata:
   name: upload-kiwix-logs
   namespace: zim
 spec:
-  # schedule: "@hourly"
-  # successfulJobsHistoryLimit: 1
-  # failedJobsHistoryLimit: 1
-  # concurrencyPolicy: Forbid
-  # jobTemplate:
-  #   spec:
+  schedule: "30 2 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
       backoffLimit: 2
       template:
         spec:
@@ -27,6 +26,8 @@ spec:
                   value: "https://stats.kiwix.org"
                 - name: LOG
                   value: "/var/log/nginx/access.log"
+                - name: USE_SUFFIXED_LOG
+                  value: "y"
                 - name: HOST
                   value: "download.kiwix.org"
                 - name: MATOMO_TOKEN
@@ -35,9 +36,9 @@ spec:
                       name: matomo-credentials
                       key: token
               volumeMounts:
-              - mountPath: "/var/log/nginx/access.log"
+              - mountPath: "/var/log/nginx"
                 name: nginx-logs-volume
-                subPath: download-kiwix/access.log
+                subPath: archives/download-kiwix
                 readOnly: true
               - mountPath: "/import-logs"
                 name: gen-scripts-volume
