@@ -135,23 +135,15 @@ metadata:
   namespace: zim
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
 spec:
   ingressClassName: nginx
-  # tls:
-  #   - hosts:
-  #     - download.openzim.org
-  #     secretName: download-openzim-org-tls
+  tls:
+    - hosts:
+      - download.openzim.org
+      secretName: download-openzim-org-tls
   rules:
-  - host: openzim.test.k8s.kiwix.org
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: download-openzim-service
-            port:
-              number: 80
   - host: download.openzim.org
     http:
       paths:

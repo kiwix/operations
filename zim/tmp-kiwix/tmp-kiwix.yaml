@@ -102,23 +102,15 @@ metadata:
   namespace: zim
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
 spec:
   ingressClassName: nginx
-  # tls:
-  #   - hosts:
-  #     - tmp.kiwix.org
-  #     secretName: tmp-kiwix-org-tls
+  tls:
+    - hosts:
+      - tmp.kiwix.org
+      secretName: tmp-kiwix-org-tls
   rules:
-  - host: tmp.test.k8s.kiwix.org
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: tmp-kiwix-service
-            port:
-              number: 80
   - host: tmp.kiwix.org
     http:
       paths:

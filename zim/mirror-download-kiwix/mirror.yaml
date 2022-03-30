@@ -8,6 +8,8 @@ data:
     server {
       listen 80;
       server_name _;
+      access_log /var/log/nginx/access.log vhost;
+      access_log /dev/stdout vhost;
       root /var/www/download.kiwix.org;
       default_type application/octet-stream;
       autoindex on;
@@ -16,6 +18,9 @@ data:
       error_page   500 502 503 504  /50x.html;
       location = /50x.html {
           root   /usr/share/nginx/html;
+      }
+      location = /README {
+        types { } default_type "text/plain; charset=utf-8";
       }
     }
 ---
@@ -57,6 +62,10 @@ spec:
         - name: nginx-configs
           mountPath: "/etc/nginx/conf.d/gzip.conf"
           subPath: gzip.conf
+          readOnly: true
+        - name: nginx-configs
+          mountPath: "/etc/nginx/conf.d/01vhost-logfmt.conf"
+          subPath: vhost-logfmt.conf
           readOnly: true
         resources:
           requests:
@@ -100,14 +109,16 @@ metadata:
   namespace: zim
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
 spec:
   ingressClassName: nginx
-  # tls:
-  #   - hosts:
-  #     - mirror.download.kiwix.org
-  #     secretName: mirror-download-kiwix-org-tls
+  tls:
+    - hosts:
+      - mirror.download.kiwix.org
+      secretName: mirror-download-kiwix-org-tls
   rules:
-  - host: mirror.test.k8s.kiwix.org
+  - host: mirror.download.kiwix.org
     http:
       paths:
       - path: /
