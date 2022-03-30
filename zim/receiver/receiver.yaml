@@ -74,6 +74,6 @@ spec:
     app: receiver-app
   ports:
     - protocol: TCP
-      port: 30022
+      port: 30122
       targetPort: 22
-      nodePort: 30022
+      nodePort: 30122
