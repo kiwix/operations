@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dropbox-host-pubkeys
+  namespace: zim
+# sshd host public keys, corresponding to the secret ones.
+# Allows maintaining fingerprint accross sshd_reinstalls (image rebuilds)
+data:
+  ecdsa: ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNFHZMYrMONAMfBEWClD+esS7bzKRz+RSo5oelMb/qk1Sfbp0jc+dpqe15e11RfenBoQajPUIuonf7xwhrrU4RU= root@buildkitsandbox
+  ed25519: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPS0ZLNtB5j92KlTz7NXST61/jSeyc4TWuN3rUeFBk3T root@buildkitsandbox
+  rsa: ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDCAW+wlW+4N8nJIUYs+pIzqLRjwuEY2yhQU+5tO8h5XB5HCyXVIqkYNANCUAUggtagi3kbOMbL9Vu8RB0DBFPvxv2TpxHwlQHIMZtB30dM55YJ1pGM9Pg3+j5Fscg5OtfcFC2LNSGNfFdp6RJsFlecmDDLlCBjT+ncC5slP0uy9Ms3R+7UyHU7EJLK47pYZ59AP783Bf9weiPG6KfA0VVDJ4hSo23iyZwL9yeZyT4r4m7ZmrjT01WfyZ1r6TKwMC3Jo2ar8raC+d3SoVsQMYUXtgzXLf5tbjn6ykLLPJALkzz/V6Q06k/Hr1erO1DGwE70tco0ImxCSM0eL+P03dgNu5v9p5CsTcoR2UIWQxRlbbKVEnoQ5NynwQp3H7LrvnxLiReE8QY+RF5hLTLBJHPO8rBze82y1g35/WKfvLmdT7ZvhsY3q6IxOTY/NJgAmUt8fzeVx2hEx+TVwklzQ55AnXf9wP257+SNAq7BNh07JgnVjL9O0fRjl9wFDScUVvE= root@buildkitsandbox

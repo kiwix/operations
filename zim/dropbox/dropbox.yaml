@@ -1,0 +1,126 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: dropbox-app
+  name: dropbox-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dropbox-app
+  template:
+    metadata:
+      labels:
+        app: dropbox-app
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/dropbox:latest
+        imagePullPolicy: Always
+        name: dropbox
+        env:
+          - name: PUBKEYS
+            value: ""
+        env:
+          - name: PUBKEYS
+            valueFrom:
+              configMapKeyRef:
+                name: dropbox-pubkeys
+                key: ci
+                optional: false
+        volumeMounts:
+        - name: tmp-volume
+          subPath: "ci"
+          mountPath: "/jail/data/tmp/ci"
+          readOnly: false
+        - name: download-volume
+          subPath: "release"
+          mountPath: "/jail/data/download/release"
+          readOnly: false
+        - name: download-volume
+          subPath: "nightly"
+          mountPath: "/jail/data/download/nightly"
+          readOnly: false
+        - name: openzim-volume
+          subPath: "release"
+          mountPath: "/jail/data/openzim/release"
+          readOnly: false
+        - name: openzim-volume
+          subPath: "nightly"
+          mountPath: "/jail/data/openzim/nightly"
+          readOnly: false
+        - name: openzim-volume
+          subPath: "wp1"
+          mountPath: "/jail/data/openzim/wp1"
+          readOnly: false
+        - name: host-keys
+          subPath: ecdsa
+          mountPath: "/etc/ssh/ssh_host_ecdsa_key"
+          readOnly: true
+        - name: host-pubkeys
+          subPath: ecdsa
+          mountPath: "/etc/ssh/ssh_host_ecdsa_key.pub"
+          readOnly: true
+        - name: host-keys
+          subPath: ed25519
+          mountPath: "/etc/ssh/ssh_host_ed25519_key"
+          readOnly: true
+        - name: host-pubkeys
+          subPath: ed25519
+          mountPath: "/etc/ssh/ssh_host_ed25519_key.pub"
+          readOnly: true
+        - name: host-keys
+          subPath: rsa
+          mountPath: "/etc/ssh/ssh_host_rsa_key"
+          readOnly: true
+        - name: host-pubkeys
+          subPath: rsa
+          mountPath: "/etc/ssh/ssh_host_rsa_key.pub"
+          readOnly: true
+        ports:
+          - containerPort: 22
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "64Mi"
+            cpu: "100m"
+      volumes:
+      - name: download-volume
+        persistentVolumeClaim:
+          claimName: kiwix-download-pvc
+      - name: openzim-volume
+        persistentVolumeClaim:
+          claimName: openzim-download-pvc
+      - name: tmp-volume
+        persistentVolumeClaim:
+          claimName: kiwix-tmp-pvc
+      - name: host-keys
+        secret:
+          secretName: dropbox-host-keys
+          defaultMode: 0600
+      - name: host-pubkeys
+        configMap:
+          name: dropbox-host-pubkeys
+          defaultMode: 0644
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: dropbox-service
+  labels:
+    app: dropbox-app
+spec:
+  type: NodePort
+  selector:
+    app: dropbox-app
+  ports:
+    - protocol: TCP
+      port: 30022
+      targetPort: 22
+      nodePort: 30022
