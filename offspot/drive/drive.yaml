@@ -68,6 +68,7 @@ metadata:
   namespace: offspot
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: 8196m
 spec:
   tls:
     - hosts:
