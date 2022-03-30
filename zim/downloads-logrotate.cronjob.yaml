@@ -1,0 +1,68 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logrotate-configs
+  namespace: zim
+data:
+  logrotate.conf: |
+    copytruncate
+    daily
+    dateext
+    compress
+    delaycompress
+    ifempty
+    rotate 30
+    maxage 30
+    missingok
+    nomail
+    /data/nginx-logs/download-kiwix/*.log {
+      olddir /data/nginx-logs/archives/download-kiwix
+    }
+    /data/nginx-logs/download-openzim/*.log {
+      olddir /data/nginx-logs/archives/download-openzim
+    }
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: downloads-logrotate
+  namespace: zim
+spec:
+  schedule: "0 1 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: logrotate
+              image: docker.io/blacklabelops/logrotate:1.3
+              imagePullPolicy: IfNotPresent
+              resources:
+                requests:
+                  memory: "512Mi"
+                  cpu: "200m"
+                limits:
+                  memory: "512Mi"
+                  cpu: "200m"
+              volumeMounts:
+              - mountPath: "/data/nginx-logs"
+                name: nginx-logs-volume
+                readOnly: false
+              - mountPath: "/etc/logrotate.conf"
+                name: logrotate-configs
+                subPath: logrotate.conf
+                readOnly: true
+              command: ["logrotate", "-v", "--state", "/data/nginx-logs/logrotate.status", "/etc/logrotate.conf"]
+          volumes:
+          - name: nginx-logs-volume
+            persistentVolumeClaim:
+              claimName: nginx-logs-pvc
+          - name: logrotate-configs
+            configMap:
+              name: logrotate-configs
+          restartPolicy: OnFailure
+          nodeSelector:
+            k8s.kiwix.org/role: "storage"
