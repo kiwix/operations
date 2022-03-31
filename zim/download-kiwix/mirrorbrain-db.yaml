@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: mirrorbrain-db
+  name: mirrorbrain-db-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mirrorbrain-db
+  template:
+    metadata:
+      labels:
+        app: mirrorbrain-db
+    spec:
+      securityContext:
+        fsGroup: 999
+        runAsUser: 999
+        runAsGroup: 999
+      containers:
+      - image: docker.io/postgres:11
+        imagePullPolicy: IfNotPresent
+        name: postgres
+        command: ["postgres", "-c", "shared_buffers=256MB", "-c", "max_connections=200"]
+        # command: ["sh", "-c", "sleep 3600"]
+        volumeMounts:
+        - name: data-volume
+          subPath: data
+          mountPath: "/var/lib/postgresql/data"
+          readOnly: false
+        - mountPath: /dev/shm
+          name: devshm
+        ports:
+        - containerPort: 5432
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "500m"
+          limits:
+            memory: "4Gi"
+            cpu: "500m"
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: mirrorbrain-db-pvc
+      - name: devshm
+        emptyDir:
+          medium: Memory
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: mirrorbrain-db-service
+  labels:
+      app: mirrorbrain-db
+spec:
+  selector:
+    app: mirrorbrain-db
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432

@@ -1,0 +1,63 @@
+apiVersion: batch/v1
+kind: Job
+# kind: CronJob
+metadata:
+  name: backup-mirrorbrain-db
+  namespace: zim
+spec:
+  # schedule: "0 3 * * *"
+  # successfulJobsHistoryLimit: 1
+  # failedJobsHistoryLimit: 2
+  # concurrencyPolicy: Forbid
+  # jobTemplate:
+  #   spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            - name: borg-backup
+              image: ghcr.io/kiwix/borg-backup:latest
+              imagePullPolicy: Always
+              env:
+                - name: BW_CLIENTID
+                  valueFrom:
+                    secretKeyRef:
+                      name: backup-mirrorbrain-db-credentials
+                      key: bw-client-id
+                - name: BW_CLIENTSECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: backup-mirrorbrain-db-credentials
+                      key: bw-client-secret
+                - name: BW_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: backup-mirrorbrain-db-credentials
+                      key: bw-password
+                - name: BITWARDEN_EMAIL
+                  valueFrom:
+                    configMapKeyRef:
+                      name: backup-mirrorbrain-db-config
+                      key: bitwarden-email
+                - name: BORGBASE_NAME
+                  valueFrom:
+                    configMapKeyRef:
+                      name: backup-mirrorbrain-db-config
+                      key: borg-name
+                - name: DATABASES
+                  valueFrom:
+                    configMapKeyRef:
+                      name: backup-mirrorbrain-db-config
+                      key: databases
+              command: ["single-backup"]
+              resources:
+                requests:
+                  cpu: 200m
+                  memory: 1Gi
+                limits:
+                  cpu: 200m
+                  memory: 1Gi
+          volumes:
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "storage"

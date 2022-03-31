@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backup-mirrorbrain-db-config
+  namespace: zim
+data:
+  bitwarden-email: "contact+bitwarden-slave@kiwix.org"
+  borg-name: "mirrorbrain"
+  databases: "postgresql://mirrorbrain:mirrorbrain@mirrorbrain-db-service:5432/all"

@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: mirrorbrain-web
+  name: mirrorbrain-web-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mirrorbrain-web
+  template:
+    metadata:
+      labels:
+        app: mirrorbrain-web
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/mirrorbrain:latest
+        imagePullPolicy: Always
+        name: apache
+        command: ["httpd-foreground"]
+        volumeMounts:
+        - mountPath: "/var/www/download.kiwix.org"
+          name: download-volume
+          readOnly: true
+        - mountPath: "/var/www/library.kiwix.org"
+          name: library-volume
+          readOnly: true
+        - name: mb-volume
+          subPath: hash
+          mountPath: "/usr/share/mirrorbrain"
+          readOnly: true
+        - name: mb-volume
+          subPath: geoip
+          mountPath: "/usr/local/geoip/share/GeoIP"
+          readOnly: true
+        - name: configs
+          subPath: mirrorbrain.conf
+          mountPath: "/etc/mirrorbrain.conf"
+          readOnly: true
+        - name: configs
+          subPath: httpd.conf
+          mountPath: "/usr/local/apache2/conf/httpd.conf"
+          readOnly: true
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+      volumes:
+      - name: download-volume
+        persistentVolumeClaim:
+          claimName: kiwix-download-pvc
+      - name: library-volume
+        persistentVolumeClaim:
+          claimName: kiwix-library-pvc
+      - name: mb-volume
+        persistentVolumeClaim:
+          claimName: mirrorbrain-support-pvc
+      - name: configs
+        configMap:
+          name: mb-configs
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: mirrorbrain-web-service
+  labels:
+      app: mirrorbrain-web
+spec:
+  selector:
+    app: mirrorbrain-web
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: mirrorbrain-web-ingress
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - download.kiwix.org
+      secretName: download-kiwix-org-tls
+  rules:
+  - host: download.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mirrorbrain-web-service
+            port:
+              number: 80

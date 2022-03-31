@@ -1,0 +1,52 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mb-update-db
+  namespace: zim
+spec:
+  schedule: "40 * * * *"
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            - image: ghcr.io/kiwix/mirrorbrain:latest
+              imagePullPolicy: IfNotPresent
+              name: mirrorbrain
+              command: ["update_mirrorbrain_db.sh"]
+              volumeMounts:
+              - mountPath: "/var/www/download.kiwix.org"
+                name: download-volume
+                readOnly: false
+              - name: mb-volume
+                subPath: hash
+                mountPath: "/usr/share/mirrorbrain"
+                readOnly: true
+              - name: configs
+                subPath: mirrorbrain.conf
+                mountPath: "/etc/mirrorbrain.conf"
+                readOnly: true
+              resources:
+                requests:
+                  memory: "128Mi"
+                  cpu: "200m"
+                limits:
+                  memory: "128Mi"
+                  cpu: "200m"
+          volumes:
+          - name: download-volume
+            persistentVolumeClaim:
+              claimName: kiwix-download-pvc
+          - name: mb-volume
+            persistentVolumeClaim:
+              claimName: mirrorbrain-support-pvc
+          - name: configs
+            configMap:
+              name: mb-configs
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "storage"

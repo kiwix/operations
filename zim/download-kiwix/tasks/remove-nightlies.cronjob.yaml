@@ -1,0 +1,59 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: remove-nightlies
+  namespace: zim
+spec:
+  schedule: "@daily"
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            - image: docker.io/alpine:3
+              imagePullPolicy: IfNotPresent
+              name: debian
+              command: ["remove-nightlies"]
+              volumeMounts:
+              - mountPath: "/var/www/download.kiwix.org"
+                name: download-volume
+                readOnly: false
+              - mountPath: "/var/www/download.openzim.org"
+                name: openzim-volume
+                readOnly: false
+              # - name: tmp-kiwix-volume
+              #   subPath: ci
+              #   mountPath: "/var/www/tmp.kiwix.org/ci"
+              #   readOnly: false
+              - name: scripts
+                subPath: remove-nightlies.sh
+                mountPath: "/usr/local/bin/remove-nightlies"
+                readOnly: true
+              resources:
+                requests:
+                  memory: "128Mi"
+                  cpu: "20m"
+                limits:
+                  memory: "128Mi"
+                  cpu: "20m"
+          volumes:
+          - name: download-volume
+            persistentVolumeClaim:
+              claimName: kiwix-download-pvc
+          - name: openzim-volume
+            persistentVolumeClaim:
+              claimName: openzim-download-pvc
+          # - name: tmp-kiwix-volume
+          #   persistentVolumeClaim:
+          #     claimName: kiwix-tmp-pvc
+          - name: scripts
+            configMap:
+              name: maint-scripts
+              defaultMode: 0755
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "storage"

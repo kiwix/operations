@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: mb-probe-mirrors
+  namespace: zim
+spec:
+  schedule: "* * * * *"
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            - image: ghcr.io/kiwix/mirrorbrain:latest
+              imagePullPolicy: IfNotPresent
+              name: mirrorbrain
+              command: ["mirrorprobe"]
+              volumeMounts:
+              - name: mb-volume
+                subPath: geoip
+                mountPath: "/usr/local/geoip/share/GeoIP"
+                readOnly: true
+              - name: configs
+                subPath: mirrorbrain.conf
+                mountPath: "/etc/mirrorbrain.conf"
+                readOnly: true
+              resources:
+                requests:
+                  memory: "64Mi"
+                  cpu: "20m"
+                limits:
+                  memory: "64Mi"
+                  cpu: "20m"
+          volumes:
+          - name: mb-volume
+            persistentVolumeClaim:
+              claimName: mirrorbrain-support-pvc
+          - name: configs
+            configMap:
+              name: mb-configs
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "storage"
