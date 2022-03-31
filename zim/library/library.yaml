@@ -93,13 +93,3 @@ spec:
             name: library-service
             port:
               number: 80
-  - host: library.test.k8s.kiwix.org
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: library-service
-            port:
-              number: 80

@@ -60,17 +60,17 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-    namespace: test
-    name: test-service
-    labels:
-        app: test-app
+  namespace: test
+  name: test-service
+  labels:
+    app: test-app
 spec:
-    selector:
-        app: test-app
-    ports:
-        - protocol: TCP
-          port: 80
-          targetPort: 8080
+  selector:
+    app: test-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8080
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
