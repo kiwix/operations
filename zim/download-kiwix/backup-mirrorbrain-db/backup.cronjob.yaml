@@ -1,16 +1,15 @@
 apiVersion: batch/v1
-kind: Job
-# kind: CronJob
+kind: CronJob
 metadata:
   name: backup-mirrorbrain-db
   namespace: zim
 spec:
-  # schedule: "0 3 * * *"
-  # successfulJobsHistoryLimit: 1
-  # failedJobsHistoryLimit: 2
-  # concurrencyPolicy: Forbid
-  # jobTemplate:
-  #   spec:
+  schedule: "0 3 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
       backoffLimit: 2
       template:
         spec:
