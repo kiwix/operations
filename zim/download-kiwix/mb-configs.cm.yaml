@@ -264,6 +264,7 @@ data:
     # If your host doesn't have a registered DNS name, enter its IP address here.
     #
     #ServerName www.example.com:80
+    ServerName download.kiwix.org:80
 
 
     #
@@ -303,6 +304,7 @@ data:
     # container, that host's errors will be logged there and not here.
     #
     ErrorLog /proc/self/fd/2
+    ErrorLog logs/custom/error.log
 
     #
     # LogLevel: Control the number of messages logged to the error_log.
@@ -319,6 +321,11 @@ data:
         LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
         LogFormat "%h %l %u %t \"%r\" %>s %b" common
 
+        # Custom `vhost` log format that we use on nginx as well
+        # and which is adapted for matomo-log-uploader
+        # log_format vhost '$host $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"';
+        LogFormat "%v %h - %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" vhost
+
         <IfModule logio_module>
           # You need to enable mod_logio.c to use %I and %O
           LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\" %I %O" combinedio
@@ -331,13 +338,15 @@ data:
         # define per-<VirtualHost> access logfiles, transactions will be
         # logged therein and *not* in this file.
         #
-        CustomLog /proc/self/fd/1 common
+        #CustomLog /proc/self/fd/1 common
+        CustomLog /proc/self/fd/1 vhost
 
         #
         # If you prefer a logfile with access, agent, and referer information
         # (Combined Logfile Format) you can use the following directive.
         #
         #CustomLog "logs/access_log" combined
+        CustomLog "logs/custom/access.log" vhost
     </IfModule>
 
     <IfModule alias_module>

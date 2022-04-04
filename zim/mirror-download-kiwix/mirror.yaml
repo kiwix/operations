@@ -8,7 +8,6 @@ data:
     server {
       listen 80;
       server_name _;
-      access_log /var/log/nginx/access.log vhost;
       access_log /dev/stdout vhost;
       root /var/www/download.kiwix.org;
       default_type application/octet-stream;
