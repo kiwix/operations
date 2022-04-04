@@ -21,9 +21,6 @@ spec:
         name: dropbox
         env:
           - name: PUBKEYS
-            value: ""
-        env:
-          - name: PUBKEYS
             valueFrom:
               configMapKeyRef:
                 name: dropbox-pubkeys
