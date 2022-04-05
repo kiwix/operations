@@ -43,6 +43,10 @@ spec:
           subPath: httpd.conf
           mountPath: "/usr/local/apache2/conf/httpd.conf"
           readOnly: true
+        - name: configs
+          subPath: httpd-vhosts.conf
+          mountPath: "/usr/local/apache2/conf/extra/httpd-vhosts.conf"
+          readOnly: true
         - mountPath: "/usr/local/apache2/logs/custom"
           subPath: download-kiwix
           name: nginx-logs-volume
