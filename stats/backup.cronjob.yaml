@@ -4,7 +4,7 @@ metadata:
   name: backup
   namespace: stats
 spec:
-  schedule: "0 2 * * *"
+  schedule: "0 1 * * 0"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 2
   concurrencyPolicy: Forbid

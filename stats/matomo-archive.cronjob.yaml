@@ -4,7 +4,7 @@ metadata:
   name: matomo-archive
   namespace: stats
 spec:
-  schedule: "5 * * * *"
+  schedule: "5 */2 * * 1-6"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 2
   concurrencyPolicy: Forbid
