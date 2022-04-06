@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-configs
+  namespace: cardshop
+data:
+  # previous hosting (sloppy) required different internal-usage URL
+  CARDSHOP_API_INTERNAL_URL: "https://api.cardshop.hotspot.kiwix.org"
+  CARDSHOP_API_URL: "https://api.cardshop.hotspot.kiwix.org"
+  # url to the manager API to create user accountd
+  MANAGER_API_URL: "https://cardshop.hotspot.kiwix.org/api"
+  # public url to display link to
+  PUBLIC_URL: "https://cardshop.hotspot.kiwix.org"
+  SHOP_PUBLIC_URL: "https://www.kiwix.org/en/cardshop-access/"
+  # URLS for download/upload warehouses
+  DEFAULT_WAREHOUSE_DOWNLOAD_URI: "s3://s3.us-west-1.wasabisys.com/?bucketName=org-kiwix-hotspot-cardshop-warehouse"
+  DEFAULT_WAREHOUSE_UPLOAD_URI: "s3://s3.us-west-1.wasabisys.com/?bucketName=org-kiwix-hotspot-cardshop-warehouse"
+  DOWNLOAD_WAREHOUSE_DOWNLOAD_URI: "https+torrent://org-kiwix-hotspot-cardshop-download.s3.us-west-1.wasabisys.com"
+  DOWNLOAD_WAREHOUSE_UPLOAD_URI: "s3://s3.us-west-1.wasabisys.com/?bucketName=org-kiwix-hotspot-cardshop-download"
+  # mail sending via mailgun
+  MAILGUN_API_URL: "https://api.mailgun.net/v3/cardshop.hotspot.kiwix.org"
+  MAIL_FROM: "Hotspot Cardshop <hotspot@kiwix.org>"
+  # Stripe shop configuration
+  STRIPE_PUBLIC_API_KEY: "pk_live_GEcXcJPSS1WkxsOtEQceoIWo"
+  STRIPE_METHOD_ACCESS1M: "payment"
+  STRIPE_METHOD_ACCESS1Y: "payment"
+  STRIPE_METHOD_WP: "payment"
+  STRIPE_PRICE_ACCESS1M: "price_1Ho6CQFwbeEkT8504VEpsIXc"
+  STRIPE_PRICE_ACCESS1Y: "price_1Ho6CLFwbeEkT850egikS1sr"
+  STRIPE_PRICE_WPDE: "price_1Ho6C4FwbeEkT850hC2koYgD"
+  STRIPE_PRICE_WPEN: "price_1IktiCFwbeEkT850dKcdIH3n"
+  STRIPE_PRICE_WPES: "price_1Ho6CAFwbeEkT8503UK7o4TS"
+  STRIPE_PRICE_WPFR: "price_1Ho6BwFwbeEkT850tNTrQi2c"
+  # debugging emails
+  TEST_EMAIL: "reg@kiwix.org"
+  FAILED_ORDER_EMAIL: "reg+cardshop-errors@kiwix.org"
+  # should not be used
+  # RESET_DB: "1"

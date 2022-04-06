@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: cardshop
+  labels:
+    app: ui-app
+  name: ui-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ui-app
+  template:
+    metadata:
+      labels:
+        app: ui-app
+    spec:
+      containers:
+      - image: ghcr.io/offspot/cardshop-manager:latest
+        imagePullPolicy: Always
+        name: ui
+        envFrom:
+        - configMapRef:
+            name: ui-configs
+        - secretRef:
+            name: ui-secrets
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "300m"
+          limits:
+            memory: "512Mi"
+            cpu: "300m"
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+    namespace: cardshop
+    name: ui-service
+    labels:
+        app: ui-app
+spec:
+    selector:
+        app: ui-app
+    ports:
+        - protocol: TCP
+          port: 80
+          targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ui-ingress
+  namespace: cardshop
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+      - cardshop.hotspot.kiwix.org
+      secretName: cardshop-hotspot-kiwix-org-tls
+  rules:
+  - host: cardshop.hotspot.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ui-service
+            port:
+              number: 80

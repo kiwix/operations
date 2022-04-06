@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: api-db-backup
+  namespace: cardshop
+spec:
+  schedule: "@daily"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            - name: borg-backup
+              image: ghcr.io/kiwix/borg-backup:latest
+              imagePullPolicy: Always
+              envFrom:
+              - secretRef:
+                  name: api-db-backup-credentials
+              - configMapRef:
+                  name: api-db-backup-configs
+              command: ["single-backup"]
+              resources:
+                requests:
+                  cpu: 200m
+                  memory: 512Mi
+                limits:
+                  cpu: 200m
+                  memory: 512Mi
+          volumes:
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "services"

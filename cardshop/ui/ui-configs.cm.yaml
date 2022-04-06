@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ui-configs
+  namespace: cardshop
+data:
+  # `y` to disable manager ui completely
+  MAINTENANCE_MODE: "n"
+  # url to display on links
+  CARDSHOP_PUBLIC_URL: "https://cardshop.hotspot.kiwix.org"
+  # api url to query
+  CARDSHOP_API_URL: "https://api.cardshop.hotspot.kiwix.org"
+  # mail sending details
+  MAILGUN_API_URL: "https://api.mailgun.net/v3/cardshop.hotspot.kiwix.org"
+  MAIL_FROM: "Hotspot Cardshop <hotspot@kiwix.org>"
+  # status health-check details
+  STATUS_CARDSHOP_API_URL: "https://api.cardshop.hotspot.kiwix.org"
+  STATUS_CARDSHOP_URL: "https://cardshop.hotspot.kiwix.org"
+  STATUS_S3_URL: "http://org-kiwix-hotspot-cardshop-download.s3.us-west-1.wasabisys.com"
+  STATUS_SCHEDULER_USERNAME: "status"
+  STATUS_MANAGER_USERNAME: "status"
+  # email to display for support requests
+  SUPPORT_EMAIL: "hotspot@kiwix.org"
+  # time to cache the catalog for
+  CACHE_TIMEOUT: "10800"
