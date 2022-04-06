@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zimfarm
+  labels:
+    app: api-db-app
+  name: api-db-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-db-app
+  template:
+    metadata:
+      labels:
+        app: api-db-app
+    spec:
+      containers:
+      - image: docker.io/mongo:4.2.9
+        imagePullPolicy: Always
+        name: mongodb
+        envFrom:
+        - secretRef:
+            name: api-db-secrets
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/data/db"
+          readOnly: false
+        ports:
+        - containerPort: 27017
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "500m"
+          limits:
+            memory: "4Gi"
+            cpu: "500m"
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: zimfarm-api-db-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+    namespace: zimfarm
+    name: api-db-service
+    labels:
+        app: api-db-app
+spec:
+    selector:
+        app: api-db-app
+    ports:
+        - protocol: TCP
+          port: 27017
+          targetPort: 27017

@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-configs
+  namespace: zimfarm
+data:
+  # comment-out to enable scheduler
+  DISABLE_SCHEDULER: "1"
+  # mail-sending, API-key in secret
+  MAILGUN_API_URL: "https://api.mailgun.net/v3/mg.farm.openzim.org"
+  MAILGUN_FROM: "Zimfarm <info@farm.openzim.org>"
+  # per-offliner limitations
+  PLATFORM_wikimedia_MAX_TASKS_PER_WORKER: "2"
+  PLATFORM_youtube_MAX_TASKS_PER_WORKER: "1"
+  PLATFORM_wikihow_MAX_TASKS_PER_WORKER: "1"
+  PLATFORM_wikihow_MAX_TASKS_TOTAL: "1"
+  # log and ZIM uploads. log-upload uri in secret (token inside)
+  ZIM_UPLOAD_URI: "sftp://uploader@warehouse.farm.openzim.org:30122/zim"
+  LOGS_EXPIRATION: "60"
+  # notifications
+  GLOBAL_NOTIFICATION_ended: "slack,#zimfarm-events"
+  # registries where to pull image versions from
+  DOCKER_REGISTRY_zimit: "ghcr.io"
+  DOCKER_REGISTRY_mwoffliner: "ghcr.io"
+  # zimcheck option passed to worker
+  ZIMCHECK_OPTION: "--all"
+  # wasabi whitelist
+  USES_WORKERS_IPS_WHITELIST: "1"
+  WHITELISTED_IPS: "185.15.56.0/24,195.154.156.115,195.154.81.22,51.159.108.60,51.159.30.163,51.159.158.1,51.159.132.199"
+  WASABI_WHITELIST_POLICY_ARN: "arn:aws:iam::100000050990:policy/ZimfarmWorker"
+  WASABI_WHITELIST_STATEMENT_ID: "ZimfarmWorkersIPsWhiteList"
+  # CMS connection
+  INFORM_CMS: "1"
+  CMS_ENDPOINT: "https://api.cms.openzim.org/v1/books/add"
+  # obsolete keys
+  # SOCKET_URI: "tcp://relay.backend.zimfarm.kiwixoffline.node.intern:5000"
