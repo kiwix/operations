@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: telco
+  labels:
+    app: watcherbot-app
+  name: watcherbot-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: watcherbot-app
+  template:
+    metadata:
+      labels:
+        app: watcherbot-app
+    spec:
+      containers:
+      - image: docker.io/kiwix/watcherbot:latest
+        imagePullPolicy: Always
+        name: watcherbot
+        envFrom:
+        - secretRef:
+            name: watcherbot-secrets
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "1m"
+          limits:
+            memory: "128Mi"
+            cpu: "1m"
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
