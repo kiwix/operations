@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-configs
+  namespace: zimit
+data:
+  ZIM_EXPIRATION: "7"
+  LOGS_EXPIRATION: "7"
+  DOCKER_REGISTRY_zimit: "ghcr.io"
+  ZIMFARM_DISALLOW_CAPABILITIES: "y"

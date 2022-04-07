@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: youzim-it
+  namespace: zimit
+spec:
+  secretName: youzim-it-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: youzim.it
+  dnsNames:
+  - youzim.it

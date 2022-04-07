@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zimit
+  labels:
+    app: farm-ui-app
+  name: farm-ui-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: farm-ui-app
+  template:
+    metadata:
+      labels:
+        app: farm-ui-app
+    spec:
+      containers:
+      - image: ghcr.io/openzim/zimfarm-ui:latest
+        imagePullPolicy: Always
+        name: farm-ui
+        envFrom:
+        - configMapRef:
+            name: farm-ui-configs
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "20m"
+          limits:
+            memory: "64Mi"
+            cpu: "20m"
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+    namespace: zimit
+    name: farm-ui-service
+    labels:
+        app: farm-ui-app
+spec:
+    selector:
+        app: farm-ui-app
+    ports:
+        - protocol: TCP
+          port: 80
+          targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: farm-ui-ingress
+  namespace: zimit
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+      - farm.youzim.it
+      secretName: farm-youzim-it-tls
+  rules:
+  - host: farm.youzim.it
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: farm-ui-service
+            port:
+              number: 80

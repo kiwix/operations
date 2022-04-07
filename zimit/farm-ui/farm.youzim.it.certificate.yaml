@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: farm-youzim-it
+  namespace: zimit
+spec:
+  secretName: farm-youzim-it-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: farm.youzim.it
+  dnsNames:
+  - farm.youzim.it
