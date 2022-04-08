@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: cms-openzim-org
+  namespace: cms
+spec:
+  secretName: cms-openzim-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: cms.openzim.org
+  dnsNames:
+  - cms.openzim.org

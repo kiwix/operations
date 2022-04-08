@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ui-configs
+  namespace: cms
+data:
+  CMS_BACKEND_API: "https://api.cms.openzim.org/v1"

@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: cms
+  labels:
+    app: api-db-app
+  name: api-db-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-db-app
+  template:
+    metadata:
+      labels:
+        app: api-db-app
+    spec:
+      containers:
+      - image: docker.io/library/postgres:10.4
+        imagePullPolicy: IfNotPresent
+        name: postgres
+        envFrom:
+        - secretRef:
+            name: api-db-secrets
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/var/lib/postgresql/data"
+          readOnly: false
+        ports:
+        - containerPort: 5432
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "200m"
+          limits:
+            memory: "1Gi"
+            cpu: "200m"
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: cms-db-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+    namespace: cms
+    name: api-db-service
+    labels:
+        app: api-db-app
+spec:
+    selector:
+        app: api-db-app
+    ports:
+        - protocol: TCP
+          port: 5432
+          targetPort: 5432

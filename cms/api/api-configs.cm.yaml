@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-configs
+  namespace: cms
+data:
+  ALLOWED_ORIGINS: "https://cms.openzim.org"
+  MAX_WORKERS: "1"
