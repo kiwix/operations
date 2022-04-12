@@ -29,10 +29,10 @@ spec:
         resources:
           requests:
             memory: "1Gi"
-            cpu: "400m"
+            cpu: "800m"
           limits:
             memory: "1Gi"
-            cpu: "400m"
+            cpu: "800m"
       nodeSelector:
         k8s.kiwix.org/role: "services"
 ---
