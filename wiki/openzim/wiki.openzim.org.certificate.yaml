@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wiki-openzim-org
+  namespace: wiki
+spec:
+  secretName: wiki-openzim-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: wiki.openzim.org
+  dnsNames:
+  - wiki.openzim.org

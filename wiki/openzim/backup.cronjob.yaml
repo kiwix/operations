@@ -1,0 +1,56 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: openzim-wiki-backup
+  namespace: wiki
+spec:
+  schedule: "@daily"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            - name: borg-backup
+              image: ghcr.io/kiwix/borg-backup:latest
+              imagePullPolicy: Always
+              envFrom:
+              - secretRef:
+                  name: openzim-wiki-backup-credentials
+              - configMapRef:
+                  name: openzim-wiki-backup-configs
+              command: ["single-backup"]
+              volumeMounts:
+              - name: data-volume
+                subPath: config
+                mountPath: "/storage/config"
+                readOnly: true
+              - name: data-volume
+                subPath: download
+                mountPath: "/storage/download"
+                readOnly: true
+              - name: data-volume
+                subPath: images
+                mountPath: "/storage/images"
+                readOnly: false
+              - name: data-volume
+                subPath: site_root
+                mountPath: "/storage/site_root"
+                readOnly: true
+              resources:
+                requests:
+                  cpu: 200m
+                  memory: 384Mi
+                limits:
+                  cpu: 200m
+                  memory: 384Mi
+          volumes:
+          - name: data-volume
+            persistentVolumeClaim:
+              claimName: openzim-wiki-pvc
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "services"

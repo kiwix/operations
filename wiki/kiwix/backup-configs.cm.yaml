@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kiwix-wiki-backup-configs
+  namespace: wiki
+data:
+  BITWARDEN_EMAIL: "contact+bitwarden-slave@kiwix.org"
+  BORGBASE_NAME: "kiwix-wiki"
+  # not secret, set in container, not reachable outside
+  DATABASES: "mysql://my_wiki:my_wiki@kiwix-wiki-service:3306/my_wiki"
+  CROSS_FS_GLOB: "1"

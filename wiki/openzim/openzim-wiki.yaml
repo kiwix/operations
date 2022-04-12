@@ -1,0 +1,116 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: wiki
+  labels:
+    app: openzim-wiki-app
+  name: openzim-wiki-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: openzim-wiki-app
+  template:
+    metadata:
+      labels:
+        app: openzim-wiki-app
+    spec:
+      containers:
+      - image: ghcr.io/offspot/mediawiki:1.36.1
+        imagePullPolicy: Always
+        name: mediawiki
+        envFrom:
+        - configMapRef:
+            name: openzim-wiki-configs
+        - secretRef:
+            name: openzim-wiki-secrets
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/var/www/data"
+          readOnly: false
+        ports:
+        - containerPort: 80
+        - containerPort: 3306
+        resources:
+          requests:
+            memory: "704Mi"
+            cpu: "300m"
+          limits:
+            memory: "704Mi"
+            cpu: "300m"
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: openzim-wiki-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: wiki
+  name: openzim-wiki-service
+  labels:
+    app: openzim-wiki-app
+spec:
+  selector:
+    app: openzim-wiki-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
+  - name: mysql
+    protocol: TCP
+    port: 3306
+    targetPort: 3306
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: openzim-wiki-ingress
+  namespace: wiki
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+      - wiki.openzim.org
+      secretName: wiki-openzim-org-tls
+    - hosts:
+      - www.openzim.org
+      secretName: www-openzim-org-tls
+    - hosts:
+      - openzim.org
+      secretName: openzim-org-tls
+  rules:
+  - host: wiki.openzim.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: openzim-wiki-service
+            port:
+              name: http
+  - host: www.openzim.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: openzim-wiki-service
+            port:
+              name: http
+  - host: openzim.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: openzim-wiki-service
+            port:
+              name: http

@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kiwix-wiki-configs
+  namespace: wiki
+data:
+  DATABASE_TYPE: "mysql"
+  URL: "https://wiki.kiwix.org"
