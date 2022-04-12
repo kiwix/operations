@@ -79,11 +79,11 @@ spec:
           - containerPort: 22
         resources:
           requests:
-            memory: "64Mi"
-            cpu: "100m"
+            memory: "128Mi"
+            cpu: "200m"
           limits:
-            memory: "64Mi"
-            cpu: "100m"
+            memory: "128Mi"
+            cpu: "200m"
       volumes:
       - name: download-volume
         persistentVolumeClaim:
