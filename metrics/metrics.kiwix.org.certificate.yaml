@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: metrics-kiwix-org
+  namespace: metrics
+spec:
+  secretName: metrics-kiwix-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: metrics.kiwix.org
+  dnsNames:
+  - metrics.kiwix.org

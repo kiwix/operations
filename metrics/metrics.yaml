@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: metrics
+  labels:
+    app: metrics-app
+  name: metrics-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metrics-app
+  template:
+    metadata:
+      labels:
+        app: metrics-app
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/metrics:latest
+        imagePullPolicy: Always
+        name: metrics
+        envFrom:
+        - configMapRef:
+            name: metrics-configs
+        - secretRef:
+            name: metrics-secrets
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/var/lib/elasticsearch"
+          readOnly: false
+        ports:
+        - containerPort: 5601
+        - containerPort: 3306
+        - containerPort: 9200
+        resources:
+          requests:
+            memory: "3Gi"
+            cpu: "1000m"
+          # limits:
+          #   memory: "3Gi"
+          #   cpu: "300m"
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: metrics-db-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "stats"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: metrics
+  name: metrics-service
+  labels:
+    app: metrics-app
+spec:
+  selector:
+    app: metrics-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 5601
+  - name: elasticsearch
+    protocol: TCP
+    port: 9200
+    targetPort: 9200
+  - name: mysql
+    protocol: TCP
+    port: 3306
+    targetPort: 3306
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: metrics-ingress
+  namespace: metrics
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+      - metrics.kiwix.org
+      secretName: metrics-kiwix-org-tls
+  rules:
+  - host: metrics.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: metrics-service
+            port:
+              name: http
+  - host: metrics.test.k8s.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: metrics-service
+            port:
+              name: http

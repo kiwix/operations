@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: metrics-configs
+  namespace: metrics
+data:
+  PROJECT_NAME: Kiwix development metrics
