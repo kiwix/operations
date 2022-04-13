@@ -1,0 +1,54 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: wp1-redirects-gen
+  namespace: zim
+spec:
+  schedule: "@hourly"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            # estimated duration: 5mn
+            - name: alpine
+              image: docker.io/library/alpine:3
+              imagePullPolicy: IfNotPresent
+              volumeMounts:
+              - mountPath: "/etc/nginx/maps"
+                name: openzim-maps-volume
+                readOnly: false
+              - mountPath: "/var/www/download.openzim.org"
+                name: openzim-volume
+                readOnly: false
+              - mountPath: "/create_wp1_redirects.sh"
+                name: gen-scripts-volume
+                subPath: "create_wp1_redirects.sh"
+                readOnly: true
+              command: ["sh"]
+              args: ["create_wp1_redirects.sh"]
+              resources:
+                requests:
+                  memory: "128Mi"
+                  cpu: "100m"
+                limits:
+                  memory: "128Mi"
+                  cpu: "100m"
+          volumes:
+            - name: gen-scripts-volume
+              configMap:
+                name: gen-scripts
+                defaultMode: 0755
+            - name: openzim-volume
+              persistentVolumeClaim:
+                claimName: openzim-download-pvc
+            - name: openzim-maps-volume
+              persistentVolumeClaim:
+                claimName: openzim-maps-pvc
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "storage"

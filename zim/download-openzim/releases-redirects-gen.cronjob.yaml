@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: redirects-gen
+  name: releases-redirects-gen
   namespace: zim
 spec:
   schedule: "@hourly"
@@ -14,8 +14,9 @@ spec:
       template:
         spec:
           containers:
+            # estimated duration: <2s
             - name: alpine
-              image: docker.io/alpine:3
+              image: docker.io/library/python:3.10-alpine
               imagePullPolicy: IfNotPresent
               volumeMounts:
               - mountPath: "/etc/nginx/maps"
@@ -24,19 +25,19 @@ spec:
               - mountPath: "/var/www/download.openzim.org"
                 name: openzim-volume
                 readOnly: false
-              - mountPath: "/create_wp1_redirects.sh"
+              - mountPath: "/create_releases_redirects.py"
                 name: gen-scripts-volume
-                subPath: "create_wp1_redirects.sh"
+                subPath: "create_releases_redirects.py"
                 readOnly: true
-              command: ["sh"]
-              args: ["create_wp1_redirects.sh"]
+              command: ["python"]
+              args: ["create_releases_redirects.py"]
               resources:
                 requests:
-                  memory: "512Mi"
-                  cpu: "200m"
+                  memory: "128Mi"
+                  cpu: "100m"
                 limits:
-                  memory: "512Mi"
-                  cpu: "200m"
+                  memory: "128Mi"
+                  cpu: "100m"
           volumes:
             - name: gen-scripts-volume
               configMap:
@@ -48,6 +49,6 @@ spec:
             - name: openzim-maps-volume
               persistentVolumeClaim:
                 claimName: openzim-maps-pvc
-          restartPolicy: OnFailure
+          restartPolicy: Never
           nodeSelector:
             k8s.kiwix.org/role: "storage"

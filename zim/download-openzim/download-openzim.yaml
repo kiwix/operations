@@ -54,7 +54,22 @@ spec:
       labels:
         app: download-openzim-app
     spec:
+      shareProcessNamespace: true
       containers:
+      - image: docker.io/library/bash:5-alpine3.15
+        imagePullPolicy: IfNotPresent
+        name: reloader
+        # reload nginx config every hour at *:10
+        command: ["crond", "-f"]
+        volumeMounts:
+        - name: nginx-configs-scripts
+          mountPath: "/usr/bin/reload-nginx"
+          subPath: reload-nginx.sh
+          readOnly: true
+        - name: nginx-configs-scripts
+          mountPath: "/etc/crontabs/root"
+          subPath: reload-nginx.crontab
+          readOnly: true
       - image: docker.io/nginx:1.21
         imagePullPolicy: IfNotPresent
         name: nginx
@@ -110,6 +125,10 @@ spec:
       - name: nginx-configs
         configMap:
           name: nginx-configs
+      - name: nginx-configs-scripts
+        configMap:
+          name: nginx-configs
+          defaultMode: 0755
       nodeSelector:
         k8s.kiwix.org/role: "storage"
 ---

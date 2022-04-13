@@ -117,3 +117,21 @@ data:
   # reusing format defined in nginxproxy/nginx-proxy:0.9 that we've been using for years
   vhost-logfmt.conf: |
     log_format vhost '$host $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"';
+  reload-nginx.sh: |
+    #!/usr/bin/env bash
+    echo "About to reload nginx…"
+    pids_str=$(pidof nginx)
+    pids=(${pids_str//:/ })
+    for pid in "${pids[@]}"; do
+        ppid=$(cat /proc/$pid/status |grep PPid | sed 's/PPid\:\s//')
+        if [ "${ppid}" = "0" ]; then
+            echo "> FOUND. Restarting PID=${pid} (PPID=${ppid})"
+            kill -s HUP $pid
+            break
+        # else
+        #     echo "not nginx: ${pid}/${ppid}"
+        fi
+    done
+  reload-nginx.crontab: |
+    # min hour    day     month   weekday command
+    10    *       *       *       *       /usr/bin/reload-nginx

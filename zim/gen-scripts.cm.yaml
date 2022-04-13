@@ -141,6 +141,59 @@ data:
     }
 
     exit 0;
+  create_releases_redirects.py: |
+    #!/usr/bin/env python3
+
+    import pathlib
+    import re
+
+
+    release_dir = "release"
+    content_fpath = pathlib.Path("/var/www/download.openzim.org")
+    release_fpath = content_fpath / release_dir
+    redirects_map_fpath = pathlib.Path("/etc/nginx/maps/openzim.map")
+
+    releases = {
+        "libzim/libzim.tar.xz": "libzim-*.tar.xz",
+        "libzim/libzim_linux-x86_64.tar.gz": "libzim_linux-x86_64-*.tar.gz",
+        "libzim/libzim_macos-x86_64.tar.gz": "libzim_macos-x86_64-*.tar.gz",
+        "zim-tools/zim-tools.tar.xz": "zim-tools-*.tar.xz",
+        "zim-tools/zim-tools_linux-x86_64.tar.gz": "zim-tools_linux-x86_64-*.tar.gz",
+        "zimwriterfs/zimwriterfs.tar.xz": "zimwriterfs-*.tar.xz",
+        "zimwriterfs/zimwriterfs_linux-x86_64.tar.gz": "zimwriterfs_linux-x86_64-*.tar.gz",
+    }
+
+
+    def get_latest_release_path(pattern):
+        """content_fpath-relative path of latest matching file"""
+
+        # retrieve list of files using glob
+        files = list(release_fpath.rglob(pattern))
+
+        # create regex from simple “glob” pattern
+        version_reg = re.compile(pattern.replace("*", "(?P<version>.+)"))
+
+        # get latest version and related file by sorting all matching files
+        # on their version number ; keeping last of list
+        latest_version, lastest_fpath = sorted(
+            [(version_reg.match(p.name).groupdict()["version"], p) for p in files],
+            key=lambda v: v[0],
+        )[-1]
+
+        return lastest_fpath.relative_to(content_fpath)
+
+
+    print(f"Rewriting {redirects_map_fpath}...")
+    content = "# openZIM releases redirects: no-version to latest\n"
+    for path, pattern in releases.items():
+        content += f"/{release_dir}/{path} /{get_latest_release_path(pattern)};\n"
+
+
+    with open(redirects_map_fpath, "w") as fh:
+        fh.write(content)
+
+    print(f"> OK. Wrote {len(content.splitlines()) -1 } redirects")
+
   genRSS.py: |
     #!/usr/bin/env python3
     # encoding: utf-8
