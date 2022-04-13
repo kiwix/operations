@@ -52,11 +52,11 @@ spec:
         - containerPort: 3306
         resources:
           requests:
-            memory: "8Gi"
-            cpu: "2000m"
-          limits:
-            memory: "8Gi"
-            cpu: "2000m"
+            memory: "4Gi"
+            cpu: "1000m"
+          # limits:
+          #   memory: "8Gi"
+          #   cpu: "2000m"
       volumes:
       - name: data-volume
         persistentVolumeClaim:
