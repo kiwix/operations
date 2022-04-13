@@ -234,9 +234,9 @@ def conv_resources(spec):
     has_identical_cpu = has_identical_memory = True
     cpu = memory = 0
     for container in spec.get("initContainers", []) + spec.get("containers", []):
-        requests_cpu = get_cpu(container["resources"].get("limits", {}).get("cpu"))
+        requests_cpu = get_cpu(container["resources"].get("requests", {}).get("cpu"))
         requests_memory = get_memory(
-            container["resources"].get("limits", {}).get("memory")
+            container["resources"].get("requests", {}).get("memory")
         )
         limit_cpu = get_cpu(container["resources"].get("limits", {}).get("cpu"))
         limit_memory = get_memory(
