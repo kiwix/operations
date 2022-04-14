@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: wikifundi
+  labels:
+    app: wikifundi-fr-app
+  name: wikifundi-fr-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wikifundi-fr-app
+  template:
+    metadata:
+      labels:
+        app: wikifundi-fr-app
+    spec:
+      containers:
+      - image: ghcr.io/offspot/wikifundi-fr:latest
+        imagePullPolicy: Always
+        name: wikifundi
+        env:
+          - name: CLEAN
+            value: "1"
+          - name: MIRRORING
+            value: "1"
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "768Mi"
+            cpu: "300m"
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: wikifundi
+  name: wikifundi-fr-service
+  labels:
+    app: wikifundi-fr-app
+spec:
+  selector:
+    app: wikifundi-fr-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: wikifundi-fr-ingress
+  namespace: wikifundi
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # https://kubernetes.github.io/ingress-nginx/examples/auth/basic/
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: basic-auth
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - WikiFundi'
+spec:
+  tls:
+    - hosts:
+      - wikifundi-fr.openzim.org
+      secretName: wikifundi-fr-openzim-org-tls
+  rules:
+  - host: wikifundi-fr.openzim.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: wikifundi-fr-service
+            port:
+              name: http

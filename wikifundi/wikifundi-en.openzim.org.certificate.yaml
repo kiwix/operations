@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wikifundi-en-openzim-org
+  namespace: wikifundi
+spec:
+  secretName: wikifundi-en-openzim-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: wikifundi-en.openzim.org
+  dnsNames:
+  - wikifundi-en.openzim.org
