@@ -48,9 +48,6 @@ spec:
           requests:
             memory: "512Mi"
             cpu: "200m"
-          limits:
-            memory: "512Mi"
-            cpu: "200m"
       volumes:
       - name: download-volume
         persistentVolumeClaim:
@@ -73,7 +70,7 @@ spec:
   selector:
     app: receiver-app
   ports:
-    - protocol: TCP
-      port: 30122
-      targetPort: 22
-      nodePort: 30122
+  - protocol: TCP
+    port: 30122
+    targetPort: 22
+    nodePort: 30122

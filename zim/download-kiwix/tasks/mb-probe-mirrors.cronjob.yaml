@@ -31,9 +31,6 @@ spec:
                 requests:
                   memory: "64Mi"
                   cpu: "20m"
-                limits:
-                  memory: "64Mi"
-                  cpu: "20m"
           volumes:
           - name: mb-volume
             persistentVolumeClaim:

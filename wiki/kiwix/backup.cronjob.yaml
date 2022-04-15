@@ -6,7 +6,7 @@ metadata:
 spec:
   schedule: "@daily"
   successfulJobsHistoryLimit: 1
-  failedJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -42,9 +42,6 @@ spec:
                 readOnly: true
               resources:
                 requests:
-                  cpu: 200m
-                  memory: 384Mi
-                limits:
                   cpu: 200m
                   memory: 384Mi
           volumes:

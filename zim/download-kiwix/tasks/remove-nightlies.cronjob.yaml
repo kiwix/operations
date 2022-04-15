@@ -25,19 +25,12 @@ spec:
               - mountPath: "/var/www/download.openzim.org"
                 name: openzim-volume
                 readOnly: false
-              # - name: tmp-kiwix-volume
-              #   subPath: ci
-              #   mountPath: "/var/www/tmp.kiwix.org/ci"
-              #   readOnly: false
               - name: scripts
                 subPath: remove-nightlies.sh
                 mountPath: "/usr/local/bin/remove-nightlies"
                 readOnly: true
               resources:
                 requests:
-                  memory: "128Mi"
-                  cpu: "20m"
-                limits:
                   memory: "128Mi"
                   cpu: "20m"
           volumes:

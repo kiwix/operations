@@ -34,9 +34,6 @@ spec:
                 requests:
                   memory: "64Mi"
                   cpu: "1000m"
-                limits:
-                  memory: "64Mi"
-                  cpu: "1000m"
           volumes:
           - name: download-volume
             persistentVolumeClaim:

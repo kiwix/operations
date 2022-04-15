@@ -28,9 +28,6 @@ spec:
           requests:
             memory: "256Mi"
             cpu: "100m"
-          limits:
-            memory: "256Mi"
-            cpu: "100m"
         ports:
           # using hostPort is reliable with any FTP client for passive mode
           # using nodePort on all but :21 (hostPort) works with some but not all clients

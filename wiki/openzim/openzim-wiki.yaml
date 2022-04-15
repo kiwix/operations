@@ -35,9 +35,6 @@ spec:
           requests:
             memory: "704Mi"
             cpu: "300m"
-          limits:
-            memory: "704Mi"
-            cpu: "300m"
       volumes:
       - name: data-volume
         persistentVolumeClaim:

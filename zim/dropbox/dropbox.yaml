@@ -81,9 +81,6 @@ spec:
           requests:
             memory: "128Mi"
             cpu: "200m"
-          limits:
-            memory: "128Mi"
-            cpu: "200m"
       volumes:
       - name: download-volume
         persistentVolumeClaim:
@@ -117,7 +114,7 @@ spec:
   selector:
     app: dropbox-app
   ports:
-    - protocol: TCP
-      port: 30022
-      targetPort: 22
-      nodePort: 30022
+  - protocol: TCP
+    port: 30022
+    targetPort: 22
+    nodePort: 30022

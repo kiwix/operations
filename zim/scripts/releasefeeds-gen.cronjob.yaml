@@ -39,9 +39,6 @@ spec:
                 requests:
                   memory: "64Mi"
                   cpu: "100m"
-                limits:
-                  memory: "64Mi"
-                  cpu: "100m"
           volumes:
             - name: gen-scripts-volume
               configMap:

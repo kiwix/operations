@@ -31,10 +31,7 @@ spec:
         resources:
           requests:
             memory: "1Gi"
-            cpu: "200m"
-          limits:
-            memory: "1Gi"
-            cpu: "200m"
+            cpu: "300m"
       volumes:
       - name: data-volume
         persistentVolumeClaim:
@@ -45,14 +42,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-    namespace: cms
-    name: api-db-service
-    labels:
-        app: api-db-app
+  namespace: cms
+  name: api-db-service
+  labels:
+    app: api-db-app
 spec:
-    selector:
-        app: api-db-app
-    ports:
-        - protocol: TCP
-          port: 5432
-          targetPort: 5432
+  selector:
+    app: api-db-app
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432

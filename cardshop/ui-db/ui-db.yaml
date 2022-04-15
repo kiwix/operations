@@ -33,9 +33,6 @@ spec:
           requests:
             memory: "1280Mi"
             cpu: "200m"
-          limits:
-            memory: "1280Mi"
-            cpu: "200m"
       volumes:
       - name: data-volume
         persistentVolumeClaim:
@@ -46,14 +43,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-    namespace: cardshop
-    name: ui-db-service
-    labels:
-        app: ui-db-app
+  namespace: cardshop
+  name: ui-db-service
+  labels:
+    app: ui-db-app
 spec:
-    selector:
-        app: ui-db-app
-    ports:
-        - protocol: TCP
-          port: 3306
-          targetPort: 3306
+  selector:
+    app: ui-db-app
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306

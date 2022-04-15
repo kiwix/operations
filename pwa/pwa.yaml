@@ -25,26 +25,23 @@ spec:
           requests:
             memory: "16Mi"
             cpu: "1m"
-          limits:
-            memory: "16Mi"
-            cpu: "1m"
       nodeSelector:
         k8s.kiwix.org/role: "services"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-    namespace: pwa
-    name: pwa-service
-    labels:
-        app: pwa-app
+  namespace: pwa
+  name: pwa-service
+  labels:
+    app: pwa-app
 spec:
-    selector:
-        app: pwa-app
-    ports:
-        - protocol: TCP
-          port: 80
-          targetPort: 80
+  selector:
+    app: pwa-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

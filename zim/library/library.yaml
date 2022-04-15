@@ -36,9 +36,6 @@ spec:
           requests:
             memory: "6Gi"
             cpu: "1000m"
-          limits:
-            memory: "6Gi"
-            cpu: "1000m"
       volumes:
       - name: download-volume
         persistentVolumeClaim:
@@ -55,17 +52,17 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-    namespace: zim
-    name: library-service
-    labels:
-        app: library-app
+  namespace: zim
+  name: library-service
+  labels:
+    app: library-app
 spec:
-    selector:
-        app: library-app
-    ports:
-        - protocol: TCP
-          port: 80
-          targetPort: 80
+  selector:
+    app: library-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

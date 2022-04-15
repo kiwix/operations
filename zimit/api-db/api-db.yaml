@@ -32,9 +32,6 @@ spec:
           requests:
             memory: "384Mi"
             cpu: "200m"
-          limits:
-            memory: "384Mi"
-            cpu: "200m"
       volumes:
       - name: data-volume
         persistentVolumeClaim:
@@ -45,14 +42,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-    namespace: zimit
-    name: api-db-service
-    labels:
-        app: api-db-app
+  namespace: zimit
+  name: api-db-service
+  labels:
+    app: api-db-app
 spec:
-    selector:
-        app: api-db-app
-    ports:
-        - protocol: TCP
-          port: 27017
-          targetPort: 27017
+  selector:
+    app: api-db-app
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017

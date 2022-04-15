@@ -6,7 +6,7 @@ metadata:
 spec:
   schedule: "@daily"
   successfulJobsHistoryLimit: 1
-  failedJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -25,9 +25,6 @@ spec:
               command: ["single-backup"]
               resources:
                 requests:
-                  cpu: 200m
-                  memory: 512Mi
-                limits:
                   cpu: 200m
                   memory: 512Mi
           volumes:

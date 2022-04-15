@@ -24,7 +24,6 @@ spec:
         imagePullPolicy: IfNotPresent
         name: postgres
         command: ["postgres", "-c", "shared_buffers=256MB", "-c", "max_connections=200"]
-        # command: ["sh", "-c", "sleep 3600"]
         volumeMounts:
         - name: data-volume
           subPath: data
@@ -36,9 +35,6 @@ spec:
         - containerPort: 5432
         resources:
           requests:
-            memory: "4Gi"
-            cpu: "500m"
-          limits:
             memory: "4Gi"
             cpu: "500m"
       volumes:
@@ -57,7 +53,7 @@ metadata:
   namespace: zim
   name: mirrorbrain-db-service
   labels:
-      app: mirrorbrain-db
+    app: mirrorbrain-db
 spec:
   selector:
     app: mirrorbrain-db

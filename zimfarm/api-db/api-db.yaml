@@ -32,9 +32,6 @@ spec:
           requests:
             memory: "4Gi"
             cpu: "500m"
-          limits:
-            memory: "4Gi"
-            cpu: "500m"
       volumes:
       - name: data-volume
         persistentVolumeClaim:
@@ -45,14 +42,14 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-    namespace: zimfarm
-    name: api-db-service
-    labels:
-        app: api-db-app
+  namespace: zimfarm
+  name: api-db-service
+  labels:
+    app: api-db-app
 spec:
-    selector:
-        app: api-db-app
-    ports:
-        - protocol: TCP
-          port: 27017
-          targetPort: 27017
+  selector:
+    app: api-db-app
+  ports:
+  - protocol: TCP
+    port: 27017
+    targetPort: 27017

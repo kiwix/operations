@@ -28,10 +28,7 @@ spec:
         - containerPort: 80
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "1000m"
-          limits:
-            memory: "256Mi"
+            memory: "512Mi"
             cpu: "1000m"
       nodeSelector:
         k8s.kiwix.org/role: "services"
@@ -39,17 +36,17 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-    namespace: cms
-    name: api-service
-    labels:
-        app: api-app
+  namespace: cms
+  name: api-service
+  labels:
+    app: api-app
 spec:
-    selector:
-        app: api-app
-    ports:
-        - protocol: TCP
-          port: 80
-          targetPort: 80
+  selector:
+    app: api-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

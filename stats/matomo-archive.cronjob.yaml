@@ -6,7 +6,7 @@ metadata:
 spec:
   schedule: "5 */2 * * 1-6"
   successfulJobsHistoryLimit: 1
-  failedJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -36,9 +36,6 @@ spec:
               command: ["/usr/local/bin/php", "/var/www/html/console", "core:archive", "--url", "http://matomo-web-service"]
               resources:
                 requests:
-                  memory: "512Mi"
-                  cpu: "200m"
-                limits:
                   memory: "512Mi"
                   cpu: "200m"
           volumes:

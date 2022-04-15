@@ -30,26 +30,23 @@ spec:
           requests:
             memory: "512Mi"
             cpu: "300m"
-          limits:
-            memory: "512Mi"
-            cpu: "300m"
       nodeSelector:
         k8s.kiwix.org/role: "services"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-    namespace: cardshop
-    name: ui-service
-    labels:
-        app: ui-app
+  namespace: cardshop
+  name: ui-service
+  labels:
+    app: ui-app
 spec:
-    selector:
-        app: ui-app
-    ports:
-        - protocol: TCP
-          port: 80
-          targetPort: 80
+  selector:
+    app: ui-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

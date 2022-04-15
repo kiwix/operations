@@ -54,9 +54,6 @@ spec:
           requests:
             memory: "4Gi"
             cpu: "1000m"
-          # limits:
-          #   memory: "8Gi"
-          #   cpu: "2000m"
       volumes:
       - name: data-volume
         persistentVolumeClaim:
@@ -73,7 +70,7 @@ metadata:
   namespace: stats
   name: matomo-db-service
   labels:
-      app: matomo-db
+    app: matomo-db
 spec:
   selector:
     app: matomo-db

@@ -70,9 +70,6 @@ spec:
           requests:
             memory: "256Mi"
             cpu: "100m"
-          limits:
-            memory: "256Mi"
-            cpu: "100m"
       volumes:
       - name: download-volume
         persistentVolumeClaim:
@@ -89,17 +86,17 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-    namespace: zim
-    name: mirror-download-service
-    labels:
-        app: mirror-download-app
+  namespace: zim
+  name: mirror-download-service
+  labels:
+    app: mirror-download-app
 spec:
-    selector:
-        app: mirror-download-app
-    ports:
-        - protocol: TCP
-          port: 80
-          targetPort: 80
+  selector:
+    app: mirror-download-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress

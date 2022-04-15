@@ -57,9 +57,6 @@ spec:
           requests:
             memory: "512Mi"
             cpu: "200m"
-          limits:
-            memory: "512Mi"
-            cpu: "200m"
       volumes:
       - name: download-volume
         persistentVolumeClaim:
@@ -85,7 +82,7 @@ metadata:
   namespace: zim
   name: mirrorbrain-web-service
   labels:
-      app: mirrorbrain-web
+    app: mirrorbrain-web
 spec:
   selector:
     app: mirrorbrain-web

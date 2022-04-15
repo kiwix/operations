@@ -28,26 +28,23 @@ spec:
           requests:
             memory: "64Mi"
             cpu: "20m"
-          limits:
-            memory: "64Mi"
-            cpu: "20m"
       nodeSelector:
         k8s.kiwix.org/role: "services"
 ---
 apiVersion: v1
 kind: Service
 metadata:
-    namespace: zimit
-    name: farm-ui-service
-    labels:
-        app: farm-ui-app
+  namespace: zimit
+  name: farm-ui-service
+  labels:
+    app: farm-ui-app
 spec:
-    selector:
-        app: farm-ui-app
-    ports:
-        - protocol: TCP
-          port: 80
-          targetPort: 80
+  selector:
+    app: farm-ui-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
