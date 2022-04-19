@@ -1,0 +1,254 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dev-library-scripts
+  namespace: zim
+data:
+  gen-empty: |
+    #!/bin/sh
+    echo '<?xml version="1.0" encoding="UTF-8" ?>\n<library version="20110515" />' > $1
+  hourly-regen-crontab: |
+    0 * * * * root gen-library
+  gen-empty-startup: |
+    #!/bin/sh
+    gen-empty $LIBRARY_PATH
+  gen-library: |
+    #!/usr/bin/env python3
+
+    """
+        apt install -y libmagic1
+        pip install zimscraperlib
+    """
+
+    import base64
+    import logging
+    import os
+    import pathlib
+    from xml.etree.ElementTree import Element, tostring
+
+    from zimscraperlib.zim import Archive
+
+    logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)s %(message)s")
+    logger = logging.getLogger("gen-lib")
+    zim_root = pathlib.Path(os.getenv("ZIM_ROOT", "/data"))
+    library_dest = pathlib.Path(os.getenv("LIBRARY_PATH", "/library/all.xml"))
+    tmp_dest = library_dest.with_suffix(".xml.tmp")
+    new_zim_root = pathlib.Path(os.getenv("NEW_ZIM_ROOT", "/data"))
+
+    names_map = {
+        "Title": "title",
+        "Description": "description",
+        "Language": "language",
+        "Creator": "creator",
+        "Publisher": "publisher",
+        "Name": "name",
+        "Flavour": "flavour",
+        "Tags": "tags",
+        "Date": "date",
+    }
+
+    logger.info(f"Starting generation of {library_dest} from {zim_root}…")
+
+    with open(tmp_dest, "wb") as fh:
+        fh.write(b'<?xml version="1.0" encoding="UTF-8" ?>\n<library version="20110515">\n')
+
+        for zim_path in zim_root.rglob("*.zim"):
+            relpath = zim_path.relative_to(zim_root)
+            logger.debug(f"Adding {relpath}")
+            zim = Archive(zim_path)
+            elem = Element("book")
+            for meta_name in names_map.keys():
+                try:
+                    elem.attrib[names_map[meta_name]] = zim.get_metadata(meta_name).decode(
+                        "UTF-8"
+                    )
+                except RuntimeError:
+                    continue
+
+            if zim.has_illustration(48):
+                elem.attrib["favicon"] = base64.standard_b64encode(
+                    bytes(zim.get_illustration_item(48).content)
+                ).decode("ASCII")
+
+            elem.attrib["id"] = str(zim.uuid)
+            elem.attrib["faviconMimeType"] = "image/png"
+            try:
+                elem.attrib["mediaCount"] = str(zim.media_counter)
+                elem.attrib["articleCount"] = str(zim.article_counter)
+            except RuntimeError:
+                logger.error(" > ERROR Counter")
+                continue
+            elem.attrib["size"] = str(int(zim.filesize / 1024))
+            elem.attrib["path"] = str(new_zim_root / relpath)
+            elem.attrib["url"] = str(f"https://download.kiwix.org/zim/{relpath}.meta4")
+
+            fh.write(tostring(elem))
+            fh.write(b"\n")
+
+            del elem
+            del zim
+        fh.write(b"</library>\n")
+
+    logger.info(f"Library successfuly generated at {tmp_dest}.\nSwaping files…")
+    tmp_dest.replace(library_dest)
+    logger.info("> done.")
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dev-library-configs
+  namespace: zim
+data:
+  LIBRARY_PATH: /library/all.xml
+  ZIM_ROOT: /data
+  NEW_ZIM_ROOT: /data
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: dev-library-app
+  name: dev-library-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dev-library-app
+  template:
+    metadata:
+      labels:
+        app: dev-library-app
+    spec:
+      initContainers:
+      - image: ghcr.io/rgaudin/debian:dev
+        imagePullPolicy: Always
+        name: initer
+        args: ["/bin/true"]
+        envFrom:
+          - configMapRef:
+              name: dev-library-configs
+        volumeMounts:
+        - mountPath: "/library"
+          name: library-volume
+          readOnly: false
+        - mountPath: "/usr/local/bin/gen-empty"
+          subPath: gen-empty
+          name: scripts
+          readOnly: true
+        - mountPath: "/usr/local/bin/startup"
+          subPath: gen-empty-startup
+          name: scripts
+          readOnly: true
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "1m"
+      containers:
+      - image: ghcr.io/rgaudin/debian:dev
+        imagePullPolicy: Always
+        name: library-regen
+        envFrom:
+          - configMapRef:
+              name: dev-library-configs
+        volumeMounts:
+        - mountPath: "/data"
+          subPath: zim/.hidden/
+          name: data-volume
+          readOnly: true
+        - mountPath: "/zim"
+          subPath: zim/
+          name: data-volume
+          readOnly: true
+        - mountPath: "/library"
+          name: library-volume
+          readOnly: false
+        - mountPath: "/usr/local/bin/startup"
+          subPath: gen-library
+          name: scripts
+          readOnly: true
+        - mountPath: "/usr/local/bin/gen-library"
+          subPath: gen-library
+          name: scripts
+          readOnly: true
+        - mountPath: "/etc/crontab"
+          subPath: hourly-regen-crontab
+          name: scripts
+          readOnly: true
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+      - image: docker.io/rgaudin/kiwix-tools:nightly
+        imagePullPolicy: Always
+        command: ["kiwix-serve", "--library", "--monitorLibrary", "/library/all.xml"]
+        envFrom:
+          - configMapRef:
+              name: dev-library-configs
+        name: kiwix-tools
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: "/data"
+          subPath: zim/.hidden/
+          name: data-volume
+          readOnly: true
+        - mountPath: "/library"
+          name: library-volume
+          readOnly: true
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: kiwix-download-pvc
+      - name: scripts
+        configMap:
+          name: dev-library-scripts
+          defaultMode: 0755
+      - name: library-volume
+        emptyDir: {}
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: dev-library-service
+  labels:
+    app: dev-library-app
+spec:
+  selector:
+    app: dev-library-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dev-library-ingress
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - dev.library.kiwix.org
+      secretName: dev-library-kiwix-org-tls
+  rules:
+  - host: dev.library.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: dev-library-service
+            port:
+              number: 80
