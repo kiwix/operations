@@ -324,7 +324,7 @@ data:
         # Custom `vhost` log format that we use on nginx as well
         # and which is adapted for matomo-log-uploader
         # log_format vhost '$host $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"';
-        LogFormat "%v %h - %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" vhost
+        LogFormat "%v %{X-Forwarded-For}i - %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" vhost
 
         <IfModule logio_module>
           # You need to enable mod_logio.c to use %I and %O
