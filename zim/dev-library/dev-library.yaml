@@ -24,16 +24,24 @@ data:
     import logging
     import os
     import pathlib
-    from xml.etree.ElementTree import Element, tostring
+
+    from lxml import etree
 
     from zimscraperlib.zim import Archive
 
     logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)s %(message)s")
     logger = logging.getLogger("gen-lib")
-    zim_root = pathlib.Path(os.getenv("ZIM_ROOT", "/data"))
-    library_dest = pathlib.Path(os.getenv("LIBRARY_PATH", "/library/all.xml"))
-    tmp_dest = library_dest.with_suffix(".xml.tmp")
-    new_zim_root = pathlib.Path(os.getenv("NEW_ZIM_ROOT", "/data"))
+
+    # Path to walk into to find ZIM files
+    ZIM_ROOT = pathlib.Path(os.getenv("ZIM_ROOT", "/data"))
+    # Path to (over)write XML Library to
+    LIBRARY_DEST = pathlib.Path(os.getenv("LIBRARY_PATH", "/library/all.xml"))
+    # URL-prefix to use for ZIM download links. URL-equivalent of ZIM_ROOT
+    DOWNLOAD_URL_ROOT = os.getenv("DOWNLOAD_URL_ROOT", "https://download.kiwix.org/zim/")
+    # Path-prefix kiwix-serve will use to reach ZIM files
+    NEW_ZIM_ROOT = pathlib.Path(os.getenv("NEW_ZIM_ROOT", "/data"))
+    TMP_DEST = LIBRARY_DEST.with_suffix(".xml.tmp")
+
 
     names_map = {
         "Title": "title",
@@ -47,51 +55,51 @@ data:
         "Date": "date",
     }
 
-    logger.info(f"Starting generation of {library_dest} from {zim_root}…")
+    logger.info(f"Starting generation of {LIBRARY_DEST} from {ZIM_ROOT}…")
 
-    with open(tmp_dest, "wb") as fh:
+    all_zims = sorted(ZIM_ROOT.rglob("*.zim"), key=lambda p: p.name)
+    logger.debug(f"> {len(all_zims)} ZIM files in {ZIM_ROOT}")
+
+    with open(TMP_DEST, "wb") as fh:
         fh.write(b'<?xml version="1.0" encoding="UTF-8" ?>\n<library version="20110515">\n')
-
-        for zim_path in zim_root.rglob("*.zim"):
-            relpath = zim_path.relative_to(zim_root)
-            logger.debug(f"Adding {relpath}")
+        for index, zim_path in enumerate(all_zims):
+            relpath = zim_path.relative_to(ZIM_ROOT)
+            logger.debug(f"{index} Adding {relpath}")
             zim = Archive(zim_path)
-            elem = Element("book")
+            elem = etree.Element("book")
+
             for meta_name in names_map.keys():
                 try:
-                    elem.attrib[names_map[meta_name]] = zim.get_metadata(meta_name).decode(
-                        "UTF-8"
-                    )
+                    elem.set(names_map[meta_name], zim.get_text_metadata(meta_name))
                 except RuntimeError:
                     continue
-
             if zim.has_illustration(48):
-                elem.attrib["favicon"] = base64.standard_b64encode(
-                    bytes(zim.get_illustration_item(48).content)
-                ).decode("ASCII")
+                elem.set(
+                    "favicon",
+                    base64.standard_b64encode(zim.get_illustration_item(48).content).decode(
+                        "ASCII"
+                    ),
+                )
 
-            elem.attrib["id"] = str(zim.uuid)
-            elem.attrib["faviconMimeType"] = "image/png"
-            try:
-                elem.attrib["mediaCount"] = str(zim.media_counter)
-                elem.attrib["articleCount"] = str(zim.article_counter)
-            except RuntimeError:
-                logger.error(" > ERROR Counter")
-                continue
-            elem.attrib["size"] = str(int(zim.filesize / 1024))
-            elem.attrib["path"] = str(new_zim_root / relpath)
-            elem.attrib["url"] = str(f"https://download.kiwix.org/zim/{relpath}.meta4")
+            elem.set("id", str(zim.uuid))
+            elem.set("faviconMimeType", "image/png")
+            elem.set("mediaCount", str(zim.media_counter))
+            elem.set("articleCount", str(zim.article_counter))
+            elem.set("size", str(int(zim_path.stat().st_size / 1024)))
+            elem.set("path", str(NEW_ZIM_ROOT / relpath))
+            elem.set("url", str(f"https://download.kiwix.org/zim/{relpath}.meta4"))
 
-            fh.write(tostring(elem))
+            fh.write(etree.tostring(elem, encoding="UTF-8"))
             fh.write(b"\n")
-
-            del elem
-            del zim
         fh.write(b"</library>\n")
 
-    logger.info(f"Library successfuly generated at {tmp_dest}.\nSwaping files…")
-    tmp_dest.replace(library_dest)
+    logger.info(f"Library successfuly generated at {TMP_DEST}")
+    logger.info("Verifying XML Integrity")
+    etree.parse(str(TMP_DEST))
+    logger.info("XML is well formed. Swaping files…")
+    TMP_DEST.replace(LIBRARY_DEST)
     logger.info("> done.")
+
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -102,6 +110,7 @@ data:
   LIBRARY_PATH: /library/all.xml
   ZIM_ROOT: /data
   NEW_ZIM_ROOT: /data
+  DOWNLOAD_URL_ROOT: https://download.kiwix.org/zim/.hidden/
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -179,6 +188,9 @@ spec:
           requests:
             memory: "256Mi"
             cpu: "200m"
+          limits:
+            memory: "2Gi"
+            cpu: "300m"
       - image: docker.io/rgaudin/kiwix-tools:nightly
         imagePullPolicy: Always
         command: ["kiwix-serve", "--library", "--monitorLibrary", "/library/all.xml"]
