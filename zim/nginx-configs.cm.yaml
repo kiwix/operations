@@ -116,7 +116,7 @@ data:
     limit_req_zone $binary_remote_addr zone=limit:10m rate=50r/s;
   # reusing format defined in nginxproxy/nginx-proxy:0.9 that we've been using for years
   vhost-logfmt.conf: |
-    log_format vhost '$host $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"';
+    log_format vhost '$host $http_x_forwarded_for - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"';
   reload-nginx.sh: |
     #!/usr/bin/env bash
     echo "About to reload nginx…"
