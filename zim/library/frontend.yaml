@@ -1,0 +1,305 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: library-frontend-configs
+  namespace: zim
+data:
+  # not really secret, not exposing port outside
+  secret.txt: |
+    varnishadmin
+  entrypoint.sh: |
+    #!/bin/sh
+    extra_opts=""
+    if [ -z "$VARNISHSIZE" ]; then
+      # WARN: uses at least double that amount
+      VARNISHSIZE=384M
+    fi
+
+    if [ ! -z "$VARNISH_SECRET_PATH" ]; then
+      extra_opts="${extra_opts} -S $VARNISH_SECRET_PATH"
+    fi
+
+    if [ ! -z "$VARNISH_ADMIN_IP" ]; then
+      extra_opts="${extra_opts} -T $VARNISH_ADMIN_IP:6082"
+    fi
+
+    echo "Starting varnish with ${extra_opts}"
+
+    exec varnishd -F -a http=:80,HTTP -p feature=+http2 -f /etc/varnish/default.vcl -s malloc,$VARNISHSIZE $extra_opts
+  varnish.vcl: |
+    vcl 4.1;
+
+    import std;
+    import dynamic;
+
+    # ACL for manual purge requests
+    acl purge {
+      "localhost";
+      "100.64.0.0"/30; // k8s cluster
+    }
+
+    # demo backend (HTML) is first (and thus default)
+    backend demo {
+        .host = "library-demo-backend-service";
+        .port = "80";
+
+        # .connect_timeout = 60s;
+        # .first_byte_timeout = 60s;
+        # .between_bytes_timeout = 60s;
+    }
+
+    # catalog backend for OPDS
+    backend catalog {
+        .host = "library-catalog-backend-service";
+        .port = "80";
+    }
+
+    sub vcl_recv {
+
+      if (req.method == "PURGE") {
+        if (!client.ip ~ purge) {
+          return(synth(403, "Not allowed."));
+        }
+
+        # Purge library
+        # curl -X PURGE -H "X-Purge-Type: library" localhost
+        if (req.http.X-Purge-Type == "library") {
+          if (std.ban("req.url ~ ^/catalog/v2/root.xml$") &&
+              std.ban("req.url ~ ^/catalog/v2/entries") &&
+              std.ban("req.url ~ ^/catalog/v2/partial_entries") &&
+              std.ban("req.url ~ ^/catalog/v2/categories") &&
+              std.ban("req.url ~ ^/catalog/v2/languages") &&
+              std.ban("req.url ~ ^/catalog/root.xml$") &&
+              std.ban("req.url ~ ^catalog/search") &&
+              std.ban("req.url ~ ^catalog/search")) {
+            return(synth(200, "Purged Library endpoints"));
+          } else {
+            # return ban error in 400 response
+            return(synth(400, std.ban_error()));
+          }
+        }
+
+        # Purge for a single Book references with http.X-Book-Id AND req.http.X-Book-Name
+        # curl -X PURGE -H "X-Purge-Type: book" -H "X-Book-Id: uuid" -H "X-Book-Name: name" localhost
+        if (req.http.X-Purge-Type == "book") {
+          if (std.ban("req.url ~ ^/catalog/v2/entry/" + req.http.X-Book-Id) &&
+              std.ban("req.url ~ ^/catalog/v2/illustration/" + req.http.X-Book-Name + "/") &&
+              std.ban("req.url ~ ^/raw/" + req.http.X-Book-Name + "/(meta|content)/") &&
+              std.ban("req.url ~ ^/search?content=" + req.http.X-Book-Name + "&") &&
+              std.ban("req.url ~ ^/suggest?content=" + req.http.X-Book-Name + "&")) {
+            return(synth(200, "Purged Book endpoints"));
+          } else {
+            # return ban error in 400 response
+            return(synth(400, std.ban_error()));
+          }
+        }
+
+        # curl -X PURGE -H "X-Purge-Type: kiwix-serve" localhost
+        if (req.http.X-Purge-Type == "kiwix-serve") {
+          if (std.ban("req.url ~ ^/catalog/v2/searchdescription.xml$") &&
+              std.ban("req.url ~ ^/skin/") &&
+              std.ban("req.url ~ ^/catalog/searchdescription.xml$") &&
+              std.ban("req.url ~ ^/catch/external") &&
+              std.ban("req.url ~ ^/$")) {
+            return(synth(200, "Purged kiwix-serve endpoints"));
+          } else {
+            # return ban error in 400 response
+            return(synth(400, std.ban_error()));
+          }
+        }
+
+        return(synth(204, "Missing valid X-Purge-Type"));
+      }
+
+
+      # direct requets to backends based on prefix
+      if (req.url ~ "^/catalog/") {
+          set req.backend_hint = catalog;
+      } else {
+          set req.backend_hint = demo;
+      }
+
+      # remove potential cookie from request (there should be none)
+      unset req.http.cookie;
+
+      # set standard proxied ip header for getting original remote address
+      # set req.http.X-Forwarded-For = client.ip;
+      set req.http.X-Forwarded-For = req.http.x-real-ip;
+
+      # CURRENT SITUATION
+      # /catalog/v2/root.xml                  cache until library-refresh
+      # /catalog/v2/searchdescription.xml     cache until kiwix-serve version change
+      # /catalog/v2/entry/<bookId>            cache until book expiration (manual)
+      # /catalog/v2/entries?<query>           cache until library-refresh
+      # /catalog/v2/partial_entries?<query>   cache until library-refresh
+      # /catalog/v2/categories                cache until library-refresh
+      # /catalog/v2/languages                 cache until library-refresh
+      # /catalog/v2/illustration/<bookName>/  cache until book expiration (manual)
+      # /skin/                                cache until kiwix-serve version change
+      # /catalog/searchdescription.xml        cache until kiwix-serve version change
+      # /catalog/root.xml                     cache until library-refresh
+      # /catalog/search?<query>               cache until library-refresh
+      # /raw/<bookName>/[meta|content]/       cache until book expiration (manual)
+      # /search?content=<bookName>&<query>    cache until book expiration (manual)
+      # /search?<query>                       cache until library-refresh
+      # /suggest?content=<bookName>&<query>   cache until book expiration (manual)
+      # /random/                              don't cache
+      # /catch/external/                      cache until kiwix-serve version change
+      # /                                     cache until kiwix-serve version change
+
+      # library-refresh is triggered by a RESET call initied after our library-refresh script
+      # kiwix-serve version change is triggered by a UPDATE call initied on container restart
+      # book expiration is triggered by BAN calls for updated/new books after library-refresh script
+
+
+      # let's cache everything except /random.
+      # all endpoints listed above
+      if (req.url !~ "^/random") {
+          return(hash);
+      }
+
+      # default to not caching (to save space)
+      return (pass);
+    }
+
+    sub vcl_backend_response {
+
+      # make sure to not cache backend errors
+      if (beresp.status >= 500 && bereq.is_bgfetch) {
+          return (abandon);
+      }
+
+      # temporary until https://github.com/kiwix/libkiwix/issues/650
+      unset beresp.http.set-cookie;
+      unset beresp.http.Cache-Control;
+      unset beresp.http.Age;
+
+      # set ttl to 1d for everything that's returned by backends
+      set beresp.ttl = 1d;
+      # set beresp.grace = 24h;
+      # set beresp.keep = 8m;
+
+      # temporary until https://github.com/kiwix/libkiwix/issues/753
+      # force gzip on OPDS response (if supported by client)
+      if (beresp.http.content-type ~ "xml" ) {
+        set beresp.do_gzip = true;
+      }
+    }
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: library-frontend-app
+  name: library-frontend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: library-frontend-app
+  template:
+    metadata:
+      labels:
+        app: library-frontend-app
+    spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+      - image: docker.io/library/varnish:7.1-alpine
+        # command: ["varnishd", "-F", "-a", "http=:80,HTTP", "-p", "feature=+http2", "-f", "/etc/varnish/default.vcl", "-s", "malloc,384M"]
+        command: ["entrypoint"]
+        imagePullPolicy: IfNotPresent
+        name: varnish
+        env:
+        - name: VARNISHSIZE
+          value: "384M"
+        - name: VARNISH_SECRET_PATH
+          value: /etc/varnish/secret
+        - name: VARNISH_ADMIN_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        ports:
+        - containerPort: 80
+        - containerPort: 6082
+        volumeMounts:
+        # - mountPath: "/usr/share/nginx/html/favicon.ico"
+        #   subPath: favicon.ico
+        #   name: branding
+        #   readOnly: true
+        - name: configs
+          mountPath: "/usr/sbin/entrypoint"
+          subPath: entrypoint.sh
+          readOnly: true
+        - name: configs
+          mountPath: "/etc/varnish/secret"
+          subPath: secret.txt
+          readOnly: true
+        - name: configs
+          mountPath: "/etc/varnish/default.vcl"
+          subPath: varnish.vcl
+          readOnly: true
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+      volumes:
+      # - name: branding
+      #   configMap:
+      #     name: branding-configs
+      - name: configs
+        configMap:
+          name: library-frontend-configs
+          defaultMode: 0755
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: library-frontend-service
+  labels:
+    app: library-frontend-app
+spec:
+  selector:
+    app: library-frontend-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
+  - name: varnishadm
+    protocol: TCP
+    port: 6082
+    targetPort: 6082
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: library-frontend-ingress
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - library.test.k8s.kiwix.org
+      secretName: library-test-k8s-kiwix-org-tls
+  rules:
+  - host: library.test.k8s.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: library-frontend-service
+            port:
+              name: http

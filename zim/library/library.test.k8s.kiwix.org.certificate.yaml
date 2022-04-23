@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: library-test-k8s-kiwix-org
+  namespace: zim
+spec:
+  secretName: library-test-k8s-kiwix-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: library.test.k8s.kiwix.org
+  dnsNames:
+  - library.test.k8s.kiwix.org

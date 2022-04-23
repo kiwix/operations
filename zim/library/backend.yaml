@@ -1,0 +1,153 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: library-demo-backend-app
+  name: library-demo-backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: library-demo-backend-app
+  template:
+    metadata:
+      labels:
+        app: library-demo-backend-app
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/kiwix-tools:3.2.0-3
+        imagePullPolicy: IfNotPresent
+        name: kiwix-tools
+        command: ["kiwix-serve", "--library", "-v", "--monitorLibrary", "--threads", "16", "--nodatealias", "/var/www/library.kiwix.org/library.kiwix.org.xml"]
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: "/var/www/download.kiwix.org"
+          name: download-volume
+          readOnly: true
+        - mountPath: "/var/www/library.kiwix.org"
+          name: library-volume
+          readOnly: true
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "500m"
+      volumes:
+      - name: download-volume
+        persistentVolumeClaim:
+          claimName: kiwix-download-pvc
+      - name: library-volume
+        persistentVolumeClaim:
+          claimName: kiwix-library-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: library-demo-backend-service
+  labels:
+    app: library-demo-backend-app
+spec:
+  selector:
+    app: library-demo-backend-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    name: http
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: library-catalog-backend-app
+  name: library-catalog-backend-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: library-catalog-backend-app
+  template:
+    metadata:
+      labels:
+        app: library-catalog-backend-app
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/kiwix-tools:3.2.0-3
+        imagePullPolicy: IfNotPresent
+        name: kiwix-tools
+        command: ["kiwix-serve", "--library", "-v", "--monitorLibrary", "--threads", "16", "--nodatealias", "/var/www/library.kiwix.org/library.kiwix.org.xml"]
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        # https://github.com/kiwix/libkiwix/issues/754
+        - mountPath: "/var/www/download.kiwix.org"
+          name: download-volume
+          readOnly: true
+        - mountPath: "/var/www/library.kiwix.org"
+          name: library-volume
+          readOnly: true
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "200m"
+      volumes:
+      # https://github.com/kiwix/libkiwix/issues/754
+      - name: download-volume
+        persistentVolumeClaim:
+          claimName: kiwix-download-pvc
+      - name: library-volume
+        persistentVolumeClaim:
+          claimName: kiwix-library-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: library-catalog-backend-service
+  labels:
+    app: library-catalog-backend-app
+spec:
+  selector:
+    app: library-catalog-backend-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: library-test-backend-ingress
+  namespace: zim
+  annotations:
+    # nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: library-backend.test.k8s.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: library-demo-backend-service
+            port:
+              name: http
+      - path: /catalog
+        pathType: Prefix
+        backend:
+          service:
+            name: library-catalog-backend-service
+            port:
+              name: http
