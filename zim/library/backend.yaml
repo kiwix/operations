@@ -16,6 +16,8 @@ spec:
         app: library-demo-backend-app
     spec:
       containers:
+      # /!\ manually purge kiwix-serve cache on kiwix-serve version upgrade
+      # curl -X PURGE -H "X-Purge-Type kiwix-serve" http://mirrorbrain-web-service
       - image: ghcr.io/kiwix/kiwix-tools:3.2.0-3
         imagePullPolicy: IfNotPresent
         name: kiwix-tools
@@ -77,6 +79,7 @@ spec:
         app: library-catalog-backend-app
     spec:
       containers:
+        # /!\ manually purge kiwix-serve cache on kiwix-serve version upgrade
       - image: ghcr.io/kiwix/kiwix-tools:3.2.0-3
         imagePullPolicy: IfNotPresent
         name: kiwix-tools
