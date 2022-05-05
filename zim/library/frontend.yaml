@@ -35,7 +35,7 @@ data:
     # ACL for manual purge requests
     acl purge {
       "localhost";
-      "100.64.0.0"/30; // k8s cluster
+      "100.64.0.0"/16; // k8s cluster
     }
 
     # demo backend (HTML) is first (and thus default)
@@ -86,7 +86,8 @@ data:
               std.ban("req.url ~ ^/catalog/v2/illustration/" + req.http.X-Book-Name + "/") &&
               std.ban("req.url ~ ^/raw/" + req.http.X-Book-Name + "/(meta|content)/") &&
               std.ban("req.url ~ ^/search?content=" + req.http.X-Book-Name + "&") &&
-              std.ban("req.url ~ ^/suggest?content=" + req.http.X-Book-Name + "&")) {
+              std.ban("req.url ~ ^/suggest?content=" + req.http.X-Book-Name + "&") &&
+              std.ban("req.url ~ ^/" + req.http.X-Book-Name-Nodate + "/")) {
             return(synth(200, "Purged Book endpoints"));
           } else {
             # return ban error in 400 response
@@ -215,7 +216,7 @@ spec:
         name: varnish
         env:
         - name: VARNISHSIZE
-          value: "384M"
+          value: "8G"
         - name: VARNISH_SECRET_PATH
           value: /etc/varnish/secret
         - name: VARNISH_ADMIN_IP
@@ -244,7 +245,7 @@ spec:
           readOnly: true
         resources:
           requests:
-            memory: "512Mi"
+            memory: "16Gi"
             cpu: "200m"
       volumes:
       # - name: branding
