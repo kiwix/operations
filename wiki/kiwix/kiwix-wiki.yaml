@@ -69,6 +69,7 @@ metadata:
   namespace: wiki
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: 512m
 spec:
   tls:
     - hosts:
