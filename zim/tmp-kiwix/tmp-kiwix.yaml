@@ -17,7 +17,7 @@ data:
       location = /50x.html {
           root   /usr/share/nginx/html;
       }
-      rewrite ^/zim/(.*)$ http://download.kiwix.org/zim/$1 permanent;
+      rewrite ^/zim/(.*)$ https://download.kiwix.org/zim/$1 permanent;
     }
 ---
 apiVersion: apps/v1
