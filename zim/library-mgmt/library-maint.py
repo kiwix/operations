@@ -78,7 +78,7 @@ class Defaults:
     INTERNAL_LIBRARY_PATH = "/data/library/internal_library.xml"
 
     REDIRECTS_ROOT = "/data/download"
-    ZIM_REDIRECTS_MAP = "/data/library/zim-downloads.permalinks"
+    ZIM_REDIRECTS_MAP = "/data/maps/zim.map"
 
     NB_ZIM_VERSIONS_TO_KEEP = 4
     NB_ZIM_VERSIONS_EXPOSED = 1
@@ -121,8 +121,8 @@ def swap(tmp: pathlib.Path, final: pathlib.Path):
 
 
 def without_period(text: str) -> str:
-    """text with its ending _YYYY-MM period suffix"""
-    return re.sub(r"_\d{4}-\d{2}$", "", text)
+    """text or filename without its ending _YYYY-MM period suffix"""
+    return re.sub(r"_\d{4}-\d{2}$", "", re.sub(r"\.zim$", "", text))
 
 
 def period_from(text: str) -> str:
@@ -486,6 +486,9 @@ class LibraryMaintainer:
             if entry["latest"] and self.previous_lib.is_update(entry):
                 logger.debug(f">> is update {alias}: {entry['id']}")
                 self.updated_zims[alias] = (entry["id"], entry["core"])
+                # print(to_std_dict(entry))
+                # print("-----")
+                # print(self.previous_lib.books.get(entry["core"]))
 
         logger.debug(f"[READ] > {len(self.all_zims)} ZIM files in {self.zim_root}")
 
@@ -507,12 +510,11 @@ class LibraryMaintainer:
         logger.info(f"[REDIR] Writting ZIM redirects to {self.zim_redirects_map}")
         # no-period redirects for content
         content = ""
-        for entries in self.all_zims.values():
-            entry = entries[0]
+        for entry in self.exposed_zims:
             relpath = self.zim_root.joinpath(entry["relpath"]).relative_to(
                 self.redirects_root
             )
-            redirpath = relpath.with_name(f"{entry['core']}.zim")
+            redirpath = relpath.with_name(f"{without_period(relpath.stem)}.zim")
 
             for suffix in ("", ".torrent", ".meta4", ".magnet", ".md5", ".sha256"):
                 content += f"/{redirpath}{suffix} /{relpath}{suffix}\n"

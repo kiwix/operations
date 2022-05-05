@@ -705,9 +705,19 @@ data:
       # HTTP 301 without a cache.
       <IfModule mod_rewrite.c>
          RewriteEngine on
-         RewriteMap redirects-map "txt:/var/www/library.kiwix.org/download.kiwix.org.permalinks"
-         RewriteCond ${redirects-map:$1} !=""
-         RewriteRule ^(.*)$ ${redirects-map:$1} [last,redirect=301,E=NOCACHE:1]
+
+         # RewriteMap redirects-map "txt:/var/www/library.kiwix.org/download.kiwix.org.permalinks"
+         # RewriteCond ${redirects-map:$1} !=""
+         # RewriteRule ^(.*)$ ${redirects-map:$1} [last,redirect=301,E=NOCACHE:1]
+
+         RewriteMap releases-map "txt:/data/maps/kiwix-releases.map"
+         RewriteCond ${releases-map:$1} !=""
+         RewriteRule ^(.*)$ ${releases-map:$1} [last,redirect=301,E=NOCACHE:1]
+
+         RewriteMap zim-map "txt:/data/maps/zim.map"
+         RewriteCond ${zim-map:$1} !=""
+         RewriteRule ^(.*)$ ${zim-map:$1} [last,redirect=301,E=NOCACHE:1]
+
          Header always set Cache-Control "no-store, no-cache, must-revalidate" env=NOCACHE
       </IfModule>
 

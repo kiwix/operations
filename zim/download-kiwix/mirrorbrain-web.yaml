@@ -27,6 +27,9 @@ spec:
         - mountPath: "/var/www/library.kiwix.org"
           name: library-volume
           readOnly: true
+        - mountPath: "/data/maps/"
+          name: maps-volume
+          readOnly: true
         - name: mb-volume
           subPath: hash
           mountPath: "/usr/share/mirrorbrain"
@@ -67,6 +70,9 @@ spec:
       - name: mb-volume
         persistentVolumeClaim:
           claimName: mirrorbrain-support-pvc
+      - name: maps-volume
+        persistentVolumeClaim:
+          claimName: maps-pvc
       - name: configs
         configMap:
           name: mb-configs
