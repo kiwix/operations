@@ -190,9 +190,9 @@ def convert(library_fpath, catalog_fpath, local_repository=False):
 
         # update title for tags
         tags = read_tags(book)
-        tags_label = get_tags_label(tags)
-        if tags_label is not None:
-            name = "{name} [{label}]".format(name=name, label=tags_label)
+        flavour = clean(ga("flavour"))
+        if flavour:
+            name = "{name} [{flavour}]".format(name=name, flavour=flavour)
 
         # language is used in both ISO 639-3 (pol) and ISO 639-1 (pl)
         lang_3 = ga("language")  # xml contains ISO 639-3
