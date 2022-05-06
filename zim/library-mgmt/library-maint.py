@@ -95,12 +95,10 @@ class Defaults:
 
 
 def pathlib_relpath(data: Any) -> Any:
-    """json.load hook to cast `relpath` and `updatedOn` attributes"""
+    """json.load hook to cast `relpath` attribute"""
     if isinstance(data, dict):
         if "relpath" in data:
             data["relpath"] = pathlib.Path(data["relpath"])
-        if "updatedOn" in data:
-            data["updatedOn"] = datetime.datetime.fromisoformat(data["updatedOn"])
 
     return data
 
@@ -375,10 +373,12 @@ class LibraryMaintainer:
         self.updated_zims: Dict[str, Tuple(str, str)] = {}  # alias: (uuid, core)
 
     @property
-    def exposed_zims(self):
-        for entries in self.all_zims.values():
-            for entry in entries[: self.nb_zim_versions_exposed]:
-                yield entry
+    def exposed_zims(self) -> Dict[str, Dict]:
+        """alias: Entry of just the last entries for an alias"""
+        # for entries in self.all_zims.values():
+        #     for entry in entries[: self.nb_zim_versions_exposed]:
+        #         yield entry
+        return {alias: entries[0] for alias, entries in self.all_zims.items()}
 
     def load_previous_library(self):
         """parse and keep previous public XML Library content for later comparison"""
@@ -413,6 +413,7 @@ class LibraryMaintainer:
                 "month": values["month"],
                 "year": values["year"],
                 "core": to_core(fpath),
+                "rsize": fpath.stat().st_size,
             }
         )
 
@@ -423,8 +424,6 @@ class LibraryMaintainer:
                 "id": str(zim.uuid),
                 "mediaCount": str(zim.media_counter),
                 "articleCount": str(zim.article_counter),
-                "rsize": fpath.stat().st_size,
-                "updatedOn": datetime.datetime.fromtimestamp(fpath.stat().st_mtime),
             }
         )
 
@@ -501,7 +500,7 @@ class LibraryMaintainer:
         logger.info("[DELETE] doing nothing ATM.")
 
     def write_zim_redirects_map(self):
-        """Writes map file of redirects for ZIM files (no-period to last)
+        """Writes map file of redirects for ZIM files (no-period to last, no folder)
 
         Writes a `source target` mapping file for non-existent no-period ZIM
         paths to point to the last matching ZIM file (and companion files)"""
@@ -509,14 +508,34 @@ class LibraryMaintainer:
         logger.info(f"[REDIR] Writting ZIM redirects to {self.zim_redirects_map}")
         # no-period redirects for content
         content = ""
-        for entry in self.exposed_zims:
+        prefix = self.zim_root.relative_to(self.redirects_root)
+
+        def add_entry(ident, relpath):
+            nonlocal content, prefix
+            for suffix in ("", ".torrent", ".meta4", ".magnet", ".md5", ".sha256"):
+                content += f"/{prefix}/{ident}.zim{suffix} /{relpath}{suffix}\n"
+
+        for entry in self.exposed_zims.values():
             relpath = self.zim_root.joinpath(entry["relpath"]).relative_to(
                 self.redirects_root
             )
-            redirpath = relpath.with_name(f"{without_period(relpath.stem)}.zim")
+            ident = without_period(relpath.stem)
+            add_entry(ident, relpath)
 
-            for suffix in ("", ".torrent", ".meta4", ".magnet", ".md5", ".sha256"):
-                content += f"/{redirpath}{suffix} /{relpath}{suffix}\n"
+            # [BACKWARD COMPATIBILITY] Redirect _all to _all_maxi if _all does not exist
+            all_ident = ident.replace("_maxi", "")
+            if all_ident not in self.exposed_zims.keys():
+                add_entry(all_ident, relpath)
+
+            # [BACKWARD COMPATIBILITY] Redirect _novid to _maxi if _novid does not exist
+            novid_ident = ident.replace("_maxi", "_novid")
+            if novid_ident not in self.exposed_zims.keys():
+                add_entry(novid_ident, relpath)
+
+            # [BACKWARD COMPATIBILITY] Redirect _nodet to _mini if _nodet does not exist
+            nodet_ident = ident.replace("_mini", "_nodet")
+            if nodet_ident not in self.exposed_zims.keys():
+                add_entry(nodet_ident, relpath)
 
         with open_chmod(self.zim_redirects_map, "w", chmod=0o644) as fh:
             fh.write(content)
@@ -534,7 +553,7 @@ class LibraryMaintainer:
                 b'<?xml version="1.0" encoding="UTF-8" ?>\n'
                 b'<library version="20110515">\n'
             )
-            for entry in self.exposed_zims:
+            for entry in self.exposed_zims.values():
                 elem = etree.Element("book")
                 for attr in COPIED_KEYS:
                     if entry.get(attr):
@@ -616,7 +635,7 @@ class LibraryMaintainer:
 
         download_dir = self.zim_root.relative_to(self.redirects_root)
         content = "<!-- PAGE IS GENERATED AUTOMATICALLY, DO NOT EDIT MANUALLY -->\n"
-        for entry in sorted(self.exposed_zims, key=human_sort):
+        for entry in sorted(self.exposed_zims.values(), key=human_sort):
             try:
                 lang_name = get_language_details(entry["lang"])["native"]
             except Exception:
