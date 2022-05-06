@@ -268,9 +268,7 @@ class PreviousLib:
             self.date = datetime.datetime.fromtimestamp(fpath.stat().st_mtime)
             tree = etree.parse(str(fpath))
         except Exception:
-            logger.warning(
-                "Unbale to read previous library. Purge of indiv. book disabled."
-            )
+            logger.warning("[READ] Unbale to read previous library. Purging disabled.")
             return
 
         for book in tree.findall("book"):
@@ -299,6 +297,7 @@ class LibraryMaintainer:
         "delete-zim",
         "write-redirects",
         "write-libraries",
+        "write-offspot",
         "purge-varnish",
         "update-wiki",
     ]
@@ -340,7 +339,7 @@ class LibraryMaintainer:
         load_fs: bool,
     ):
 
-        self.actions = [action.strip() for action in actions.split(",")]
+        self.actions = [action.strip() for action in actions]
 
         self.zim_root = pathlib.Path(zim_root)
         self.with_hidden = with_hidden
@@ -672,6 +671,8 @@ class LibraryMaintainer:
         if "write-libraries" in self.actions:
             self.write_public_library()
             self.write_internal_library()
+
+        if "write-offspot" in self.actions:
             self.write_offspot_library()
 
         if "purge-varnish" in self.actions:
@@ -692,6 +693,7 @@ def entrypoint():
         help="Actions to perform. Comma-separated list within: "
         f"{LibraryMaintainer.ACTIONS}. “all” shortcut runs them all. "
         "Defaults to `LIBRARY_MAINT_ACTION` environ or {Defaults.LIBRARY_MAINT_ACTION}",
+        nargs="+",
         default=os.getenv("LIBRARY_MAINT_ACTION", Defaults.LIBRARY_MAINT_ACTION),
     )
 
