@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: releases-redirects-gen
+  name: maps-generator
   namespace: zim
 spec:
   schedule: "@hourly"
@@ -14,23 +14,34 @@ spec:
       template:
         spec:
           containers:
-            # estimated duration: <2s
+            # estimated duration: <5s
             - name: alpine
               image: docker.io/library/python:3.10-alpine
               imagePullPolicy: IfNotPresent
               volumeMounts:
-              - mountPath: "/etc/nginx/maps"
-                name: openzim-maps-volume
+              - mountPath: "/data/maps"
+                name: maps-volume
                 readOnly: false
-              - mountPath: "/var/www/download.openzim.org"
+              - mountPath: "/data/openzim"
                 name: openzim-volume
-                readOnly: false
-              - mountPath: "/create_releases_redirects.py"
-                name: gen-scripts-volume
-                subPath: "create_releases_redirects.py"
                 readOnly: true
-              command: ["python"]
-              args: ["create_releases_redirects.py"]
+              - mountPath: "/data/download"
+                name: kiwix-volume
+                readOnly: true
+              - mountPath: "/usr/local/bin/create-releases-maps"
+                name: gen-scripts-volume
+                subPath: "create_releases_maps.py"
+                readOnly: true
+              - mountPath: "/usr/local/bin/create-wp1-map"
+                name: gen-scripts-volume
+                subPath: "create_wp1_map.sh"
+                readOnly: true
+              - mountPath: "/usr/local/bin/create-all-maps"
+                name: gen-scripts-volume
+                subPath: "create_all_maps.sh"
+                readOnly: true
+              command: ["sh", "-c"]
+              args: ["create-all-maps"]
               resources:
                 requests:
                   memory: "128Mi"
@@ -43,9 +54,12 @@ spec:
             - name: openzim-volume
               persistentVolumeClaim:
                 claimName: openzim-download-pvc
-            - name: openzim-maps-volume
+            - name: kiwix-volume
               persistentVolumeClaim:
-                claimName: openzim-maps-pvc
+                claimName: kiwix-download-pvc
+            - name: maps-volume
+              persistentVolumeClaim:
+                claimName: maps-pvc
           restartPolicy: Never
           nodeSelector:
             k8s.kiwix.org/role: "storage"

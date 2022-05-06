@@ -4,13 +4,170 @@ metadata:
   name: gen-scripts
   namespace: zim
 data:
-  create_wp1_redirects.sh: |
-    #/bin/sh
+  create_all_maps.sh: |
+    #!/bin/sh
+    set -e
+
+    create-releases-maps kiwix openzim
+    create-wp1-map
+
+  create_releases_maps.py: |
+    #!/usr/bin/env python3
+
+    """ Rewrites releases redirects map for Kiwix and openZIM """
+
+    import argparse
+    import os
+    import pathlib
+    import re
+    from dataclasses import dataclass
+
+
+    @dataclass
+    class Defaults:
+        OPENZIM_DOWNLOAD_ROOT = "/data/openzim"
+        OPENZIM_REDIRECTS_MAP = "/data/maps/openzim-releases.map"
+        KIWIX_DOWNLOAD_ROOT = "/data/download"
+        KIWIX_REDIRECTS_MAP = "/data/maps/kiwix-releases.map"
+
+
+    openzim_releases = {
+        "libzim/libzim.tar.xz": "libzim-*.tar.xz",
+        "libzim/libzim_linux-x86_64.tar.gz": "libzim_linux-x86_64-*.tar.gz",
+        "libzim/libzim_macos-x86_64.tar.gz": "libzim_macos-x86_64-*.tar.gz",
+        "zim-tools/zim-tools.tar.xz": "zim-tools-*.tar.xz",
+        "zim-tools/zim-tools_linux-x86_64.tar.gz": "zim-tools_linux-x86_64-*.tar.gz",
+        "zimwriterfs/zimwriterfs.tar.xz": "zimwriterfs-*.tar.xz",
+        "zimwriterfs/zimwriterfs_linux-x86_64.tar.gz": "zimwriterfs_linux-x86_64-*.tar.gz",
+    }
+
+    kiwix_releases = {
+        "kiwix-tools/kiwix-tools.tar.xz": "kiwix-tools-*.tar.xz",
+        "kiwix-tools/kiwix-tools_linux-armhf.tar.gz": ("kiwix-tools_linux-armhf-*.tar.gz"),
+        "kiwix-tools/kiwix-tools_linux-i586.tar.gz": ("kiwix-tools_linux-i586-*.tar.gz"),
+        "kiwix-tools/kiwix-tools_linux-x86_64.tar.gz": (
+            "kiwix-tools_linux-x86_64-*.tar.gz"
+        ),
+        "kiwix-tools/kiwix-tools_win-i686.zip": "kiwix-tools_win-i686-*.zip",
+        "kiwix-desktop/kiwix-desktop.tar.gz": "kiwix-desktop-*.tar.gz",
+        "kiwix-desktop/kiwix-desktop_windows_x64.zip": ("kiwix-desktop_windows_x64_*.zip"),
+        "kiwix-desktop/kiwix-desktop_x86_64.appimage": ("kiwix-desktop_x86_64_*.appimage"),
+        "kiwix-desktop/org.kiwix.desktop.flatpak": "org.kiwix.desktop.*.flatpak",
+        "kiwix-desktop-macos/kiwix-desktop-macos.dmg": "kiwix-desktop-macos_*.dmg",
+        "kiwix-hotspot/kiwix-hotspot-linux.tar.gz": "kiwix-hotspot-linux-*.tar.gz",
+        "kiwix-hotspot/kiwix-hotspot-macos.dmg": "kiwix-hotspot-macos-*.dmg",
+        "kiwix-hotspot/kiwix-hotspot-win64.exe": "kiwix-hotspot-win64-*.exe",
+        "kiwix-android/kiwix.apk": "kiwix-*.apk",
+        "kiwix-js-windows/kiwix-js-windows.appxbundle": ("kiwix-js-windows_*.appxbundle"),
+    }
+
+
+    def write_release_redirects_map(content_fpath, redirects_map_fpath, releases):
+        release_dir = "release"
+        release_fpath = content_fpath / release_dir
+
+        if not release_fpath.exists():
+            raise IOError(f"release folder {release_fpath} does not exist.")
+
+        def get_latest_release_path(pattern):
+            """content_fpath-relative path of latest matching file"""
+
+            # retrieve list of files using glob
+            files = list(release_fpath.rglob(pattern))
+
+            # create regex from simple “glob” pattern
+            version_reg = re.compile(pattern.replace("*", "(?P<version>.+)"))
+
+            # get latest version and related file by sorting all matching files
+            # on their version number ; keeping last of list
+            latest_version, lastest_fpath = sorted(
+                [(version_reg.match(p.name).groupdict()["version"], p) for p in files],
+                key=lambda v: v[0],
+            )[-1]
+
+            return lastest_fpath.relative_to(content_fpath)
+
+        print(f"Rewriting {redirects_map_fpath}...")
+        content = "# releases redirects: no-version to latest\n"
+        for path, pattern in releases.items():
+            content += f"/{release_dir}/{path} /{get_latest_release_path(pattern)};\n"
+
+        with open(redirects_map_fpath, "w") as fh:
+            fh.write(content)
+
+        print(f"> OK. Wrote {len(content.splitlines()) -1 } redirects")
+
+
+    if __name__ == "__main__":
+        parser = argparse.ArgumentParser(
+            prog="create-releases-maps",
+            description="Rewrites releases redirects map for Kiwix and openZIM",
+        )
+
+        parser.add_argument(
+            "projects",
+            help="Maps to create, from `kiwix`, `openzim`",
+            nargs="+",
+        )
+
+        parser.add_argument(
+            "--openzim-root",
+            default=os.getenv("OPENZIM_DOWNLOAD_ROOT", Defaults.OPENZIM_DOWNLOAD_ROOT),
+            help="Root openZIM download folder. Defaults to "
+            f"`OPENZIM_DOWNLOAD_ROOT` environ or {Defaults.OPENZIM_DOWNLOAD_ROOT}",
+            dest="openzim_root",
+        )
+        parser.add_argument(
+            "--openzim-redirects",
+            default=os.getenv("OPENZIM_REDIRECTS_MAP", Defaults.OPENZIM_REDIRECTS_MAP),
+            help="Path to openZIM releases redirects map. Defaults to "
+            f"`OPENZIM_REDIRECTS_MAP` environ or {Defaults.OPENZIM_REDIRECTS_MAP}",
+            dest="openzim_redirects",
+        )
+        parser.add_argument(
+            "--kiwix-root",
+            default=os.getenv("KIWIX_DOWNLOAD_ROOT", Defaults.KIWIX_DOWNLOAD_ROOT),
+            help="Root Kiwix download folder. Defaults to "
+            f"`KIWIX_DOWNLOAD_ROOT` environ or {Defaults.KIWIX_DOWNLOAD_ROOT}",
+            dest="kiwix_root",
+        )
+        parser.add_argument(
+            "--kiwix-redirects",
+            default=os.getenv("KIWIX_REDIRECTS_MAP", Defaults.KIWIX_REDIRECTS_MAP),
+            help="Path to Kiwix releases redirects map. Defaults to "
+            f"`KIWIX_REDIRECTS_MAP` environ or {Defaults.KIWIX_REDIRECTS_MAP}",
+            dest="kiwix_redirects",
+        )
+        args = parser.parse_args()
+
+        if "kiwix" in args.projects:
+            print("Generating releases map for Kiwix…")
+            write_release_redirects_map(
+                pathlib.Path(args.kiwix_root),
+                pathlib.Path(args.kiwix_redirects),
+                kiwix_releases,
+            )
+
+        if "openzim" in args.projects:
+            print("Generating releases map for openZIM…")
+            write_release_redirects_map(
+                pathlib.Path(args.openzim_root),
+                pathlib.Path(args.openzim_redirects),
+                openzim_releases,
+            )
+
+  create_wp1_map.sh: |
+    #!/bin/sh
 
     echo "Starting create_wp1_redirects..."
 
-    WP1_DIR=/var/www/download.openzim.org/wp1
-    WP1_MAP=/etc/nginx/maps/wp1.map
+    if [ -z "$WP1_DIR" ]; then
+      WP1_DIR=/data/openzim/wp1
+    fi
+
+    if [ -z "$WP1_MAP" ]; then
+      WP1_MAP=/data/maps/wp1.map
+    fi
 
     cat /dev/null > $WP1_MAP
     cd $WP1_DIR
@@ -25,6 +182,7 @@ data:
     done
 
     echo "> done"
+
   create_release_feeds.py: |
     #!/usr/bin/env python3
 
@@ -88,111 +246,6 @@ data:
         "Kiwix",
         "https://download.kiwix.org/release",
     )
-  create_release_redirects.pl: |
-    #!/usr/bin/perl
-    use utf8;
-    use strict;
-    use warnings;
-
-    my $contentDirectoryPath = "/var/www/download.openzim.org";
-    my $releaseDirectoryName = "release";
-    my $releaseDirectoryPath = $contentDirectoryPath."/".$releaseDirectoryName;
-    my $redirectsPath = "/etc/nginx/maps/openzim.map";
-
-    my $content = "";
-    $content .= "/".$releaseDirectoryName."/libzim/libzim.tar.xz ".getLastRelease("libzim-*.tar.xz").";\n";
-    $content .= "/".$releaseDirectoryName."/libzim/libzim_linux-x86_64.tar.gz ".getLastRelease("libzim_linux-x86_64-*.tar.gz").";\n";
-    $content .= "/".$releaseDirectoryName."/libzim/libzim_macos-x86_64.tar.gz ".getLastRelease("libzim_macos-x86_64-*.tar.gz").";\n";
-    $content .= "/".$releaseDirectoryName."/zim-tools/zim-tools.tar.xz ".getLastRelease("zim-tools-*.tar.xz").";\n";
-    $content .= "/".$releaseDirectoryName."/zim-tools/zim-tools_linux-x86_64.tar.gz ".getLastRelease("zim-tools_linux-x86_64-*.tar.gz").";\n";
-    $content .= "/".$releaseDirectoryName."/zimwriterfs/zimwriterfs.tar.gz ".getLastRelease("zimwriterfs-*.tar.gz").";\n";
-    $content .= "/".$releaseDirectoryName."/zimwriterfs/zimwriterfs_linux-x86_64.tar.gz ".getLastRelease("zimwriterfs_linux-x86_64-*.tar.gz").";\n";
-    writeFile($redirectsPath, $content);
-
-    sub getLastRelease {
-        my ($regex) = @_;
-
-        # Get list of files matching the regex
-        my @files = split /\n/, `find "$releaseDirectoryPath" -name "$regex"`;
-
-        # Version regex
-        my $version_regex = $regex =~ s/\*/(.*)/r;
-
-        # Last version
-        my $file = (sort {
-            $a =~ /$version_regex/;
-            my $aa = $1 // $a;
-            $b =~ /$version_regex/;
-            my $bb = $1 // $b;
-            $aa cmp $bb;
-        } @files)[-1];
-
-        # Not full path
-        substr($file, length($contentDirectoryPath))
-    }
-
-    sub writeFile {
-        my ($file, $data) = @_;
-        utf8::encode($data);
-        utf8::encode($file);
-        open (FILE, ">", "$file") or die "Couldn't open file: $file";
-        print FILE $data;
-        close (FILE);
-    }
-
-    exit 0;
-  create_releases_redirects.py: |
-    #!/usr/bin/env python3
-
-    import pathlib
-    import re
-
-
-    release_dir = "release"
-    content_fpath = pathlib.Path("/var/www/download.openzim.org")
-    release_fpath = content_fpath / release_dir
-    redirects_map_fpath = pathlib.Path("/etc/nginx/maps/openzim.map")
-
-    releases = {
-        "libzim/libzim.tar.xz": "libzim-*.tar.xz",
-        "libzim/libzim_linux-x86_64.tar.gz": "libzim_linux-x86_64-*.tar.gz",
-        "libzim/libzim_macos-x86_64.tar.gz": "libzim_macos-x86_64-*.tar.gz",
-        "zim-tools/zim-tools.tar.xz": "zim-tools-*.tar.xz",
-        "zim-tools/zim-tools_linux-x86_64.tar.gz": "zim-tools_linux-x86_64-*.tar.gz",
-        "zimwriterfs/zimwriterfs.tar.xz": "zimwriterfs-*.tar.xz",
-        "zimwriterfs/zimwriterfs_linux-x86_64.tar.gz": "zimwriterfs_linux-x86_64-*.tar.gz",
-    }
-
-
-    def get_latest_release_path(pattern):
-        """content_fpath-relative path of latest matching file"""
-
-        # retrieve list of files using glob
-        files = list(release_fpath.rglob(pattern))
-
-        # create regex from simple “glob” pattern
-        version_reg = re.compile(pattern.replace("*", "(?P<version>.+)"))
-
-        # get latest version and related file by sorting all matching files
-        # on their version number ; keeping last of list
-        latest_version, lastest_fpath = sorted(
-            [(version_reg.match(p.name).groupdict()["version"], p) for p in files],
-            key=lambda v: v[0],
-        )[-1]
-
-        return lastest_fpath.relative_to(content_fpath)
-
-
-    print(f"Rewriting {redirects_map_fpath}...")
-    content = "# openZIM releases redirects: no-version to latest\n"
-    for path, pattern in releases.items():
-        content += f"/{release_dir}/{path} /{get_latest_release_path(pattern)};\n"
-
-
-    with open(redirects_map_fpath, "w") as fh:
-        fh.write(content)
-
-    print(f"> OK. Wrote {len(content.splitlines()) -1 } redirects")
 
   genRSS.py: |
     #!/usr/bin/env python3

@@ -1,20 +1,20 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: openzim-maps-local-pv
+  name: maps-local-pv
 spec:
   capacity:
     # content is 300Gi+ ATM (Apr 2022)
-    storage: 10Mi
+    storage: 100Mi
   volumeMode: Filesystem
   accessModes:
   - ReadWriteMany
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage
   local:
-    path: /data/openzim-maps
+    path: /data/maps
   claimRef:
-    name: openzim-maps-pvc
+    name: maps-pvc
     namespace: zim
   nodeAffinity:
     required:
