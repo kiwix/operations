@@ -18,17 +18,20 @@ spec:
       containers:
       # /!\ manually purge kiwix-serve cache on kiwix-serve version upgrade
       # curl -X PURGE -H "X-Purge-Type kiwix-serve" http://mirrorbrain-web-service
+      # also check that varnish hack still necessary (gzip, endpoints)
       - image: ghcr.io/kiwix/kiwix-tools:3.2.0-3
         imagePullPolicy: IfNotPresent
         name: kiwix-tools
-        command: ["kiwix-serve", "--library", "-v", "--monitorLibrary", "--threads", "16", "--nodatealias", "/var/www/library.kiwix.org/library.kiwix.org.xml"]
+        command: ["kiwix-serve", "--library", "-v", "--monitorLibrary", "--threads", "16", "--nodatealias", "/data/library/internal_library.xml"]
         ports:
         - containerPort: 80
         volumeMounts:
-        - mountPath: "/var/www/download.kiwix.org"
+        - mountPath: "/data/download/zim"
+          subPath: zim
           name: download-volume
           readOnly: true
-        - mountPath: "/var/www/library.kiwix.org"
+        - mountPath: "/data/library/internal_library.xml"
+          subPath: internal_library.xml
           name: library-volume
           readOnly: true
         resources:
@@ -83,15 +86,17 @@ spec:
       - image: ghcr.io/kiwix/kiwix-tools:3.2.0-3
         imagePullPolicy: IfNotPresent
         name: kiwix-tools
-        command: ["kiwix-serve", "--library", "-v", "--monitorLibrary", "--threads", "16", "--nodatealias", "/var/www/library.kiwix.org/library.kiwix.org.xml"]
+        command: ["kiwix-serve", "--library", "-v", "--monitorLibrary", "--threads", "16", "--nodatealias", "/data/library/internal_library.xml"]
         ports:
         - containerPort: 80
         volumeMounts:
         # https://github.com/kiwix/libkiwix/issues/754
-        - mountPath: "/var/www/download.kiwix.org"
+        - mountPath: "/data/download/zim"
+          subPath: zim
           name: download-volume
           readOnly: true
-        - mountPath: "/var/www/library.kiwix.org"
+        - mountPath: "/data/library/internal_library.xml"
+          subPath: internal_library.xml
           name: library-volume
           readOnly: true
         resources:
