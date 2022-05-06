@@ -22,7 +22,7 @@ spec:
       - image: ghcr.io/kiwix/kiwix-tools:3.2.0-3
         imagePullPolicy: IfNotPresent
         name: kiwix-tools
-        command: ["kiwix-serve", "--library", "-v", "--monitorLibrary", "--threads", "16", "--nodatealias", "/data/library/internal_library.xml"]
+        args: ["kiwix-serve", "--library", "-v", "--monitorLibrary", "--threads", "16", "--nodatealias", "/data/library/internal_library.xml"]
         ports:
         - containerPort: 80
         volumeMounts:
@@ -86,7 +86,7 @@ spec:
       - image: ghcr.io/kiwix/kiwix-tools:3.2.0-3
         imagePullPolicy: IfNotPresent
         name: kiwix-tools
-        command: ["kiwix-serve", "--library", "-v", "--monitorLibrary", "--threads", "16", "--nodatealias", "/data/library/internal_library.xml"]
+        args: ["kiwix-serve", "--library", "-v", "--monitorLibrary", "--threads", "16", "--nodatealias", "/data/library/internal_library.xml"]
         ports:
         - containerPort: 80
         volumeMounts:
