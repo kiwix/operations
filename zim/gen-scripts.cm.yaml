@@ -62,9 +62,10 @@ data:
     }
 
 
-    def write_release_redirects_map(content_fpath, redirects_map_fpath, releases):
+    def write_release_redirects_map(content_fpath, redirects_map_fpath, releases, is_nginx):
         release_dir = "release"
         release_fpath = content_fpath / release_dir
+        eol = ";" if is_nginx else ""
 
         if not release_fpath.exists():
             raise IOError(f"release folder {release_fpath} does not exist.")
@@ -90,7 +91,7 @@ data:
         print(f"Rewriting {redirects_map_fpath}...")
         content = "# releases redirects: no-version to latest\n"
         for path, pattern in releases.items():
-            content += f"/{release_dir}/{path} /{get_latest_release_path(pattern)};\n"
+            content += f"/{release_dir}/{path} /{get_latest_release_path(pattern)}{eol}\n"
 
         with open(redirects_map_fpath, "w") as fh:
             fh.write(content)
@@ -146,6 +147,7 @@ data:
                 pathlib.Path(args.kiwix_root),
                 pathlib.Path(args.kiwix_redirects),
                 kiwix_releases,
+                is_nginx=False,
             )
 
         if "openzim" in args.projects:
@@ -154,6 +156,7 @@ data:
                 pathlib.Path(args.openzim_root),
                 pathlib.Path(args.openzim_redirects),
                 openzim_releases,
+                is_nginx=True,
             )
 
   create_wp1_map.sh: |
