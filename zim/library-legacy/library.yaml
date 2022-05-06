@@ -34,8 +34,8 @@ spec:
           readOnly: true
         resources:
           requests:
-            memory: "6Gi"
-            cpu: "1000m"
+            memory: "1Gi"
+            cpu: "200m"
       volumes:
       - name: download-volume
         persistentVolumeClaim:
@@ -75,12 +75,13 @@ metadata:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
 spec:
   ingressClassName: nginx
-  tls:
-    - hosts:
-      - library.kiwix.org
-      secretName: library-kiwix-org-tls
+  # tls:
+  #   - hosts:
+  #     - library.kiwix.org
+  #     secretName: library-kiwix-org-tls
   rules:
-  - host: library.kiwix.org
+  # - host: library.kiwix.org
+  - host: library-legacy.test.k8s.kiwix.org
     http:
       paths:
       - path: /

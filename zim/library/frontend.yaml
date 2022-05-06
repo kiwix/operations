@@ -23,9 +23,32 @@ data:
       extra_opts="${extra_opts} -T $VARNISH_ADMIN_IP:6082"
     fi
 
+    if [ -z "$VARNISH_LOG" ]; then
+      VARNISH_LOG="/dev/stdout"
+    fi
+
+    function varnishncsa_after_varnishd {
+      echo "Awaiting varnishd startup "
+      while :
+      do
+        if [ -f /var/run/varnishd.pid ] ; then
+          echo ""
+          break
+        fi
+        echo -n "."
+        sleep 1
+      done
+      echo "Varnishd running at PID=$(cat /var/run/varnishd.pid)."
+
+      echo "Starting varnishncsa to record logs to $VARNISH_LOG"
+      varnishncsa -D -P /var/run/varnishncsa.pid -c -a -F '%{Host}i %{X-Forwarded-For}i - %u %t "%r" %s %b "%{Referer}i" "%{User-agent}i"' -q 'ReqURL ~ "^/catalog/"' -w $VARNISH_LOG
+    }
+
+    varnishncsa_after_varnishd &
+
     echo "Starting varnish with ${extra_opts}"
 
-    exec varnishd -F -a http=:80,HTTP -p feature=+http2 -f /etc/varnish/default.vcl -s malloc,$VARNISHSIZE $extra_opts
+    exec varnishd -P /var/run/varnishd.pid -F -a http=:80,HTTP -p feature=+http2 -f /etc/varnish/default.vcl -s malloc,$VARNISHSIZE $extra_opts
   varnish.vcl: |
     vcl 4.1;
 
@@ -223,14 +246,12 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: status.podIP
+        - name: VARNISH_LOG
+          value: "/data/logs/access.log"
         ports:
         - containerPort: 80
         - containerPort: 6082
         volumeMounts:
-        # - mountPath: "/usr/share/nginx/html/favicon.ico"
-        #   subPath: favicon.ico
-        #   name: branding
-        #   readOnly: true
         - name: configs
           mountPath: "/usr/sbin/entrypoint"
           subPath: entrypoint.sh
@@ -243,18 +264,22 @@ spec:
           mountPath: "/etc/varnish/default.vcl"
           subPath: varnish.vcl
           readOnly: true
+        - mountPath: "/data/logs"
+          subPath: library-kiwix
+          name: nginx-logs-volume
+          readOnly: false
         resources:
           requests:
             memory: "16Gi"
             cpu: "200m"
       volumes:
-      # - name: branding
-      #   configMap:
-      #     name: branding-configs
       - name: configs
         configMap:
           name: library-frontend-configs
           defaultMode: 0755
+      - name: nginx-logs-volume
+        persistentVolumeClaim:
+          claimName: nginx-logs-pvc
       nodeSelector:
         k8s.kiwix.org/role: "storage"
 ---
@@ -287,13 +312,50 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    # should not be necessary once kiwix-serve speaks gzip and varnish picks it up (#753 libkiwix 10.2.0+)
+    nginx.ingress.kubernetes.io/server-snippet: |
+      gzip on;
+      gzip_types
+        application/atom+xml
+        application/javascript
+        application/x-javascript
+        application/json
+        application/rss+xml
+        application/vnd.ms-fontobject
+        application/x-font-ttf
+        application/x-web-app-manifest+json
+        application/xhtml+xml
+        application/xml
+        font/opentype
+        image/svg+xml
+        image/x-icon
+        text/css
+        text/plain
+        text/xml
+        text/x-component;
+
+        rewrite ^/favicon.ico$ https://www.kiwix.org/favicon.ico permanent;
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
       - library.test.k8s.kiwix.org
       secretName: library-test-k8s-kiwix-org-tls
+    - hosts:
+      - library.kiwix.org
+      secretName: library-kiwix-org-tls
   rules:
+  - host: library.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: library-frontend-service
+            port:
+              name: http
+
   - host: library.test.k8s.kiwix.org
     http:
       paths:
