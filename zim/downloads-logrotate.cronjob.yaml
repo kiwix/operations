@@ -21,6 +21,9 @@ data:
     /data/nginx-logs/download-openzim/*.log {
       olddir /data/nginx-logs/archives/download-openzim
     }
+    /data/nginx-logs/library-kiwix/*.log {
+      olddir /data/nginx-logs/archives/library-kiwix
+    }
 ---
 apiVersion: batch/v1
 kind: CronJob
