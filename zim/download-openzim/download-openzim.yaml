@@ -8,8 +8,8 @@ data:
     map_hash_max_size 2048;
     map_hash_bucket_size 256;
     map $uri $redirect_uri {
-        include /etc/nginx/maps/wp1.map;
-        include /etc/nginx/maps/openzim.map;
+        include /data/maps/wp1.map;
+        include /data/maps/openzim-releases.map;
     }
 
     server {
@@ -76,8 +76,8 @@ spec:
         ports:
         - containerPort: 80
         volumeMounts:
-        - mountPath: "/etc/nginx/maps"
-          name: openzim-maps-volume
+        - mountPath: "/data/maps"
+          name: maps-volume
           readOnly: true
         - mountPath: "/var/www/download.openzim.org"
           name: openzim-volume
@@ -110,9 +110,9 @@ spec:
       - name: openzim-volume
         persistentVolumeClaim:
           claimName: openzim-download-pvc
-      - name: openzim-maps-volume
+      - name: maps-volume
         persistentVolumeClaim:
-          claimName: openzim-maps-pvc
+          claimName: maps-pvc
       - name: nginx-logs-volume
         persistentVolumeClaim:
           claimName: nginx-logs-pvc
