@@ -1,0 +1,76 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: library-generator
+  namespace: zim
+spec:
+  schedule: "30 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - name: debian
+              image: ghcr.io/rgaudin/debian:dev
+              imagePullPolicy: Always
+              env:
+              - name: INSTALL_SCRIPTS
+                value: "library-maint#github://kiwix/k8s/zim/library-mgmt/library-maint.py\nlibrary-to-offspot#github://kiwix/k8s/zim/library-mgmt/library-to-offspot.py"
+              - name: VARNISH_URL
+                value: "http://library-frontend-service"
+              - name: MIRRORBRAIN_URL
+                value: "http://mirrorbrain-web-service"
+              - name: WIKI_DOMAIN
+                value: "wiki.kiwix.org"
+              - name: WIKI_USERNAME
+                value: "Reg@library-maint"
+              - name: WIKI_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: wiki-credentials
+                    key: password
+              - name: WIKI_PAGE
+                value: "Template:ZIMdumps/content"
+              volumeMounts:
+              - name: kiwix-download
+                subPath: library/library_zim.xml
+                mountPath: "/data/download/library/library_zim.xml"
+                readOnly: false  # tmp
+              - name: kiwix-download
+                subPath: zim
+                mountPath: "/data/download/zim"
+                readOnly: true  # no-rm for now
+              - name: kiwix-library
+                subPath: internal_library.xml
+                mountPath: "/data/library/internal_library.xml"
+                readOnly: false
+              - mountPath: "/data/maps/zim.map"
+                subPath: zim.map
+                name: maps-volume
+                readOnly: false
+              - name: kiwix-download
+                subPath: library/ideascube.yml
+                mountPath: "/data/download/library/ideascube.yml"
+                readOnly: false
+              args: ["library-maint", "--zim-root", "/data/download/zim", "--library-dest", "/data/download/library/library_zim.xml", "--internal-zim-root", "/data/download/zim", "--internal-library-dest", "/data/library/internal_library.xml", "--redirects-root", "/data/download", "--zim-redirects-map", "/data/maps/zim.map", "--nb-keep-zim", "3", "--nb-exposed-zim", "1", "--offspot-library", "/data/download/library/ideascube.yml", "all"]
+              resources:
+                requests:
+                  cpu: 200m
+                  memory: 1Gi
+          volumes:
+          - name: kiwix-download
+            persistentVolumeClaim:
+              claimName: kiwix-download-pvc
+          - name: kiwix-library
+            persistentVolumeClaim:
+              claimName: kiwix-library-pvc
+          - name: maps-volume
+            persistentVolumeClaim:
+              claimName: maps-pvc
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "storage"
