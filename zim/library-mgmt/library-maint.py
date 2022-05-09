@@ -21,7 +21,7 @@ import unidecode
 import urllib.parse
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Any, Dict, Generator, Tuple
+from typing import Any, Dict, Generator, Tuple, List
 
 import mwclient
 import requests
@@ -164,6 +164,27 @@ def human_sort(entry: Dict) -> str:
     )
 
 
+def sort_filenames_for_recent(filenames: List[pathlib.Path]) -> List[pathlib.Path]:
+    """Sorted copy of a list of ZIM filenames with ASC names but DESC periods"""
+
+    def split_filename(filename):
+        return re.split(r"_(?P<period>\d{4}-\d{2})$", filename.stem)
+
+    def get_core(filename):
+        return split_filename(filename)[0]
+
+    def get_period(filename):
+        return split_filename(filename)[1]
+
+    filenames_ = list(filenames)
+    # sort by descending period
+    filenames_.sort(key=get_period, reverse=True)
+    # sort by core
+    filenames_.sort(key=get_core, reverse=False)
+
+    return filenames_
+
+
 @contextmanager
 def open_chmod(file: pathlib.Path, *args, **kwargs):
     chmod = kwargs.pop("chmod", None)
@@ -283,7 +304,6 @@ class PreviousLib:
     def is_update(self, entry):
         if not self.has_book(entry["core"], to_human_alias(entry["relpath"])):
             return False
-
         return to_std_dict(entry) != self.books.get(entry["core"])
 
 
@@ -375,9 +395,6 @@ class LibraryMaintainer:
     @property
     def exposed_zims(self) -> Dict[str, Dict]:
         """alias: Entry of just the last entries for an alias"""
-        # for entries in self.all_zims.values():
-        #     for entry in entries[: self.nb_zim_versions_exposed]:
-        #         yield entry
         return {alias: entries[0] for alias, entries in self.all_zims.items()}
 
     def load_previous_library(self):
@@ -390,9 +407,10 @@ class LibraryMaintainer:
                 f"{len(self.previous_lib.aliases)} aliases"
             )
 
-    def read_zim_info_from(self, fpath: pathlib.Path) -> Dict[str, Any]:
+    def read_zimfile_info(self, fpath: pathlib.Path, read_zim: bool) -> Dict[str, Any]:
         """All infor read from ZIM file/name"""
         entry = {}
+        relpath = fpath.relative_to(self.zim_root)
 
         try:
             values = self.filename_fmt.match(fpath.stem).groupdict()
@@ -414,8 +432,15 @@ class LibraryMaintainer:
                 "year": values["year"],
                 "core": to_core(fpath),
                 "rsize": fpath.stat().st_size,
+                "relpath": relpath,
+                "size": str(int(fpath.stat().st_size / 1024)),
+                "url": str(f"{self.download_url_root}{relpath}.meta4"),
+                "latest": is_latest(fpath),
             }
         )
+
+        if not read_zim:
+            return entry
 
         zim = Archive(fpath)
 
@@ -429,8 +454,13 @@ class LibraryMaintainer:
 
         for meta_name in NAMES_MAP.keys():
             try:
+                if meta_name == "Tags":
+                    entry[NAMES_MAP[meta_name]] = ";".join(zim.get_tags(libkiwix=True))
+                    continue
                 entry[NAMES_MAP[meta_name]] = zim.get_text_metadata(meta_name)
             except RuntimeError:
+                if meta_name == "Title":
+                    entry[NAMES_MAP[meta_name]] = fpath.stem.replace("_", " ")
                 continue
         if zim.has_illustration(48):
             entry["favicon"] = base64.standard_b64encode(
@@ -439,7 +469,7 @@ class LibraryMaintainer:
 
         return entry
 
-    def readfs(self, dump_to: pathlib.Path = None):
+    def readfs(self):
         """walk filesystem for ZIM files to build self.all_zims
 
         Optionnaly reads from load_fs JSON file.
@@ -458,19 +488,23 @@ class LibraryMaintainer:
                 )
 
         all_zim_files = get_zim_files(self.zim_root, self.with_hidden)
-        for index, zim_path in enumerate(sorted(all_zim_files)):
+        for index, zim_path in enumerate(sort_filenames_for_recent(all_zim_files)):
             relpath = zim_path.relative_to(self.zim_root)
             alias = to_human_alias(relpath)
             logger.debug(f"[READ] {str(index).zfill(4)} {relpath}")
 
             try:
-                entry = self.read_zim_info_from(zim_path)
+                # only read in-zim data (slow) for the first n (1) files.
+                # we want to track all files so we can delete obsolete but deletion
+                # is only based on filename. ZIM-details only for latest comp.
+                # /!\ depends on iterator being sorted
+                entry = self.read_zimfile_info(
+                    zim_path,
+                    read_zim=len(self.all_zims.get(alias, []))
+                    < self.nb_zim_versions_exposed,
+                )
             except ValueError:
                 continue
-            entry["relpath"] = relpath
-            entry["size"] = str(int(entry["rsize"] / 1024))
-            entry["url"] = str(f"{self.download_url_root}{relpath}.meta4")
-            entry["latest"] = is_latest(zim_path)
 
             if alias not in self.all_zims:
                 self.all_zims[alias] = [entry]
@@ -484,9 +518,6 @@ class LibraryMaintainer:
             if entry["latest"] and self.previous_lib.is_update(entry):
                 logger.debug(f">> is update {alias}: {entry['id']}")
                 self.updated_zims[alias] = (entry["id"], entry["core"])
-                # print(to_std_dict(entry))
-                # print("-----")
-                # print(self.previous_lib.books.get(entry["core"]))
 
         logger.debug(f"[READ] > {len(self.all_zims)} ZIM files in {self.zim_root}")
 
