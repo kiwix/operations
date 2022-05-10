@@ -335,28 +335,19 @@ metadata:
         text/x-component;
 
         rewrite ^/favicon.ico$ https://www.kiwix.org/favicon.ico permanent;
+
+        location /robots.txt {
+          add_header Content-Type "text/plain";
+          return 200 "User-agent: *\nDisallow: /";
+        }
 spec:
   ingressClassName: nginx
   tls:
-    - hosts:
-      - library.test.k8s.kiwix.org
-      secretName: library-test-k8s-kiwix-org-tls
     - hosts:
       - library.kiwix.org
       secretName: library-kiwix-org-tls
   rules:
   - host: library.kiwix.org
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: library-frontend-service
-            port:
-              name: http
-
-  - host: library.test.k8s.kiwix.org
     http:
       paths:
       - path: /
