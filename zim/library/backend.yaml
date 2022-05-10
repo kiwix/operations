@@ -25,6 +25,15 @@ spec:
         args: ["kiwix-serve", "--library", "-v", "--monitorLibrary", "--threads", "16", "--nodatealias", "/data/library/internal_library.xml"]
         ports:
         - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /catalog/search?count=1
+            port: 80
+            httpHeaders:
+              - name: Host
+                value: localhost
+          initialDelaySeconds: 20
+          periodSeconds: 5
         volumeMounts:
         - mountPath: "/data/download/zim"
           subPath: zim
@@ -89,6 +98,15 @@ spec:
         args: ["kiwix-serve", "--library", "-v", "--monitorLibrary", "--threads", "16", "--nodatealias", "/data/library/internal_library.xml"]
         ports:
         - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /catalog/search?count=1
+            port: 80
+            httpHeaders:
+              - name: Host
+                value: localhost
+          initialDelaySeconds: 20
+          periodSeconds: 5
         volumeMounts:
         # https://github.com/kiwix/libkiwix/issues/754
         - mountPath: "/data/download/zim"
@@ -129,33 +147,3 @@ spec:
     port: 80
     targetPort: 80
     name: http
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: library-test-backend-ingress
-  namespace: zim
-  annotations:
-    # nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
-spec:
-  ingressClassName: nginx
-  rules:
-  - host: library-backend.test.k8s.kiwix.org
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: library-demo-backend-service
-            port:
-              name: http
-      - path: /catalog
-        pathType: Prefix
-        backend:
-          service:
-            name: library-catalog-backend-service
-            port:
-              name: http
