@@ -17,10 +17,10 @@ spec:
             - name: borg-backup
               image: ghcr.io/kiwix/borg-backup:latest
               imagePullPolicy: Always
-              volumeMounts:
-              - name: files-volume
-                mountPath: "/storage"
-                readOnly: true
+              # volumeMounts:
+              # - name: files-volume
+              #   mountPath: "/storage"
+              #   readOnly: true
               env:
                 - name: BW_CLIENTID
                   valueFrom:
@@ -57,10 +57,12 @@ spec:
                 requests:
                   cpu: 200m
                   memory: 1Gi
-          volumes:
-          - name: files-volume
-            persistentVolumeClaim:
-              claimName: matomo-files-pvc
+                limits:
+                  memory: 1Gi
+          # volumes:
+          # - name: files-volume
+          #   persistentVolumeClaim:
+          #     claimName: matomo-files-pvc
           restartPolicy: OnFailure
           nodeSelector:
-            k8s.kiwix.org/role: "stats"
+            k8s.kiwix.org/role: "services"
