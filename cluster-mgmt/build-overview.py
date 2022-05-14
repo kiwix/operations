@@ -282,7 +282,7 @@ class Global:
         "storage": {"cpu": 8000, "memory": 96519},
         "system": {"cpu": 3000, "memory": 3930},
         "services": {"cpu": 8000, "memory": 32065},
-        "stats": {"cpu": 4000, "memory": 11975},
+        "stats": {"cpu": 8000, "memory": 32065},
     }
     namespaces: List = []
     pods: List[Dict[str, Dict]] = []
