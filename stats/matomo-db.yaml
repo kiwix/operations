@@ -10,12 +10,23 @@ data:
     net_write_timeout   = 43200
   pool.cnf: |
     [mysqld]
-    innodb_buffer_pool_size=16G
-    innodb_lru_scan_depth=256
+    skip_name_resolve
     max_allowed_packet=512M
-    innodb_page_cleaners=8
+    secure-file-priv = ""
+    local-infile=1
+
+    innodb_log_file_size=512M
+    innodb_buffer_pool_size=8G
+    innodb-buffer-pool-chunk-size=134217728
     innodb_buffer_pool_instances=8
+
+    innodb_flush_log_at_trx_commit=2
+    innodb_lru_scan_depth=256
+    innodb_page_cleaners=8
     innodb_io_capacity=100
+
+    [mysql]
+    local-infile=1
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -35,7 +46,7 @@ spec:
         app: matomo-db
     spec:
       containers:
-      - image: docker.io/mysql:5
+      - image: docker.io/mysql:8-debian
         imagePullPolicy: IfNotPresent
         name: mysql
         env:
@@ -48,12 +59,14 @@ spec:
         - name: mysql-configs
           mountPath: "/etc/mysql/conf.d"
           readOnly: true
+        - mountPath: /tmp
+          name: tmpfs
         ports:
         - containerPort: 3306
         resources:
           requests:
-            memory: "4Gi"
-            cpu: "1000m"
+            memory: "10Gi"
+            cpu: "3000m"
       volumes:
       - name: data-volume
         persistentVolumeClaim:
@@ -61,6 +74,9 @@ spec:
       - name: mysql-configs
         configMap:
           name: mysql-configs
+      - name: tmpfs
+        emptyDir:
+          medium: Memory
       nodeSelector:
         k8s.kiwix.org/role: "stats"
 ---

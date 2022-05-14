@@ -12,24 +12,23 @@ data:
       root /var/www/html/;
       index index.php index.html index.htm;
 
-      # location ~ ^/(index|matomo|piwik|js/index).php {
-      location / {
-        fastcgi_index index.php;
-        include fastcgi_params;
-        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-        fastcgi_param PATH_INFO $fastcgi_path_info;
-        fastcgi_read_timeout 600;
-        fastcgi_pass matomo-app-service:9000;
+      location ~ ^/matomo.js {
+        gzip on;
+        gzip_types "*";
+
+        proxy_hide_header 'Cache-Control';
+        add_header 'Cache-Control' 'max-age=3600, must-revalidate';
+      }
+
+      location = /favicon.ico {
+        log_not_found off;
+        access_log off;
       }
 
       # location ~* ^.+\.php$ {
       #   deny all;
       #   return 403;
       # }
-
-      location /ssss {
-        try_files $uri $uri/ =404;
-      }
 
       location ~ /(config|tmp|core|lang) {
         deny all;
@@ -44,15 +43,21 @@ data:
         deny all;
         return 403;
       }
+
+      location ~ ^/(index|matomo|piwik|js/index).php {
+      # location / {
+        fastcgi_index index.php;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+        fastcgi_read_timeout 600;
+        fastcgi_pass matomo-app-service:9000;
+      }
+
       error_page 404 /404.html;
       error_page 500 502 503 504 /50x.html;
       location = /50x.html {
         root /usr/share/nginx/html;
-      }
-
-      location = /favicon.ico {
-        log_not_found off;
-        access_log off;
       }
     }
 ---
@@ -128,6 +133,11 @@ metadata:
   namespace: stats
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/server-snippet: |
+      location /robots.txt {
+        add_header Content-Type "text/plain";
+        return 200 "User-agent: *\nDisallow: /";
+      }
 spec:
   tls:
     - hosts:

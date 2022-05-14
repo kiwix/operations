@@ -4,8 +4,6 @@ metadata:
   name: php-configs
   namespace: stats
 data:
-  memory-limit.ini: |
-    memory_limit = 512M
   www-pool.conf: |
     [www]
     pm.max_children = 20
@@ -28,13 +26,15 @@ spec:
         app: matomo-app
     spec:
       containers:
-      - image: docker.io/matomo:3.9.1-fpm
+      - image: ghcr.io/kiwix/matomo:4.9.1-fpm
         imagePullPolicy: IfNotPresent
         name: matomo
         env:
           # URL to internal web service for cron upload
           - name: MATOMO_URL
             value: "http://matomo-web-service"
+          - name: PHP_MEMORY_LIMIT
+            value: "3096M"
         volumeMounts:
         - name: files-volume
           mountPath: "/var/www/html/misc/user"
@@ -49,10 +49,6 @@ spec:
           subPath: config.ini.php
           readOnly: false
         - name: php-configs
-          mountPath: "/usr/local/etc/php/conf.d/memory-limit.ini"
-          subPath: memory-limit.ini
-          readOnly: true
-        - name: php-configs
           mountPath: "/usr/local/etc/php-fpm.d/zz-www-pool.conf"
           subPath: www-pool.conf
           readOnly: true
@@ -60,8 +56,8 @@ spec:
         - containerPort: 9000
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "300m"
+            memory: "4Gi"
+            cpu: "1000m"
       volumes:
       - name: files-volume
         persistentVolumeClaim:
