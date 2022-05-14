@@ -153,6 +153,8 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/proxy-redirect-from: "http://download.openzim.org/"
+    nginx.ingress.kubernetes.io/proxy-redirect-to: "$scheme://download.openzim.org/"
 spec:
   ingressClassName: nginx
   tls:
