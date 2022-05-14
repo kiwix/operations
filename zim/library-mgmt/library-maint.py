@@ -667,6 +667,7 @@ class LibraryMaintainer:
         download_dir = self.zim_root.relative_to(self.redirects_root)
         content = "<!-- PAGE IS GENERATED AUTOMATICALLY, DO NOT EDIT MANUALLY -->\n"
         for entry in sorted(self.exposed_zims.values(), key=human_sort):
+            ident = without_period(entry["relpath"].stem)
             try:
                 lang_name = get_language_details(entry["lang"])["native"]
             except Exception:
@@ -680,7 +681,7 @@ class LibraryMaintainer:
                 f"{human_size(entry['rsize'])} | {entry['year']}-{entry['month']} "
                 f"| {options} |"
                 r"8={{DownloadLink|"
-                f"{entry['core']}|"
+                f"{ident}|"
                 r"{{{1}}}|"
                 f"{download_dir}"
                 "/}} }}\n"
