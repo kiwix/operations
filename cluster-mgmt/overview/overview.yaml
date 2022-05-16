@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: cluster-mgmt
+  labels:
+    app: overview-app
+  name: overview-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: overview-app
+  template:
+    metadata:
+      labels:
+        app: overview-app
+    spec:
+      serviceAccountName: cluster-viewer
+      containers:
+      - image: ghcr.io/rgaudin/debian:dev
+        imagePullPolicy: Always
+        name: script
+        # regen every 5mn
+        args: ["sh", "-c", "while true; do startup; sleep 300; done"]
+        env:
+          - name: INSTALL_SCRIPTS
+            value: "startup#github://kiwix/k8s/cluster-mgmt/overview/build-overview.py"
+          - name: OVERVIEW_DEST
+            value: "/usr/share/nginx/html"
+        volumeMounts:
+        - mountPath: "/usr/share/nginx/html"
+          name: webroot-volume
+          readOnly: false
+      - image: docker.io/nginx:1.21
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: "/usr/share/nginx/html"
+          name: webroot-volume
+          readOnly: true
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+      volumes:
+      - name: webroot-volume
+        emptyDir: {}
+      nodeSelector:
+        k8s.kiwix.org/role: "system"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: cluster-mgmt
+  name: overview-service
+  labels:
+    app: overview-app
+spec:
+  selector:
+    app: overview-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tmp-kiwix-ingress
+  namespace: cluster-mgmt
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/server-snippet: |
+        location /robots.txt {
+          add_header Content-Type "text/plain";
+          return 200 "User-agent: *\nDisallow: /";
+        }
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - overview.k8s.kiwix.org
+      secretName: overview-k8s-kiwix-org-tls
+  rules:
+  - host: overview.k8s.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: overview-service
+            port:
+              number: 80
