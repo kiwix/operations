@@ -31,7 +31,6 @@ from humanfriendly import format_size as human_size
 from zimscraperlib.i18n import get_language_details
 from zimscraperlib.zim import Archive
 
-logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger("gen-lib")
 
 # in-ZIM metadata to in-library XML attributes
@@ -353,10 +352,10 @@ class LibraryMaintainer:
         wiki_page: str,
         offspot_library_dest: str,
         mirrorbrain_url: str,
+        log_to: str,
         dump_fs: bool,
         load_fs: bool,
     ):
-
         self.actions = [action.strip() for action in actions]
 
         self.zim_root = pathlib.Path(zim_root)
@@ -383,6 +382,7 @@ class LibraryMaintainer:
         self.offspot_library_dest = pathlib.Path(offspot_library_dest)
         self.mirrorbrain_url = mirrorbrain_url
 
+        self.log_to = pathlib.Path(log_to) if log_to else False
         self.dump_fs = pathlib.Path(dump_fs) if dump_fs else False
         self.load_fs = pathlib.Path(load_fs) if load_fs else False
 
@@ -874,6 +874,13 @@ def entrypoint():
     )
 
     parser.add_argument(
+        "--log-to",
+        help="Save log output to to file in addition to stdout",
+        default="",
+        dest="log_to",
+    )
+
+    parser.add_argument(
         "--dump-fs",
         help="Dump filesystem-read info to a JSON file",
         default="",
@@ -888,6 +895,16 @@ def entrypoint():
     )
 
     args = parser.parse_args()
+
+    # enable log to file
+    handlers = [logging.StreamHandler()]
+    if args.log_to:
+        handlers.append(logging.FileHandler(pathlib.Path(args.log_to)))
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format="%(asctime)s %(levelname)s %(message)s",
+        handlers=handlers,
+    )
 
     try:
         maint = LibraryMaintainer(**dict(args._get_kwargs()))
