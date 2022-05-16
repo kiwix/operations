@@ -39,6 +39,10 @@ spec:
               - name: kiwix-download
                 subPath: library/library_zim.xml
                 mountPath: "/data/download/library/library_zim.xml"
+                readOnly: false
+              - name: kiwix-library
+                subPath: library_maint.log
+                mountPath: "/data/library/library_maint.log"
                 readOnly: false  # tmp
               - name: kiwix-download
                 subPath: zim
@@ -56,7 +60,7 @@ spec:
                 subPath: library/ideascube.yml
                 mountPath: "/data/download/library/ideascube.yml"
                 readOnly: false
-              args: ["library-maint", "--zim-root", "/data/download/zim", "--library-dest", "/data/download/library/library_zim.xml", "--internal-zim-root", "/data/download/zim", "--internal-library-dest", "/data/library/internal_library.xml", "--redirects-root", "/data/download", "--zim-redirects-map", "/data/maps/zim.map", "--nb-keep-zim", "3", "--nb-exposed-zim", "1", "--offspot-library", "/data/download/library/ideascube.yml", "--log-to", "/tmp/maint.log", "all"]
+              args: ["library-maint", "--zim-root", "/data/download/zim", "--library-dest", "/data/download/library/library_zim.xml", "--internal-zim-root", "/data/download/zim", "--internal-library-dest", "/data/library/internal_library.xml", "--redirects-root", "/data/download", "--zim-redirects-map", "/data/maps/zim.map", "--nb-keep-zim", "3", "--nb-exposed-zim", "1", "--offspot-library", "/data/download/library/ideascube.yml", "--log-to", "/data/library/library_maint.log", "all"]
               resources:
                 requests:
                   cpu: 200m
