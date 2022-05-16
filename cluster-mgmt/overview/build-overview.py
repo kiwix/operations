@@ -421,7 +421,12 @@ class Global:
 
 
 def fetch_data():
-    Global.context = kube(["config", "current-context"])
+    try:
+        Global.context = kube(["config", "current-context"])
+    except Exception:
+        # serviceAccount mode has no current-context but can access namespaces
+        kube(["get", "ns"])
+        Global.context = "serviceAccount"
     logger.info(f"Fetching resources usage for {Global.context}")
 
     Global.get_namespaces()
