@@ -17,20 +17,23 @@
         - node-{nodename}.html  Total and per-services resources for this node
 """
 
+import datetime
 import json
 import logging
+import os
 import pathlib
 import subprocess
 import sys
-from pprint import pprint
 from typing import Dict, List
 
 import humanfriendly
 from jinja2 import Environment, select_autoescape
 
-HERE = pathlib.Path(__file__).parent
-OUTPUT = HERE / "k8s-overview"
-ONEMIB = 1024 ** 2
+OUTPUT = pathlib.Path(
+    os.getenv("OVERVIEW_DEST", pathlib.Path(__file__).parent / "k8s-overview")
+)
+ONEMIB = 1024**2
+NOW = datetime.datetime.now()
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger("rsc")
 
@@ -80,6 +83,7 @@ tmpl_header = """
 """
 
 tmpl_footer = """
+            <p class="text-center mt-2">{{ date.strftime('%c') }}</p>
         </div>
     </body>
 </html>
@@ -442,6 +446,7 @@ def gen_node(nodename: str):
                     "total_cpu": Global.total_cpu,
                     "total_memory": Global.total_memory,
                     "where": f"node-{nodename}",
+                    "date": NOW,
                 }
             )
         )
@@ -453,7 +458,7 @@ def gen_nodes():
 
 
 def gen_overview():
-    fpath = OUTPUT / f"index.html"
+    fpath = OUTPUT / "index.html"
     with open(fpath, "w") as fh:
         fh.write(
             jinja_env.from_string(tmpl_header + overview_template + tmpl_footer).render(
@@ -464,10 +469,11 @@ def gen_overview():
                     "total_cpu": Global.total_cpu,
                     "total_memory": Global.total_memory,
                     "where": "overview",
+                    "date": NOW,
                 }
             )
         )
-    fpath = OUTPUT / f"all.html"
+    fpath = OUTPUT / "all.html"
     with open(fpath, "w") as fh:
         fh.write(
             jinja_env.from_string(tmpl_header + overview_template + tmpl_footer).render(
@@ -478,6 +484,7 @@ def gen_overview():
                     "total_cpu": Global.total_cpu,
                     "total_memory": Global.total_memory,
                     "where": "detailed",
+                    "date": NOW,
                 }
             )
         )
