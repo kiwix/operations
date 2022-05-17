@@ -79,7 +79,7 @@ class Defaults:
     REDIRECTS_ROOT = "/data/download"
     ZIM_REDIRECTS_MAP = "/data/maps/zim.map"
 
-    NB_ZIM_VERSIONS_TO_KEEP = 4
+    NB_ZIM_VERSIONS_TO_KEEP = 2
     NB_ZIM_VERSIONS_EXPOSED = 1
 
     VARNISH_URL = "http://localhost"
@@ -91,6 +91,8 @@ class Defaults:
 
     OFFSPOT_LIBRARY = "/data/download/library/ideascube.yml"
     MIRRORBRAIN_URL = "http://mirrorbrain-web-service"
+
+    DELETE_TO = "/data/download/.deleted-zim"
 
 
 def pathlib_relpath(data: Any) -> Any:
@@ -353,6 +355,7 @@ class LibraryMaintainer:
         offspot_library_dest: str,
         mirrorbrain_url: str,
         log_to: str,
+        delete_to: str,
         dump_fs: bool,
         load_fs: bool,
     ):
@@ -383,6 +386,7 @@ class LibraryMaintainer:
         self.mirrorbrain_url = mirrorbrain_url
 
         self.log_to = pathlib.Path(log_to) if log_to else False
+        self.delete_to = pathlib.Path(delete_to) if delete_to else False
         self.dump_fs = pathlib.Path(dump_fs) if dump_fs else False
         self.load_fs = pathlib.Path(load_fs) if load_fs else False
 
@@ -526,9 +530,31 @@ class LibraryMaintainer:
             with open_chmod(self.dump_fs, "w", chmod=0o644) as fh:
                 json.dump(self.all_zims, fh, indent=4, cls=JSONEncoder)
 
+    @property
+    def obsolete_zim_files(self):
+        for entries in self.all_zims.values():
+            for entry in entries[self.nb_zim_versions_to_keep :]:
+                yield self.zim_root / entry["relpath"]
+
     def delete_outdated(self):
         """Delete non-last (see nb_zim_versions_to_keep) ZIM files from filesystem"""
-        logger.info("[DELETE] doing nothing ATM.")
+
+        def delete_file(fpath):
+            shutil.move(fpath, self.delete_to / f"{fpath.parent.name}__{fpath.name}")
+
+        logger.info(f"[DELETE] moving obsolete ZIMs to {self.delete_to}")
+        nb_deleted = deleted_size = 0
+        for fpath in self.obsolete_zim_files:
+            size = fpath.stat().st_size
+            logger.info(f"[DELETE] moving {fpath} ({human_size(size)})")
+
+            delete_file(fpath)
+
+            nb_deleted += 1
+            deleted_size += size
+        logger.info(
+            f"[DELETE] moved {nb_deleted} files, saving {human_size(deleted_size)}"
+        )
 
     def write_zim_redirects_map(self):
         """Writes map file of redirects for ZIM files (no-period to last, no folder)
@@ -878,6 +904,14 @@ def entrypoint():
         help="Save log output to to file in addition to stdout",
         default="",
         dest="log_to",
+    )
+
+    parser.add_argument(
+        "--delete-to",
+        help="Where to move files to instead of deleting them. "
+        f"`Defaults to DELETE_TO` environ or {Defaults.DELETE_TO}",
+        default=os.getenv("DELETE_TO", Defaults.DELETE_TO),
+        dest="delete_to",
     )
 
     parser.add_argument(

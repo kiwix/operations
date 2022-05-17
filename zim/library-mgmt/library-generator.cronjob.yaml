@@ -48,6 +48,10 @@ spec:
                 subPath: zim
                 mountPath: "/data/download/zim"
                 readOnly: true  # no-rm for now
+              - name: kiwix-download
+                subPath: .deleted-zim
+                mountPath: "/data/download/.deleted-zim"
+                readOnly: false
               - name: kiwix-library
                 subPath: internal_library.xml
                 mountPath: "/data/library/internal_library.xml"
