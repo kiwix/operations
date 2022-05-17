@@ -47,7 +47,7 @@ spec:
               - name: kiwix-download
                 subPath: zim
                 mountPath: "/data/download/zim"
-                readOnly: true  # no-rm for now
+                readOnly: false
               - name: kiwix-download
                 subPath: .deleted-zim
                 mountPath: "/data/download/.deleted-zim"
