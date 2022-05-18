@@ -933,8 +933,9 @@ def entrypoint():
     # enable log to file
     handlers = [logging.StreamHandler()]
     if args.log_to:
-        pathlib.Path(args.log_to).unlink(missing_ok=True)
-        handlers.append(logging.FileHandler(pathlib.Path(args.log_to)))
+        log_fpath = pathlib.Path(args.log_to)
+        os.truncate(log_fpath, 0)
+        handlers.append(logging.FileHandler(log_fpath))
     logging.basicConfig(
         level=logging.DEBUG,
         format="%(asctime)s %(levelname)s %(message)s",
