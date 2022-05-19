@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: api-db-backup-configs
-  namespace: zimfarm
-data:
-  BITWARDEN_EMAIL: "contact+bitwarden-slave@kiwix.org"
-  BORGBASE_NAME: "zimfarm-dispatcher-mongodb"

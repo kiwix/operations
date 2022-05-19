@@ -19,14 +19,19 @@ spec:
               imagePullPolicy: Always
               envFrom:
               - secretRef:
+                  name: backup-credentials
+              - secretRef:
                   name: api-db-backup-credentials
-              - configMapRef:
-                  name: api-db-backup-configs
+              env:
+                - name: BITWARDEN_EMAIL
+                  value: "contact+bitwarden-slave@kiwix.org"
+                - name: BORGBASE_NAME
+                  value: "zimfarm-dispatcher-mongodb"
               command: ["single-backup"]
               resources:
                 requests:
-                  cpu: 200m
-                  memory: 512Mi
+                  cpu: 100m
+                  memory: 128Mi
           volumes:
           restartPolicy: Never
           nodeSelector:
