@@ -36,9 +36,9 @@ spec:
             subPath: zim
             mountPath: "/data/download/zim"
             readOnly: false
-          - name: kiwix-download
-            subPath: .deleted-zim
-            mountPath: "/data/download/.deleted-zim"
+          - name: kiwix-library
+            subPath: deleted-zim
+            mountPath: "/data/library/deleted-zim"
             readOnly: false
           args: ["bash", "-c", "sleep infinity"]
           resources:
