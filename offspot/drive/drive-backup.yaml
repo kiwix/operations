@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: drive-backup
+  namespace: offspot
+spec:
+  schedule: "@daily"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - name: borg-backup
+              image: ghcr.io/kiwix/borg-backup:latest
+              imagePullPolicy: Always
+              volumeMounts:
+              - name: files-volume
+                mountPath: "/storage"
+                readOnly: true
+              envFrom:
+                - secretRef:
+                    name: backup-credentials
+              env:
+                - name: BORGBASE_NAME
+                  value: "offspot-drive"
+                - name: BITWARDEN_EMAIL
+                  value: "contact+bitwarden-slave@kiwix.org"
+              command: ["single-backup"]
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  memory: 256Mi
+          volumes:
+          - name: files-volume
+            persistentVolumeClaim:
+              claimName: drive-local-pvc
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "storage"
