@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup-mirrorbrain-db
+  namespace: zim
+spec:
+  schedule: "0 3 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            - name: borg-backup
+              image: ghcr.io/kiwix/borg-backup:latest
+              imagePullPolicy: Always
+              env:
+                - name: DATABASES
+                  value: "postgresql://mirrorbrain:mirrorbrain@mirrorbrain-db-service:5432/all"
+                - name: BORGBASE_NAME
+                  value: "mirrorbrain"
+              envFrom:
+                - secretRef:
+                    name: backup-credentials
+              command: ["single-backup"]
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  memory: 256Mi
+          volumes:
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "storage"
