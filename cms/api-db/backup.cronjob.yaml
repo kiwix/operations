@@ -6,11 +6,11 @@ metadata:
 spec:
   schedule: "@daily"
   successfulJobsHistoryLimit: 1
-  failedJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
-      backoffLimit: 2
+      backoffLimit: 1
       template:
         spec:
           containers:
@@ -20,16 +20,16 @@ spec:
               envFrom:
               - secretRef:
                   name: api-db-backup-credentials
-              - configMapRef:
-                  name: api-db-backup-configs
+              env:
+                - name: BITWARDEN_EMAIL
+                  value: "contact+bitwarden-slave@kiwix.org"
+                - name: BORGBASE_NAME
+                  value: "openzim-cms-postgresdb"
               command: ["single-backup"]
               resources:
                 requests:
-                  cpu: 200m
-                  memory: 384Mi
-                limits:
-                  cpu: 200m
-                  memory: 384Mi
+                  cpu: 100m
+                  memory: 128Mi
           volumes:
           restartPolicy: Never
           nodeSelector:
