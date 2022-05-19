@@ -10,7 +10,7 @@ spec:
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
-      backoffLimit: 2
+      backoffLimit: 1
       template:
         spec:
           containers:
@@ -21,37 +21,16 @@ spec:
               - name: files-volume
                 mountPath: "/storage"
                 readOnly: true
+              envFrom:
+                - secretRef:
+                    name: backup-credentials
               env:
-                - name: BW_CLIENTID
-                  valueFrom:
-                    secretKeyRef:
-                      name: backup-credentials
-                      key: bw-client-id
-                - name: BW_CLIENTSECRET
-                  valueFrom:
-                    secretKeyRef:
-                      name: backup-credentials
-                      key: bw-client-secret
-                - name: BW_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: backup-credentials
-                      key: bw-password
-                - name: BITWARDEN_EMAIL
-                  valueFrom:
-                    configMapKeyRef:
-                      name: backup-config
-                      key: bitwarden-email
                 - name: BORGBASE_NAME
-                  valueFrom:
-                    configMapKeyRef:
-                      name: backup-config
-                      key: borg-name
+                  value: "stats"
                 - name: DATABASES
-                  valueFrom:
-                    configMapKeyRef:
-                      name: backup-config
-                      key: databases
+                  value: "mysql://root:root@matomo-db-service:3306/all"
+                - name: BITWARDEN_EMAIL
+                  value: "contact+bitwarden-slave@kiwix.org"
               command: ["single-backup"]
               resources:
                 requests:
@@ -63,6 +42,6 @@ spec:
           - name: files-volume
             persistentVolumeClaim:
               claimName: matomo-files-pvc
-          restartPolicy: OnFailure
+          restartPolicy: Never
           nodeSelector:
             k8s.kiwix.org/role: "stats"
