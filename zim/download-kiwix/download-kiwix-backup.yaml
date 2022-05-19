@@ -1,0 +1,144 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kiwix-other-downloads-backup
+  namespace: zim
+spec:
+  schedule: "@daily"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - name: borg-backup
+              image: ghcr.io/kiwix/borg-backup:latest
+              imagePullPolicy: Always
+              volumeMounts:
+              - name: data-volume
+                subPath: README
+                mountPath: "/storage/README"
+                readOnly: true
+              - name: data-volume
+                subPath: other
+                mountPath: "/storage/other"
+                readOnly: true
+              envFrom:
+                - secretRef:
+                    name: backup-credentials
+              env:
+                - name: BORGBASE_NAME
+                  value: "kiwix-other-downloads"
+                - name: BITWARDEN_EMAIL
+                  value: "contact+bitwarden-slave@kiwix.org"
+              command: ["single-backup"]
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  memory: 256Mi
+          volumes:
+          - name: data-volume
+            persistentVolumeClaim:
+              claimName: kiwix-download-pvc
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "storage"
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kiwix-archive-downloads-backup
+  namespace: zim
+spec:
+  schedule: "@daily"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - name: borg-backup
+              image: ghcr.io/kiwix/borg-backup:latest
+              imagePullPolicy: Always
+              volumeMounts:
+              - name: data-volume
+                subPath: archive
+                mountPath: "/storage"
+                readOnly: true
+              envFrom:
+                - secretRef:
+                    name: backup-credentials
+              env:
+                - name: BORGBASE_NAME
+                  value: "kiwix-archive-downloads"
+                - name: BITWARDEN_EMAIL
+                  value: "contact+bitwarden-slave@kiwix.org"
+              command: ["single-backup"]
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  memory: 256Mi
+          volumes:
+          - name: data-volume
+            persistentVolumeClaim:
+              claimName: kiwix-download-pvc
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "storage"
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kiwix-release-downloads-backup
+  namespace: zim
+spec:
+  schedule: "@daily"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - name: borg-backup
+              image: ghcr.io/kiwix/borg-backup:latest
+              imagePullPolicy: Always
+              volumeMounts:
+              - name: data-volume
+                subPath: release
+                mountPath: "/storage"
+                readOnly: true
+              envFrom:
+                - secretRef:
+                    name: backup-credentials
+              env:
+                - name: BORGBASE_NAME
+                  value: "kiwix-release-downloads"
+                - name: BITWARDEN_EMAIL
+                  value: "contact+bitwarden-slave@kiwix.org"
+              command: ["single-backup"]
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 64Mi
+                limits:
+                  memory: 256Mi
+          volumes:
+          - name: data-volume
+            persistentVolumeClaim:
+              claimName: kiwix-download-pvc
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "storage"
