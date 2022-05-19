@@ -22,4 +22,4 @@ data:
   # email to display for support requests
   SUPPORT_EMAIL: "hotspot@kiwix.org"
   # time to cache the catalog for
-  CACHE_TIMEOUT: "10800"
+  CACHE_TIMEOUT: "3600"
