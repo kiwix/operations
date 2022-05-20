@@ -10,7 +10,7 @@ spec:
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
-      backoffLimit: 2
+      backoffLimit: 1
       template:
         spec:
           containers:
@@ -18,7 +18,7 @@ spec:
               image: ghcr.io/kiwix/matomo-log-analytics:latest
               imagePullPolicy: Always
               command: ["sh"]
-              args: ["import-logs"]
+              args: ["/import-logs"]
               env:
                 - name: ID_SITE
                   value: "6"
@@ -46,8 +46,8 @@ spec:
                 readOnly: true
               resources:
                 requests:
-                  memory: "512Mi"
-                  cpu: "200m"
+                  memory: "128Mi"
+                  cpu: "100m"
           volumes:
             - name: gen-scripts-volume
               configMap:
@@ -56,6 +56,6 @@ spec:
             - name: nginx-logs-volume
               persistentVolumeClaim:
                 claimName: nginx-logs-pvc
-          restartPolicy: OnFailure
+          restartPolicy: Never
           nodeSelector:
             k8s.kiwix.org/role: "storage"
