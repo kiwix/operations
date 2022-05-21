@@ -39,7 +39,7 @@ data:
         allow all;
       }
 
-      location ~ /(libs|vendor|plugins|misc/user) {
+      location ~ /(libs|vendor|plugins) {
         deny all;
         return 403;
       }
