@@ -19,7 +19,7 @@ spec:
       # /!\ manually purge kiwix-serve cache on kiwix-serve version upgrade
       # curl -X PURGE -H "X-Purge-Type: kiwix-serve" http://library-frontend-service
       # also check that varnish hack still necessary (gzip, endpoints)
-      - image: ghcr.io/kiwix/kiwix-tools:3.2.0-4
+      - image: ghcr.io/kiwix/kiwix-tools:3.2.0-5
         imagePullPolicy: IfNotPresent
         name: kiwix-tools
         args: ["kiwix-serve", "--library", "-v", "--monitorLibrary", "--threads", "16", "--nodatealias", "/data/library/internal_library.xml"]
@@ -92,7 +92,7 @@ spec:
     spec:
       containers:
         # /!\ manually purge kiwix-serve cache on kiwix-serve version upgrade
-      - image: ghcr.io/kiwix/kiwix-tools:3.2.0-4
+      - image: ghcr.io/kiwix/kiwix-tools:3.2.0-5
         imagePullPolicy: IfNotPresent
         name: kiwix-tools
         args: ["kiwix-serve", "--library", "-v", "--monitorLibrary", "--threads", "16", "--nodatealias", "/data/library/internal_library.xml"]
