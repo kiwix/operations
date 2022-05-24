@@ -17,14 +17,13 @@ spec:
             - name: matomo-uploader
               image: ghcr.io/kiwix/matomo-log-analytics:latest
               imagePullPolicy: Always
-              command: ["sh"]
-              args: ["/import-logs"]
+              command: ["import-log"]
               env:
-                - name: ID_SITE
+                - name: MATOMO_SITE_ID
                   value: "2"
-                - name: URL
+                - name: MATOMO_URL
                   value: "https://stats.kiwix.org"
-                - name: LOG
+                - name: LOG_PATH
                   value: "/var/log/nginx/access.log"
                 - name: USE_SUFFIXED_LOG
                   value: "y"
@@ -40,19 +39,11 @@ spec:
                 name: nginx-logs-volume
                 subPath: archives/download-kiwix
                 readOnly: true
-              - mountPath: "/import-logs"
-                name: gen-scripts-volume
-                subPath: "import_logs.sh"
-                readOnly: true
               resources:
                 requests:
                   memory: "128Mi"
                   cpu: "100m"
           volumes:
-            - name: gen-scripts-volume
-              configMap:
-                name: gen-scripts
-                defaultMode: 0755
             - name: nginx-logs-volume
               persistentVolumeClaim:
                 claimName: nginx-logs-pvc

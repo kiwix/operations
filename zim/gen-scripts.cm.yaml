@@ -754,9 +754,3 @@ data:
             statsfile.close()
             sys.exit(0)
         sys.exit(main())
-  import_logs.sh: |
-    #!/bin/sh
-    if [ ! -z "$USE_SUFFIXED_LOG" ] ; then
-      LOG=$LOG-$(date +"%Y%m%d")
-    fi
-    import_logs.py --enable-http-redirects --include-host=$HOST --idsite=$ID_SITE --url=$URL --token-auth=$MATOMO_TOKEN $LOG
