@@ -4,6 +4,7 @@ import pytest
 import requests
 
 from utils import (
+    COMPRESSABLE_OPDS_ENDPOINTS,
     get_response_headers,
     get_url,
     is_cached,
@@ -22,7 +23,7 @@ def test_opds_mimetypes(path, mimetype):
     assert get_response_headers(path).get("Content-Type") == mimetype
 
 
-@pytest.mark.parametrize("path", OPDS_ENDPOINTS.keys())
+@pytest.mark.parametrize("path", COMPRESSABLE_OPDS_ENDPOINTS.keys())
 def test_opds_is_gzipped(path):
     assert get_response_headers(path).get("Content-Encoding") == "gzip"
 

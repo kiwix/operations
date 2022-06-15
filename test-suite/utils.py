@@ -14,6 +14,12 @@ OPDS_ENDPOINTS = {
     "/catalog/v2/categories": OPDS_NAV_MIMETYPE,
     "/catalog/v2/languages": OPDS_NAV_MIMETYPE,
 }
+# searchdescription is so small compression would be counter-productive
+COMPRESSABLE_OPDS_ENDPOINTS = {
+    endpoint: mime
+    for endpoint, mime in OPDS_ENDPOINTS.items()
+    if mime != "application/opensearchdescription+xml"
+}
 
 
 def get_url(
