@@ -1,0 +1,47 @@
+apiVersion: batch/v1
+kind: Job
+# kind: CronJob
+metadata:
+  name: dev-library-generator
+  namespace: zim
+spec:
+  # schedule: "*/6 * * * *"
+  # successfulJobsHistoryLimit: 1
+  # failedJobsHistoryLimit: 1
+  # concurrencyPolicy: Forbid
+  # jobTemplate:
+  #   spec:
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - name: debian
+              image: ghcr.io/rgaudin/debian:dev
+              imagePullPolicy: Always
+              env:
+              - name: INSTALL_SCRIPTS
+                value: "library-maint#github://kiwix/k8s/zim/library-mgmt/library-maint.py\n"
+              volumeMounts:
+              - name: kiwix-download
+                subPath: zim/.hidden
+                mountPath: "/data"
+                readOnly: true
+              - name: kiwix-library
+                subPath: dev_library.xml
+                mountPath: "/library/dev.xml"
+                readOnly: false
+              args: ["library-maint", "--zim-root", "/data", "--with-hidden", "--library-dest", "/public.xml", "--internal-zim-root", "/data", "--internal-library-dest", "/library/dev.xml", "read", "write-libraries"]
+              resources:
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+          volumes:
+          - name: kiwix-download
+            persistentVolumeClaim:
+              claimName: kiwix-download-pvc
+          - name: kiwix-library
+            persistentVolumeClaim:
+              claimName: kiwix-library-pvc
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "storage"

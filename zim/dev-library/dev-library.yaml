@@ -1,14 +1,3 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: dev-library-configs
-  namespace: zim
-data:
-  LIBRARY_PATH: /library/all.xml
-  ZIM_ROOT: /data
-  NEW_ZIM_ROOT: /data
-  DOWNLOAD_URL_ROOT: https://download.kiwix.org/zim/.hidden/
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -26,74 +15,10 @@ spec:
       labels:
         app: dev-library-app
     spec:
-      initContainers:
-      - image: ghcr.io/rgaudin/debian:dev
-        imagePullPolicy: Always
-        name: initer
-        args: ["/bin/true"]
-        envFrom:
-          - configMapRef:
-              name: dev-library-configs
-        volumeMounts:
-        - mountPath: "/library"
-          name: library-volume
-          readOnly: false
-        - mountPath: "/usr/local/bin/gen-empty"
-          subPath: gen-empty
-          name: scripts
-          readOnly: true
-        - mountPath: "/usr/local/bin/startup"
-          subPath: gen-empty-startup
-          name: scripts
-          readOnly: true
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "1m"
       containers:
-      - image: ghcr.io/rgaudin/debian:dev
-        imagePullPolicy: Always
-        name: library-regen
-        envFrom:
-          - configMapRef:
-              name: dev-library-configs
-        volumeMounts:
-        - mountPath: "/data"
-          subPath: zim/.hidden/
-          name: data-volume
-          readOnly: true
-        - mountPath: "/zim"
-          subPath: zim/
-          name: data-volume
-          readOnly: true
-        - mountPath: "/library"
-          name: library-volume
-          readOnly: false
-        - mountPath: "/usr/local/bin/startup"
-          subPath: gen-library
-          name: scripts
-          readOnly: true
-        - mountPath: "/usr/local/bin/gen-library"
-          subPath: gen-library
-          name: scripts
-          readOnly: true
-        - mountPath: "/etc/crontab"
-          subPath: hourly-regen-crontab
-          name: scripts
-          readOnly: true
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "200m"
-          limits:
-            memory: "2Gi"
-            cpu: "300m"
       - image: ghcr.io/rgaudin/kiwix-tools:nightly
         imagePullPolicy: Always
-        command: ["kiwix-serve", "-v", "--library", "--monitorLibrary", "/library/all.xml"]
-        envFrom:
-          - configMapRef:
-              name: dev-library-configs
+        command: ["kiwix-serve", "-v", "--library", "--monitorLibrary", "/library/dev_library.xml"]
         name: kiwix-tools
         ports:
         - containerPort: 80
@@ -102,23 +27,24 @@ spec:
           subPath: zim/.hidden/
           name: data-volume
           readOnly: true
-        - mountPath: "/library"
-          name: library-volume
+        - mountPath: "/library/dev_library.xml"
+          subPath: dev_library.xml
+          name: kiwix-library
           readOnly: true
         resources:
           requests:
             memory: "256Mi"
             cpu: "200m"
+          limits:
+            memory: "512Mi"
+            cpu: "300m"
       volumes:
       - name: data-volume
         persistentVolumeClaim:
           claimName: kiwix-download-pvc
-      - name: scripts
-        configMap:
-          name: dev-library-scripts
-          defaultMode: 0755
-      - name: library-volume
-        emptyDir: {}
+      - name: kiwix-library
+        persistentVolumeClaim:
+          claimName: kiwix-library-pvc
       nodeSelector:
         k8s.kiwix.org/role: "storage"
 ---
