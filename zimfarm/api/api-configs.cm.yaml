@@ -26,7 +26,15 @@ data:
   ZIMCHECK_OPTION: "--all"
   # wasabi whitelist
   USES_WORKERS_IPS_WHITELIST: "1"
-  WHITELISTED_IPS: "185.15.56.0/24,195.154.156.115,195.154.81.22,51.159.108.60,51.159.30.163,51.159.158.1,51.159.132.199,2600:1700:2320:9090:d0cc::/80"
+  # wikimedia cloud: 185.15.56.0/24
+  # cardshop worker: 195.154.81.22
+  # k8s storage node: 51.159.108.60
+  # k8s services node: 51.159.30.163
+  # bastion: 51.159.132.199
+  # k8s stats: 51.159.31.32
+  # pixelmemory v6 prefix: 2600:1700:2320:9090:d0cc::/80
+  # worker.youzim.it: 51.159.4.131 and 2001:bc8:6005:9:ec4:7aff:fe0e:dda8
+  WHITELISTED_IPS: "185.15.56.0/24,195.154.81.22,51.159.108.60,51.159.30.163,51.159.132.199,51.159.31.32,2600:1700:2320:9090:d0cc::/80,51.159.4.131,2001:bc8:6005:9:ec4:7aff:fe0e:dda8"
   WASABI_WHITELIST_POLICY_ARN: "arn:aws:iam::100000050990:policy/ZimfarmWorker"
   WASABI_WHITELIST_STATEMENT_ID: "ZimfarmWorkersIPsWhiteList"
   # CMS connection
