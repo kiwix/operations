@@ -5,3 +5,4 @@ metadata:
   namespace: metrics
 data:
   PROJECT_NAME: Kiwix development metrics
+  TRUNCATE_LOGS: "yes"
