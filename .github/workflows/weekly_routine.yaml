@@ -45,7 +45,7 @@ jobs:
         sys.exit(0)
       env:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        REPO: rgaudin/test-ci
+        REPO: kiwix/k8s
         LABELS: maint
         ASSIGNEES: rgaudin
         ISSUE_BODY: |
