@@ -1,16 +1,15 @@
 apiVersion: batch/v1
-kind: Job
-# kind: CronJob
+kind: CronJob
 metadata:
   name: dev-library-generator
   namespace: zim
 spec:
-  # schedule: "*/6 * * * *"
-  # successfulJobsHistoryLimit: 1
-  # failedJobsHistoryLimit: 1
-  # concurrencyPolicy: Forbid
-  # jobTemplate:
-  #   spec:
+  schedule: "*/10 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
       backoffLimit: 1
       template:
         spec:
