@@ -540,20 +540,21 @@ class LibraryMaintainer:
         """Delete non-last (see nb_zim_versions_to_keep) ZIM files from filesystem"""
 
         def delete_file(fpath):
-            shutil.move(fpath, self.delete_to / f"{fpath.parent.name}__{fpath.name}")
+            # shutil.move(fpath, self.delete_to / f"{fpath.parent.name}__{fpath.name}")
+            fpath.unlink()
 
         logger.info(f"[DELETE] moving obsolete ZIMs to {self.delete_to}")
         nb_deleted = deleted_size = 0
         for fpath in self.obsolete_zim_files:
             size = fpath.stat().st_size
-            logger.info(f"[DELETE] moving {fpath} ({human_size(size)})")
+            logger.info(f"[DELETE] removing {fpath} ({human_size(size)})")
 
             delete_file(fpath)
 
             nb_deleted += 1
             deleted_size += size
         logger.info(
-            f"[DELETE] moved {nb_deleted} files, saving {human_size(deleted_size)}"
+            f"[DELETE] removed {nb_deleted} files, saving {human_size(deleted_size)}"
         )
 
     def write_zim_redirects_map(self):
