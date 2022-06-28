@@ -1,0 +1,63 @@
+
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: debug
+  namespace: debug
+spec:
+  backoffLimit: 1
+  template:
+    metadata:
+      labels:
+        app: debug-app
+    spec:
+      containers:
+        - name: debian
+          image: ghcr.io/rgaudin/debian:dev
+          imagePullPolicy: Always
+          env:
+          - name: ZIM_PATH
+            value: "/data"
+          - name: INSTALL_SCRIPTS
+            value: "startup#github://kiwix/k8s/debug/debug-startup.sh\n"
+          volumeMounts:
+          - name: debug-files
+            mountPath: "/data"
+            readOnly: true
+          args: ["bash", "-c", "sleep infinity"]
+          ports:
+          - containerPort: 22
+          resources:
+            requests:
+              cpu: 200m
+              memory: 1Gi
+            limits:
+              cpu: 200m
+              memory: 1Gi
+      volumes:
+      - name: debug-files
+        persistentVolumeClaim:
+          claimName: debug-files-pvc
+      restartPolicy: Never
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: debug
+  name: debug-ssh-service
+  labels:
+    app: debug-app
+spec:
+  type: NodePort
+  selector:
+    app: debug-app
+  ports:
+  - protocol: TCP
+    # set custom value each time this job is ran
+    port: 0
+    nodePort: 0
+    targetPort: 22
+

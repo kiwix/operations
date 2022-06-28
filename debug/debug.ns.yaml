@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: debug
+  annotations:
+    k8s.kiwix.org/client: https://github.com/rgaudin
+    k8s.kiwix.org/source_repo: https://github.com/kiwix/k8s
