@@ -92,8 +92,6 @@ class Defaults:
     OFFSPOT_LIBRARY = "/data/download/library/ideascube.yml"
     MIRRORBRAIN_URL = "http://mirrorbrain-web-service"
 
-    DELETE_TO = "/data/download/.deleted-zim"
-
 
 def pathlib_relpath(data: Any) -> Any:
     """json.load hook to cast `relpath` attribute"""
@@ -355,7 +353,6 @@ class LibraryMaintainer:
         offspot_library_dest: str,
         mirrorbrain_url: str,
         log_to: str,
-        delete_to: str,
         dump_fs: bool,
         load_fs: bool,
     ):
@@ -386,7 +383,6 @@ class LibraryMaintainer:
         self.mirrorbrain_url = mirrorbrain_url
 
         self.log_to = pathlib.Path(log_to) if log_to else False
-        self.delete_to = pathlib.Path(delete_to) if delete_to else False
         self.dump_fs = pathlib.Path(dump_fs) if dump_fs else False
         self.load_fs = pathlib.Path(load_fs) if load_fs else False
 
@@ -540,10 +536,9 @@ class LibraryMaintainer:
         """Delete non-last (see nb_zim_versions_to_keep) ZIM files from filesystem"""
 
         def delete_file(fpath):
-            # shutil.move(fpath, self.delete_to / f"{fpath.parent.name}__{fpath.name}")
             fpath.unlink()
 
-        logger.info(f"[DELETE] moving obsolete ZIMs to {self.delete_to}")
+        logger.info("[DELETE] removing obsolete ZIMs")
         nb_deleted = deleted_size = 0
         for fpath in self.obsolete_zim_files:
             size = fpath.stat().st_size
@@ -905,14 +900,6 @@ def entrypoint():
         help="Save log output to to file in addition to stdout",
         default="",
         dest="log_to",
-    )
-
-    parser.add_argument(
-        "--delete-to",
-        help="Where to move files to instead of deleting them. "
-        f"`Defaults to DELETE_TO` environ or {Defaults.DELETE_TO}",
-        default=os.getenv("DELETE_TO", Defaults.DELETE_TO),
-        dest="delete_to",
     )
 
     parser.add_argument(

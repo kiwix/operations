@@ -36,10 +36,6 @@ spec:
             subPath: zim
             mountPath: "/data/download/zim"
             readOnly: false
-          - name: kiwix-library
-            subPath: deleted-zim
-            mountPath: "/data/library/deleted-zim"
-            readOnly: false
           args: ["bash", "-c", "sleep infinity"]
           resources:
             requests:
@@ -49,9 +45,6 @@ spec:
       - name: kiwix-download
         persistentVolumeClaim:
           claimName: kiwix-download-pvc
-      - name: kiwix-library
-        persistentVolumeClaim:
-          claimName: kiwix-library-pvc
       restartPolicy: Never
       nodeSelector:
         k8s.kiwix.org/role: "storage"
