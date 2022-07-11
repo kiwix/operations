@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: manual-log-uploader
+  namespace: zim
+spec:
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - name: matomo-uploader
+              image: ghcr.io/kiwix/matomo-log-analytics:latest
+              imagePullPolicy: Always
+              command: ["sh", "-c", "sleep infinity"]
+              env:
+                - name: MATOMO_SITE_ID
+                  value: ""
+                - name: LOG_PATH
+                  value: ""
+                - name: MATOMO_URL
+                  value: "https://stats.kiwix.org"
+                - name: MATOMO_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: matomo-credentials
+                      key: token
+              volumeMounts:
+              - mountPath: "/var/log/nginx"
+                name: nginx-logs-volume
+                subPath: archives
+                readOnly: true
+              resources:
+                requests:
+                  memory: "128Mi"
+                  cpu: "100m"
+          volumes:
+            - name: nginx-logs-volume
+              persistentVolumeClaim:
+                claimName: nginx-logs-pvc
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "storage"
