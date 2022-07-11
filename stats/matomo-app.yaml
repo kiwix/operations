@@ -26,7 +26,7 @@ spec:
         app: matomo-app
     spec:
       containers:
-      - image: ghcr.io/kiwix/matomo:4.10.0-fpm
+      - image: ghcr.io/kiwix/matomo:4.10.1-fpm
         imagePullPolicy: IfNotPresent
         name: matomo
         env:
@@ -39,7 +39,7 @@ spec:
         - name: files-volume
           mountPath: "/var/www/html/misc/user"
           subPath: branding
-          readOnly: true
+          readOnly: false
         - name: files-volume
           mountPath: "/var/www/html"
           subPath: webroot
