@@ -71,6 +71,11 @@ jobs:
           ```
           - [ ] [Upgrade k8s](https://github.com/kiwix/k8s/wiki/Cluster-Setup#upgrading-kubernetes) if applicable
 
+          ### Stats
+
+          - [ ] Ensure download.kiwix.org stats are being recorded
+          - [ ] Check whether [matomo](https://stats.kiwix.org) should be upgraded
+
           ## Projects
 
           - [ ] UptimeRobot [has no alert](https://uptimerobot.com/dashboard#tvMode)
@@ -81,7 +86,6 @@ jobs:
           ## Security
 
           - [ ] Analyze/merge [dependabot PRs](https://github.com/notifications?query=author%3Adependabot[bot])
-          - [ ] Skim through [latest CVEs](https://nvd.nist.gov/feeds/xml/cve/misc/nvd-rss.xml)
 
 
           **Note**: this is an *automatic reminder* intended for the assignee(s).
