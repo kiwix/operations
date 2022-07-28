@@ -28,9 +28,17 @@ spec:
           protocol: TCP
           containerPort: 19999
         volumeMounts:
-        - mountPath: /var/cache/netdata"
+        - mountPath: "/var/cache/netdata"
+          subPath: var_cache_netdata
           name: data-volume
           readOnly: false
+        - mountPath: "/var/lib/netdata"
+          subPath: var_lib_netdata
+          name: data-volume
+          readOnly: false
+        - name: os-release
+          mountPath: /host/etc/os-release
+          readOnly: true
         resources:
           requests:
             memory: "1Gi"
@@ -43,6 +51,7 @@ spec:
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 1
+          initialDelaySeconds: 30
         readinessProbe:
           httpGet:
             path: /api/v1/info
@@ -51,11 +60,15 @@ spec:
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 1
+          initialDelaySeconds: 30
       terminationGracePeriodSeconds: 300
       volumes:
       - name: data-volume
         persistentVolumeClaim:
           claimName: monitoring-db-pvc
+      - name: os-release
+        hostPath:
+          path: /etc/os-release
       nodeSelector:
         k8s.kiwix.org/role: "stats"
 ---
