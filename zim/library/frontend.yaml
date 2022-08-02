@@ -110,6 +110,7 @@ data:
               std.ban("req.url ~ ^/raw/" + req.http.X-Book-Name + "/(meta|content)/") &&
               std.ban("req.url ~ ^/search?content=" + req.http.X-Book-Name + "&") &&
               std.ban("req.url ~ ^/suggest?content=" + req.http.X-Book-Name + "&") &&
+              std.ban("req.url ~ ^/" + req.http.X-Book-Name + "/") &&
               std.ban("req.url ~ ^/" + req.http.X-Book-Name-Nodate + "/")) {
             return(synth(200, "Purged Book endpoints"));
           } else {
