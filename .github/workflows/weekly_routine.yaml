@@ -51,6 +51,10 @@ jobs:
         ISSUE_BODY: |
           ## Infra
 
+          - [ ] Check nodes free space
+          ```sh
+          df -h / && df -h /data
+          ```
           - [ ] Nodes and worker system upgrades
           ```sh
           apt update && apt upgrade
