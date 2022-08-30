@@ -50,6 +50,9 @@ spec:
         - mountPath: "/var/www/download.kiwix.org"
           name: download-volume
           readOnly: true
+        - name: hidden-volume
+          mountPath: "/var/www/download.kiwix.org/zim/.hidden"
+          readOnly: true
         - name: configs
           mountPath: "/etc/nginx/conf.d/default.conf"
           subPath: vhost.conf
@@ -74,6 +77,9 @@ spec:
       - name: download-volume
         persistentVolumeClaim:
           claimName: kiwix-download-pvc
+      - name: hidden-volume
+        persistentVolumeClaim:
+          claimName: hidden-zim-pvc
       - name: configs
         configMap:
           name: mirror-download-configs

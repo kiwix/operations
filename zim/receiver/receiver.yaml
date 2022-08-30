@@ -38,6 +38,9 @@ spec:
           subPath: "check-logs"
           mountPath: "/mnt/check_logs"
           readOnly: false
+        - name: hidden-volume
+          mountPath: "/mnt/zim/.hidden"
+          readOnly: false
         - name: download-volume
           subPath: "zim"
           mountPath: "/mnt/zim"
@@ -52,6 +55,9 @@ spec:
       - name: download-volume
         persistentVolumeClaim:
           claimName: kiwix-download-pvc
+      - name: hidden-volume
+        persistentVolumeClaim:
+          claimName: hidden-zim-pvc
       - name: receiver-volume
         persistentVolumeClaim:
           claimName: zim-receiver-pvc

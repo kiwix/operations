@@ -23,9 +23,8 @@ spec:
         ports:
         - containerPort: 80
         volumeMounts:
-        - mountPath: "/data"
-          subPath: zim/.hidden/
-          name: data-volume
+        - name: hidden-volume
+          mountPath: "/data"
           readOnly: true
         - mountPath: "/library/dev_library.xml"
           subPath: dev_library.xml
@@ -39,9 +38,9 @@ spec:
             memory: "1Gi"
             cpu: "300m"
       volumes:
-      - name: data-volume
+      - name: hidden-volume
         persistentVolumeClaim:
-          claimName: kiwix-download-pvc
+          claimName: hidden-zim-pvc
       - name: kiwix-library
         persistentVolumeClaim:
           claimName: kiwix-library-pvc
