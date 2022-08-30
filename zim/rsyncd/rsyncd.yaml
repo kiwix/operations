@@ -63,7 +63,7 @@ spec:
       - image: docker.io/vimagick/rsyncd:latest
         imagePullPolicy: IfNotPresent
         name: rsyncd
-        command: ["/bin/nice", "-n", "-10", "ionice", "-c2", "-n2", "rsync", "--daemon", "--no-detach", "--log-file", "/dev/stdout"]
+        command: ["rsync", "--daemon", "--no-detach", "--log-file", "/dev/stdout"]
         securityContext:
           capabilities:
             add:
@@ -84,9 +84,6 @@ spec:
           readOnly: true
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "100m"
-          limits:
             memory: "256Mi"
             cpu: "100m"
         ports:
