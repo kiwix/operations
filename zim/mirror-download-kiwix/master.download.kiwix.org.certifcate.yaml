@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: master-download-kiwix-org
+  namespace: zim
+spec:
+  secretName: master-download-kiwix-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: master.download.kiwix.org
+  dnsNames:
+  - master.download.kiwix.org

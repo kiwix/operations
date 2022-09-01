@@ -139,8 +139,21 @@ spec:
     - hosts:
       - mirror.download.kiwix.org
       secretName: mirror-download-kiwix-org-tls
+    - hosts:
+      - master.download.kiwix.org
+      secretName: master-download-kiwix-org-tls
   rules:
   - host: mirror.download.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mirror-download-service
+            port:
+              number: 80
+  - host: master.download.kiwix.org
     http:
       paths:
       - path: /
