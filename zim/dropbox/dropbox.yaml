@@ -20,36 +20,40 @@ spec:
         imagePullPolicy: Always
         name: dropbox
         env:
-          - name: PUBKEYS
+          - name: USERS
             valueFrom:
               configMapKeyRef:
                 name: dropbox-pubkeys
-                key: ci
+                key: users
                 optional: false
         volumeMounts:
+        - name: library-volume
+          subPath: "cms"
+          mountPath: "/jails/cms/data/cms/"
+          readOnly: false
         - name: tmp-volume
           subPath: "ci"
-          mountPath: "/jail/data/tmp/ci"
+          mountPath: "/jails/ci/data/tmp/ci"
           readOnly: false
         - name: download-volume
           subPath: "release"
-          mountPath: "/jail/data/download/release"
+          mountPath: "/jails/ci/data/download/release"
           readOnly: false
         - name: download-volume
           subPath: "nightly"
-          mountPath: "/jail/data/download/nightly"
+          mountPath: "/jails/ci/data/download/nightly"
           readOnly: false
         - name: openzim-volume
           subPath: "release"
-          mountPath: "/jail/data/openzim/release"
+          mountPath: "/jails/ci/data/openzim/release"
           readOnly: false
         - name: openzim-volume
           subPath: "nightly"
-          mountPath: "/jail/data/openzim/nightly"
+          mountPath: "/jails/ci/data/openzim/nightly"
           readOnly: false
         - name: openzim-volume
           subPath: "wp1"
-          mountPath: "/jail/data/openzim/wp1"
+          mountPath: "/jails/ci/data/openzim/wp1"
           readOnly: false
         - name: host-keys
           subPath: ecdsa
@@ -79,9 +83,12 @@ spec:
           - containerPort: 22
         resources:
           requests:
-            memory: "128Mi"
-            cpu: "200m"
+            memory: "512Mi"
+            cpu: "300m"
       volumes:
+      - name: library-volume
+        persistentVolumeClaim:
+          claimName: kiwix-library-pvc
       - name: download-volume
         persistentVolumeClaim:
           claimName: kiwix-download-pvc
