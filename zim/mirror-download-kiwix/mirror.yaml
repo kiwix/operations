@@ -114,6 +114,8 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
     nginx.ingress.kubernetes.io/server-snippet: |
+      # kiwix-js requests
+      add_header Access-Control-Allow-Origin *;
       gzip on;
       gzip_types
         application/atom+xml
