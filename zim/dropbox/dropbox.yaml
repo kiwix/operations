@@ -81,10 +81,6 @@ spec:
           readOnly: true
         ports:
           - containerPort: 22
-        resources:
-          requests:
-            memory: "512Mi"
-            cpu: "300m"
       volumes:
       - name: library-volume
         persistentVolumeClaim:

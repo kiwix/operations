@@ -83,9 +83,9 @@ spec:
           subPath: rsyncd.conf
           readOnly: true
         resources:
-          requests:
-            memory: "256Mi"
-            cpu: "100m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
         ports:
         # we don't want to request mirrors to use an alternate port
         - containerPort: 873
