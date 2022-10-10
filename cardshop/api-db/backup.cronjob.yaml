@@ -4,7 +4,7 @@ metadata:
   name: api-db-backup
   namespace: cardshop
 spec:
-  schedule: "@daily"
+  schedule: "3 10 * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid

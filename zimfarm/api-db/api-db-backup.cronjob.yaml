@@ -4,7 +4,7 @@ metadata:
   name: api-db-backup
   namespace: zimfarm
 spec:
-  schedule: "@daily"
+  schedule: "5 10 * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid

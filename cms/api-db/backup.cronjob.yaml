@@ -4,7 +4,7 @@ metadata:
   name: api-db-backup
   namespace: cms
 spec:
-  schedule: "@daily"
+  schedule: "4 10 * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid

@@ -4,7 +4,7 @@ metadata:
   name: openzim-wiki-backup
   namespace: wiki
 spec:
-  schedule: "@daily"
+  schedule: "6 10 * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
