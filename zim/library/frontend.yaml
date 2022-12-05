@@ -92,9 +92,9 @@ data:
               std.ban("req.url ~ ^/catalog/v2/partial_entries") &&
               std.ban("req.url ~ ^/catalog/v2/categories") &&
               std.ban("req.url ~ ^/catalog/v2/languages") &&
+              std.ban("req.url ~ ^/catalog/v2/search") &&
               std.ban("req.url ~ ^/catalog/root.xml$") &&
-              std.ban("req.url ~ ^catalog/search") &&
-              std.ban("req.url ~ ^catalog/search")) {
+              std.ban("req.url ~ ^/catalog/search")) {
             return(synth(200, "Purged Library endpoints"));
           } else {
             # return ban error in 400 response
@@ -105,12 +105,25 @@ data:
         # Purge for a single Book references with http.X-Book-Id AND req.http.X-Book-Name
         # curl -X PURGE -H "X-Purge-Type: book" -H "X-Book-Id: uuid" -H "X-Book-Name: name" localhost
         if (req.http.X-Purge-Type == "book") {
-          if (std.ban("req.url ~ ^/catalog/v2/entry/" + req.http.X-Book-Id) &&
-              std.ban("req.url ~ ^/catalog/v2/illustration/" + req.http.X-Book-Name + "/") &&
-              std.ban("req.url ~ ^/raw/" + req.http.X-Book-Name + "/(meta|content)/") &&
-              std.ban("req.url ~ ^/search?content=" + req.http.X-Book-Name + "&") &&
-              std.ban("req.url ~ ^/suggest?content=" + req.http.X-Book-Name + "&") &&
-              std.ban("req.url ~ ^/" + req.http.X-Book-Name + "/") &&
+          if (
+              # metadata updates
+              std.ban("req.url ~ ^/catalog/v2/entry/" + req.http.X-Book-Id) &&
+              std.ban("req.url ~ ^/catalog/v2/illustration/" + req.http.X-Book-Id + "/") &&
+
+              # never changes (not purging)
+              # std.ban("req.url ~ ^/raw/" + req.http.X-Book-Name + "/(meta|content)/") &&
+              # std.ban("req.url ~ ^/content/" + req.http.X-Book-Name + "/") &&
+
+              # may change if kiwix-serve updates search algo/template (not purging. we'll see in time)
+              # std.ban("req.url ~ ^/search?content=" + req.http.X-Book-Name + "&") &&
+
+              # may change if kiwix-serve updates suggest algo/template (not purging. we'll see in time)
+              # std.ban("req.url ~ ^/suggest?content=" + req.http.X-Book-Name + "&") &&
+
+              # redirects to /content/ (not purging)
+              # std.ban("req.url ~ ^/" + req.http.X-Book-Name + "/") &&
+
+              # no-date must be purged as redirect may point to a new location
               std.ban("req.url ~ ^/" + req.http.X-Book-Name-Nodate + "/")) {
             return(synth(200, "Purged Book endpoints"));
           } else {
@@ -123,7 +136,9 @@ data:
         if (req.http.X-Purge-Type == "kiwix-serve") {
           if (std.ban("req.url ~ ^/catalog/v2/searchdescription.xml$") &&
               std.ban("req.url ~ ^/skin/") &&
+              std.ban("req.url ~ ^/viewer") &&
               std.ban("req.url ~ ^/catalog/searchdescription.xml$") &&
+              std.ban("req.url ~ ^/search/searchdescription.xml$") &&
               std.ban("req.url ~ ^/catch/external") &&
               std.ban("req.url ~ ^/$")) {
             return(synth(200, "Purged kiwix-serve endpoints"));
@@ -151,31 +166,12 @@ data:
       # set req.http.X-Forwarded-For = client.ip;
       set req.http.X-Forwarded-For = req.http.x-real-ip;
 
-      # CURRENT SITUATION
-      # /catalog/v2/root.xml                  cache until library-refresh
-      # /catalog/v2/searchdescription.xml     cache until kiwix-serve version change
-      # /catalog/v2/entry/<bookId>            cache until book expiration (manual)
-      # /catalog/v2/entries?<query>           cache until library-refresh
-      # /catalog/v2/partial_entries?<query>   cache until library-refresh
-      # /catalog/v2/categories                cache until library-refresh
-      # /catalog/v2/languages                 cache until library-refresh
-      # /catalog/v2/illustration/<bookName>/  cache until book expiration (manual)
-      # /skin/                                cache until kiwix-serve version change
-      # /catalog/searchdescription.xml        cache until kiwix-serve version change
-      # /catalog/root.xml                     cache until library-refresh
-      # /catalog/search?<query>               cache until library-refresh
-      # /raw/<bookName>/[meta|content]/       cache until book expiration (manual)
-      # /search?content=<bookName>&<query>    cache until book expiration (manual)
-      # /search?<query>                       cache until library-refresh
-      # /suggest?content=<bookName>&<query>   cache until book expiration (manual)
-      # /random/                              don't cache
-      # /catch/external/                      cache until kiwix-serve version change
-      # /                                     cache until kiwix-serve version change
+      # Kiwix-serve 3.4.0 endpoints described at:
+      # https://github.com/kiwix/kiwix-tools/issues/498#issuecomment-1337309380
 
       # library-refresh is triggered by a RESET call initied after our library-refresh script
       # kiwix-serve version change is triggered by a UPDATE call initied on container restart
       # book expiration is triggered by BAN calls for updated/new books after library-refresh script
-
 
       # let's cache everything except /random.
       # all endpoints listed above
@@ -193,11 +189,6 @@ data:
       if (beresp.status >= 500 && bereq.is_bgfetch) {
           return (abandon);
       }
-
-      # temporary until https://github.com/kiwix/libkiwix/issues/650
-      unset beresp.http.set-cookie;
-      unset beresp.http.Cache-Control;
-      unset beresp.http.Age;
 
       # set ttl to 1d for everything that's returned by backends
       set beresp.ttl = 1d;
