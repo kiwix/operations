@@ -6,3 +6,5 @@ metadata:
 data:
   ALLOWED_ORIGINS: "https://cms.openzim.org"
   MAX_WORKERS: "1"
+  UPLOAD_URI: "sftp://cms@master.download.kiwix.org:30022/data/cms/kiwix_library.xml"
+  PRIVATE_KEY: "/secrets/id_rsa"

@@ -24,12 +24,25 @@ spec:
             name: api-configs
         - secretRef:
             name: api-secrets
+        volumeMounts:
+        - mountPath: "/secrets"
+          name: secrets
+          readOnly: true
         ports:
         - containerPort: 80
         resources:
           requests:
             memory: "512Mi"
             cpu: "1000m"
+      volumes:
+      - name: secrets
+        secret:
+          secretName: api-secrets
+          defaultMode: 0600
+          optional: false
+          items:
+          - key: PRIVATE_KEY_CONTENT
+            path: id_rsa
       nodeSelector:
         k8s.kiwix.org/role: "services"
 ---
