@@ -17,6 +17,7 @@ data:
     """ Rewrites releases redirects map for Kiwix and openZIM """
 
     import argparse
+    import datetime
     import os
     import pathlib
     import re
@@ -26,9 +27,11 @@ data:
     @dataclass
     class Defaults:
         OPENZIM_DOWNLOAD_ROOT = "/data/openzim"
-        OPENZIM_REDIRECTS_MAP = "/data/maps/openzim-releases.map"
+        OPENZIM_RELEASE_REDIRECTS_MAP = "/data/maps/openzim-releases.map"
+        OPENZIM_NIGHTLY_REDIRECTS_MAP = "/data/maps/openzim-nightly.map"
         KIWIX_DOWNLOAD_ROOT = "/data/download"
-        KIWIX_REDIRECTS_MAP = "/data/maps/kiwix-releases.map"
+        KIWIX_RELEASE_REDIRECTS_MAP = "/data/maps/kiwix-releases.map"
+        KIWIX_NIGHTLY_REDIRECTS_MAP = "/data/maps/kiwix-nightly.map"
 
 
     openzim_releases = {
@@ -93,8 +96,50 @@ data:
         for path, pattern in releases.items():
             content += f"/{release_dir}/{path} /{get_latest_release_path(pattern)}{eol}\n"
 
-        with open(redirects_map_fpath, "w") as fh:
-            fh.write(content)
+        redirects_map_fpath.write_text(content)
+
+        print(f"> OK. Wrote {len(content.splitlines()) -1 } redirects")
+
+
+    def write_nightly_redirects_map(content_fpath, redirects_map_fpath, releases, is_nginx):
+        nightly_dir = "nightly"
+        nightly_fpath = content_fpath / nightly_dir
+        eol = ";" if is_nginx else ""
+
+        if not nightly_fpath.exists():
+            raise IOError(f"nightly folder {nightly_fpath} does not exist.")
+
+        content = "# nightly redirects: path -> date/path\n"
+        ordered_folders = [
+            nightly_fpath / d.strftime("%Y-%m-%d")
+            for d in sorted(
+                [
+                    datetime.date(*[int(p) for p in file.name.split("-")])
+                    for file in nightly_fpath.iterdir()
+                    if file.is_dir()
+                ],
+                reverse=True,
+            )
+        ]
+
+        patterns = []
+        for folder in ordered_folders:
+            for fpath in folder.rglob("*"):
+                if not fpath.is_file():
+                    continue
+                pattern = (
+                    fpath.name.replace(f"_{folder.name}", "")
+                    .replace(f"-{folder.name}", "")
+                    .replace(f".{folder.name}", "")
+                )
+                if pattern not in patterns:
+                    patterns.append(pattern)
+                    content += (
+                        f"/{nightly_dir}/{pattern} "
+                        f"/{nightly_dir}/{fpath.relative_to(nightly_fpath)}{eol}\n"
+                    )
+
+        redirects_map_fpath.write_text(content)
 
         print(f"> OK. Wrote {len(content.splitlines()) -1 } redirects")
 
@@ -119,11 +164,24 @@ data:
             dest="openzim_root",
         )
         parser.add_argument(
-            "--openzim-redirects",
-            default=os.getenv("OPENZIM_REDIRECTS_MAP", Defaults.OPENZIM_REDIRECTS_MAP),
-            help="Path to openZIM releases redirects map. Defaults to "
-            f"`OPENZIM_REDIRECTS_MAP` environ or {Defaults.OPENZIM_REDIRECTS_MAP}",
-            dest="openzim_redirects",
+            "--openzim-release-redirects",
+            default=os.getenv(
+                "OPENZIM_RELEASE_REDIRECTS_MAP", Defaults.OPENZIM_RELEASE_REDIRECTS_MAP
+            ),
+            help="Path to openZIM releases redirects map. "
+            "Defaults to `OPENZIM_RELEASE_REDIRECTS_MAP` environ "
+            f"or {Defaults.OPENZIM_RELEASE_REDIRECTS_MAP}",
+            dest="openzim_release_redirects",
+        )
+        parser.add_argument(
+            "--openzim-nightly-redirects",
+            default=os.getenv(
+                "OPENZIM_NIGHTLY_REDIRECTS_MAP", Defaults.OPENZIM_NIGHTLY_REDIRECTS_MAP
+            ),
+            help="Path to openZIM nightly redirects map. "
+            "Defaults to `OPENZIM_NIGHTLY_REDIRECTS_MAP` environ "
+            f"or {Defaults.OPENZIM_NIGHTLY_REDIRECTS_MAP}",
+            dest="openzim_nightly_redirects",
         )
         parser.add_argument(
             "--kiwix-root",
@@ -133,11 +191,24 @@ data:
             dest="kiwix_root",
         )
         parser.add_argument(
-            "--kiwix-redirects",
-            default=os.getenv("KIWIX_REDIRECTS_MAP", Defaults.KIWIX_REDIRECTS_MAP),
-            help="Path to Kiwix releases redirects map. Defaults to "
-            f"`KIWIX_REDIRECTS_MAP` environ or {Defaults.KIWIX_REDIRECTS_MAP}",
-            dest="kiwix_redirects",
+            "--kiwix-release-redirects",
+            default=os.getenv(
+                "KIWIX_RELEASE_REDIRECTS_MAP", Defaults.KIWIX_RELEASE_REDIRECTS_MAP
+            ),
+            help="Path to Kiwix releases redirects map. "
+            "Defaults to `KIWIX_RELEASE_REDIRECTS_MAP` environ "
+            f"or {Defaults.KIWIX_RELEASE_REDIRECTS_MAP}",
+            dest="kiwix_release_redirects",
+        )
+        parser.add_argument(
+            "--kiwix-nightly-redirects",
+            default=os.getenv(
+                "KIWIX_NIGHTLY_REDIRECTS_MAP", Defaults.KIWIX_NIGHTLY_REDIRECTS_MAP
+            ),
+            help="Path to Kiwix nightly redirects map. "
+            "Defaults to `KIWIX_NIGHTLY_REDIRECTS_MAP` environ "
+            f"or {Defaults.KIWIX_NIGHTLY_REDIRECTS_MAP}",
+            dest="kiwix_nightly_redirects",
         )
         args = parser.parse_args()
 
@@ -145,7 +216,14 @@ data:
             print("Generating releases map for Kiwix…")
             write_release_redirects_map(
                 pathlib.Path(args.kiwix_root),
-                pathlib.Path(args.kiwix_redirects),
+                pathlib.Path(args.kiwix_release_redirects),
+                kiwix_releases,
+                is_nginx=False,
+            )
+            print("Generating nightly map for Kiwix…")
+            write_nightly_redirects_map(
+                pathlib.Path(args.kiwix_root),
+                pathlib.Path(args.kiwix_nightly_redirects),
                 kiwix_releases,
                 is_nginx=False,
             )
@@ -154,7 +232,14 @@ data:
             print("Generating releases map for openZIM…")
             write_release_redirects_map(
                 pathlib.Path(args.openzim_root),
-                pathlib.Path(args.openzim_redirects),
+                pathlib.Path(args.openzim_release_redirects),
+                openzim_releases,
+                is_nginx=True,
+            )
+            print("Generating nightyly map for openZIM…")
+            write_nightly_redirects_map(
+                pathlib.Path(args.openzim_root),
+                pathlib.Path(args.openzim_nightly_redirects),
                 openzim_releases,
                 is_nginx=True,
             )

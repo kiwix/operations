@@ -719,6 +719,10 @@ data:
          RewriteCond ${zim-map:$1} !=""
          RewriteRule ^(.*)$ ${zim-map:$1} [last,redirect=301,E=NOCACHE:1]
 
+         RewriteMap nightly-map "txt:/data/maps/kiwix-nightly.map"
+         RewriteCond ${nightly-map:$1} !=""
+         RewriteRule ^(.*)$ ${nightly-map:$1} [last,redirect=301,E=NOCACHE:1]
+
          Header always set Cache-Control "no-store, no-cache, must-revalidate" env=NOCACHE
       </IfModule>
 

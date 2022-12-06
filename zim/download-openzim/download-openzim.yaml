@@ -10,6 +10,7 @@ data:
     map $uri $redirect_uri {
         include /data/maps/wp1.map;
         include /data/maps/openzim-releases.map;
+        include /data/maps/openzim-nightly.map;
     }
 
     server {
