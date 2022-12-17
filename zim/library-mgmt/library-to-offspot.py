@@ -206,6 +206,11 @@ def convert(library_fpath, catalog_fpath, local_repository=False):
         # find ISO 639-1 from ISO 639-3 (might not exist)
         if re.search(r"[^a-z]", lang_3) is not None:
             lang_3 = re.split(r"[^a-z]", lang_3, 1)[0]
+
+        # skip content that resulted in empty lang_3
+        if not lang_3:
+            continue
+
         try:
             lang_1 = pycountry.languages.get(
                 **{"alpha_{}".format(len(lang_3)): lang_3}
