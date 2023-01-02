@@ -110,15 +110,17 @@ data:
               std.ban("req.url ~ ^/catalog/v2/entry/" + req.http.X-Book-Id) &&
               std.ban("req.url ~ ^/catalog/v2/illustration/" + req.http.X-Book-Id + "/") &&
 
-              # never changes (not purging)
-              # std.ban("req.url ~ ^/raw/" + req.http.X-Book-Name + "/(meta|content)/") &&
-              # std.ban("req.url ~ ^/content/" + req.http.X-Book-Name + "/") &&
+              # should never change; but can if we redo same ZIM or was 404 before or became 404
+              std.ban("req.url ~ ^/raw/" + req.http.X-Book-Name + "/(meta|content)/") &&
+              std.ban("req.url ~ ^/content/" + req.http.X-Book-Name + "/") &&
 
-              # may change if kiwix-serve updates search algo/template (not purging. we'll see in time)
-              # std.ban("req.url ~ ^/search?content=" + req.http.X-Book-Name + "&") &&
+              # may change if kiwix-serve updates search algo/template
+              # purging in case ZIM has been updated (should not)
+              std.ban("req.url ~ ^/search?content=" + req.http.X-Book-Name + "&") &&
 
-              # may change if kiwix-serve updates suggest algo/template (not purging. we'll see in time)
-              # std.ban("req.url ~ ^/suggest?content=" + req.http.X-Book-Name + "&") &&
+              # may change if kiwix-serve updates suggest algo/template
+              # purging in case ZIM has been updated (should not)
+              std.ban("req.url ~ ^/suggest?content=" + req.http.X-Book-Name + "&") &&
 
               # redirects to /content/ (not purging)
               # std.ban("req.url ~ ^/" + req.http.X-Book-Name + "/") &&
