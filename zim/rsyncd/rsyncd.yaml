@@ -37,10 +37,10 @@ data:
     list = no
     path = /var/www/download.kiwix.org
     comment = Kiwix download repository (mirrors only)
-    hosts allow = ftp.rrze.uni-erlangen.de 131.188.12.211 mirrors.dotsrc.org 130.225.254.116 2001:878:346::116 www.mirrorservice.org 212.219.56.184 ftp.nluug.nl 145.220.21.40 poincare.acc.umu.se 130.239.18.154 2001:6b0:e:2018::154 192.115.2.70 192.115.2.0/24 ftpmirror.your.org.219.237.163.in-addr.arpa 163.237.219.7
+    hosts allow = ftp.rrze.uni-erlangen.de 131.188.12.211 2001:638:a000:1021:21::1 mirrors.dotsrc.org 130.225.254.116 2001:878:346::116 www.mirrorservice.org 212.219.56.184 ftp.nluug.nl 145.220.21.40 poincare.acc.umu.se 130.239.18.154 2001:6b0:e:2018::154 192.115.2.70 192.115.2.0/24 ftpmirror.your.org.219.237.163.in-addr.arpa 163.237.219.7
 
     # Our mirrors
-    # [ ] ftp.fau.de (Michael Meier <rrze-ftp-admins@fau.de>): ftp.rrze.uni-erlangen.de 131.188.12.211
+    # [X] ftp.fau.de (Michael Meier <rrze-ftp-admins@fau.de>): ftp.rrze.uni-erlangen.de 131.188.12.211 2001:638:a000:1021:21::1
     # [X] mirrors.dotsrc.org (Anders Trier Olesen <staff@dotsrc.org>): mirrors.dotsrc.org 130.225.254.116 2001:878:346::116
     # [ ] www.mirrorservice.org (Tim Bishop <help@mirrorservice.org>): www.mirrorservice.org 212.219.56.184
     # [ ] ftp.nluug.nl (Mike Hulsman  <ftpmirror-beheer@nluug.nl>): ftp.nluug.nl 145.220.21.40
@@ -55,6 +55,15 @@ data:
     path = /var/www/download.kiwix.org
     comment = Kiwix download repository (wikimedia foundation only)
     hosts allow = 208.80.154.0/23
+
+    [self.download.kiwix.org]
+    # internal module for mirrorbrain discovery or our own mirror
+    max connections = 1
+    list = no
+    path = /var/www/download.kiwix.org
+    comment = Kiwix download repository (mirror.kiwix only)
+    # using clusterCIDR from kube-proxy's config.conf
+    hosts allow = 100.64.0.0/15
 
     [download.openzim.org]
     max connections = 1
@@ -124,3 +133,18 @@ spec:
           name: rsyncd-configs
       nodeSelector:
         k8s.kiwix.org/role: "storage"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: rsyncd-service
+  labels:
+    app: rsyncd-app
+spec:
+  selector:
+    app: rsyncd-app
+  ports:
+  - protocol: TCP
+    port: 873
+    targetPort: 873
