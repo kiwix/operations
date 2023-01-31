@@ -50,7 +50,7 @@ data:
 
     [wmf.download.kiwix.org]
     # Ariel <ariel@wikimedia.org>
-    max connections = 2
+    max connections = 6
     list = no
     path = /var/www/download.kiwix.org
     comment = Kiwix download repository (wikimedia foundation only)
