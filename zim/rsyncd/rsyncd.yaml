@@ -37,12 +37,12 @@ data:
     list = no
     path = /var/www/download.kiwix.org
     comment = Kiwix download repository (mirrors only)
-    hosts allow = ftp.rrze.uni-erlangen.de 131.188.12.211 2001:638:a000:1021:21::1 mirrors.dotsrc.org 130.225.254.116 2001:878:346::116 www.mirrorservice.org 212.219.56.184 ftp.nluug.nl 145.220.21.40 poincare.acc.umu.se 130.239.18.154 2001:6b0:e:2018::154 192.115.2.70 192.115.2.0/24 ftpmirror.your.org.219.237.163.in-addr.arpa 163.237.219.7
+    hosts allow = ftp.rrze.uni-erlangen.de 131.188.12.211 2001:638:a000:1021:21::1 mirrors.dotsrc.org 130.225.254.116 2001:878:346::116 www.mirrorservice.org 212.219.56.128/26 2001:630:341:0012::/64 ftp.nluug.nl 145.220.21.40 poincare.acc.umu.se 130.239.18.154 2001:6b0:e:2018::154 192.115.2.70 192.115.2.0/24 ftpmirror.your.org.219.237.163.in-addr.arpa 163.237.219.7
 
     # Our mirrors
     # [X] ftp.fau.de (Michael Meier <rrze-ftp-admins@fau.de>): ftp.rrze.uni-erlangen.de 131.188.12.211 2001:638:a000:1021:21::1
     # [X] mirrors.dotsrc.org (Anders Trier Olesen <staff@dotsrc.org>): mirrors.dotsrc.org 130.225.254.116 2001:878:346::116
-    # [ ] www.mirrorservice.org (Tim Bishop <help@mirrorservice.org>): www.mirrorservice.org 212.219.56.184
+    # [X] www.mirrorservice.org (Tim Bishop <help@mirrorservice.org>): www.mirrorservice.org 212.219.56.128/26 2001:630:341:0012::/64
     # [ ] ftp.nluug.nl (Mike Hulsman  <ftpmirror-beheer@nluug.nl>): ftp.nluug.nl 145.220.21.40
     # [X] saimei.ftp.acc.umu.se (Niklas Edmundsson <ftp-adm@accum.se>): poincare.acc.umu.se 130.239.18.154 2001:6b0:e:2018::154
     # [ ] mirror.isoc.org.il: 192.115.2.70 192.115.2.0/24
@@ -66,7 +66,7 @@ data:
     hosts allow = 100.64.0.0/15
 
     [download.openzim.org]
-    max connections = 1
+    max connections = 3
     path = /var/www/download.openzim.org
     comment = openZIM download repository
 ---
