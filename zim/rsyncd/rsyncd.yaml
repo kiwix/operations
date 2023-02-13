@@ -7,7 +7,6 @@ data:
   rsyncd.conf: |
     [global]
     charset = utf-8
-    max connections = 10
     # logs already sent to stdout for k8s to handle
     # log file = /var/log/rsync.log
 
@@ -22,22 +21,23 @@ data:
     gid = 33
     read only = true
 
+    dont compress = *.zim *.gz *.xz *.bz2 *.zip *.img
+
     # anonymous module
     [download.kiwix.org]
     path = /var/www/download.kiwix.org
     comment = Kiwix download repository
-    # TODO: change this to 3 once mirrors are done migrating to auth one
-    max connections = 10
-
-    dont compress = *.zim *.gz *.xz *.bz2 *.zip *.img
+    max connections = 3
+    lock file = /var/lock/public.lock
 
     # private module for official mirrors
     [master.download.kiwix.org]
-    max connections = 9
-    list = no
     path = /var/www/download.kiwix.org
     comment = Kiwix download repository (mirrors only)
-    hosts allow = ftp.rrze.uni-erlangen.de 131.188.12.211 2001:638:a000:1021:21::1 mirrors.dotsrc.org 130.225.254.116 2001:878:346::116 www.mirrorservice.org 212.219.56.128/26 2001:630:341:0012::/64 ftp.nluug.nl 145.220.21.40 poincare.acc.umu.se 130.239.18.154 2001:6b0:e:2018::154 192.115.2.70 192.115.2.0/24 ftpmirror.your.org.219.237.163.in-addr.arpa 163.237.219.7
+    max connections = 10
+    lock file = /var/lock/mirrors.lock
+    list = no
+    hosts allow = ftp.rrze.uni-erlangen.de 131.188.12.211 2001:638:a000:1021:21::1 mirrors.dotsrc.org 130.225.254.116 2001:878:346::116 www.mirrorservice.org 212.219.56.128/26 2001:630:341:0012::/64 ftp.nluug.nl 145.220.21.40 poincare.acc.umu.se 130.239.18.154 2001:6b0:e:2018::154 192.115.2.70 192.115.2.0/24 ftpmirror.your.org.219.237.163.in-addr.arpa 163.237.219.7 md.mirrors.hacktegic.com 185.181.228.68 2a0a:d580:802:68::68
 
     # Our mirrors
     # [X] ftp.fau.de (Michael Meier <rrze-ftp-admins@fau.de>): ftp.rrze.uni-erlangen.de 131.188.12.211 2001:638:a000:1021:21::1
@@ -47,28 +47,32 @@ data:
     # [X] saimei.ftp.acc.umu.se (Niklas Edmundsson <ftp-adm@accum.se>): poincare.acc.umu.se 130.239.18.154 2001:6b0:e:2018::154
     # [ ] mirror.isoc.org.il: 192.115.2.70 192.115.2.0/24
     # [X] ftpmirror.your.org (Ryan Steinmetz <noc@your.org>): ftpmirror.your.org.219.237.163.in-addr.arpa 163.237.219.7
+    # [X] md.mirrors.hacktegic.com (Artiom Mocrenco <amocrenco@protonmail.com>) md.mirrors.hacktegic.com 185.181.228.68 2a0a:d580:802:68::68
 
     [wmf.download.kiwix.org]
     # Ariel <ariel@wikimedia.org>
-    max connections = 6
-    list = no
     path = /var/www/download.kiwix.org
     comment = Kiwix download repository (wikimedia foundation only)
+    max connections = 8
+    lock file = /var/lock/wmf.lock
+    list = no
     hosts allow = 208.80.154.0/23
 
     [self.download.kiwix.org]
     # internal module for mirrorbrain discovery or our own mirror
-    max connections = 1
-    list = no
     path = /var/www/download.kiwix.org
     comment = Kiwix download repository (mirror.kiwix only)
+    max connections = 1
+    lock file = /var/lock/self.lock
+    list = no
     # using clusterCIDR from kube-proxy's config.conf
     hosts allow = 100.64.0.0/15
 
     [download.openzim.org]
-    max connections = 3
     path = /var/www/download.openzim.org
     comment = openZIM download repository
+    max connections = 3
+    lock file = /var/lock/openzim.lock
 ---
 apiVersion: apps/v1
 kind: Deployment
