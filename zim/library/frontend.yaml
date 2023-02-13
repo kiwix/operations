@@ -302,8 +302,6 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
     nginx.ingress.kubernetes.io/server-snippet: |
-        rewrite ^/favicon.ico$ https://www.kiwix.org/favicon.ico permanent;
-
         location /robots.txt {
           add_header Content-Type "text/plain";
           return 200 "User-agent: *\nDisallow: /";
