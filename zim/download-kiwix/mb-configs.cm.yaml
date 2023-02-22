@@ -670,7 +670,7 @@ data:
       DocumentRoot /var/www/download.kiwix.org
 
       MirrorBrainMetalinkPublisher "Kiwix project" https://kiwix.org
-      MirrorBrainTorrentTrackerURL "https://tracker.openzim.org:6969/announce"
+      MirrorBrainTorrentTrackerURL "http://tracker.openzim.org:6969/announce"
       MirrorBrainTorrentTrackerURL "udp://tracker.openzim.org:6969/announce"
       # MirrorBrainTorrentTrackerURL "https://opentracker.xyz:443/announce"
       # MirrorBrainTorrentTrackerURL "http://torrent.nwps.ws:80/announce"
