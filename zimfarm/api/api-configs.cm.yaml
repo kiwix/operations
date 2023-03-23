@@ -22,15 +22,7 @@ data:
   LOGS_EXPIRATION: "60"
   # notifications
   GLOBAL_NOTIFICATION_ended: "slack,#zimfarm-events"
-  # registries where to pull image versions from
-  DOCKER_REGISTRY_zimit: "ghcr.io"
-  DOCKER_REGISTRY_mwoffliner: "ghcr.io"
-  DOCKER_REGISTRY_sotoki: "ghcr.io"
-  DOCKER_REGISTRY_wikihow: "ghcr.io"
-  DOCKER_REGISTRY_gutenberg: "ghcr.io"
-  DOCKER_REGISTRY_ted: "ghcr.io"
-  DOCKER_REGISTRY_openedx: "ghcr.io"
-  DOCKER_REGISTRY_youtube: "ghcr.io"
+  # registries where to pull image versions from (defaults to ghcr.io)
   # DOCKER_REGISTRY_nautilus: "ghcr.io"
   # zimcheck option passed to worker
   ZIMCHECK_OPTION: "--all"
