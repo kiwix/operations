@@ -8,6 +8,7 @@ GROUPNAME=$3
 CLUSTERURL=https://api.scw.k8s.kiwix.org:6443
 NAMESPACE="${NAMESPACE:=default}"
 GROUPNAME="${GROUPNAME:=users}"  # users | gh-bots
+YEAR=$(date +"%Y")  # distinct files over the years
 ### CONFIG-END
 
 
@@ -27,11 +28,11 @@ if [ ! -f $CA_CERT ] ; then
 fi
 
 echo "Creating certificate for User ${USERNAME} with Group ${GROUPNAME}"
-CERTIFICATE_NAME="user-${USERNAME}"
-CONFIGNAME="${SCRIPT_DIR}/users/${USERNAME}_kiwix-prod.config"
-CSR_FILE="${SCRIPT_DIR}/users/${USERNAME}.csr"
-KEY_FILE="${SCRIPT_DIR}/users/${USERNAME}.key"
-CRT_FILE="${SCRIPT_DIR}/users/${USERNAME}.crt"
+CERTIFICATE_NAME="user-${USERNAME}-${YEAR}"
+CONFIGNAME="${SCRIPT_DIR}/users/${USERNAME}-${YEAR}_kiwix-prod.config"
+CSR_FILE="${SCRIPT_DIR}/users/${USERNAME}-${YEAR}.csr"
+KEY_FILE="${SCRIPT_DIR}/users/${USERNAME}-${YEAR}.key"
+CRT_FILE="${SCRIPT_DIR}/users/${USERNAME}-${YEAR}.crt"
 
 openssl genrsa -out ${KEY_FILE} 4096
 
@@ -57,8 +58,8 @@ kubectl certificate approve $CERTIFICATE_NAME
 
 kubectl get csr $CERTIFICATE_NAME -o jsonpath='{.status.certificate}' | base64 -d > $CRT_FILE
 
-echo "Generate kubeconfig for ${USERNAME}_kiwix-prod on namespace ${NAMESPACE}"
-kubectl config --kubeconfig $CONFIGNAME set-credentials "${USERNAME}_kiwix-prod" --client-key=$KEY_FILE --client-certificate=$CRT_FILE --embed-certs=true
+echo "Generate kubeconfig for ${USERNAME}-${YEAR}_kiwix-prod on namespace ${NAMESPACE}"
+kubectl config --kubeconfig $CONFIGNAME set-credentials "${USERNAME}-${YEAR}_kiwix-prod" --client-key=$KEY_FILE --client-certificate=$CRT_FILE --embed-certs=true
 kubectl config --kubeconfig $CONFIGNAME set-cluster kiwix-prod --embed-certs --certificate-authority=$CA_CERT --server=$CLUSTERURL
-kubectl config --kubeconfig $CONFIGNAME set-context "${USERNAME}@kiwix-prod" --cluster=kiwix-prod --user="${USERNAME}_kiwix-prod" --namespace=$NAMESPACE
-kubectl config --kubeconfig $CONFIGNAME use-context "${USERNAME}@kiwix-prod"
+kubectl config --kubeconfig $CONFIGNAME set-context "${USERNAME}-${YEAR}@kiwix-prod" --cluster=kiwix-prod --user="${USERNAME}-${YEAR}_kiwix-prod" --namespace=$NAMESPACE
+kubectl config --kubeconfig $CONFIGNAME use-context "${USERNAME}-${YEAR}@kiwix-prod"
