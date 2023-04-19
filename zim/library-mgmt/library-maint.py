@@ -170,10 +170,18 @@ def sort_filenames_for_recent(filenames: List[pathlib.Path]) -> List[pathlib.Pat
         return re.split(r"_(?P<period>\d{4}-\d{2})$", filename.stem)
 
     def get_core(filename):
-        return split_filename(filename)[0]
+        try:
+            return split_filename(filename)[0]
+        except IndexError:
+            print(f"FAILED on {filename}")
+            raise
 
     def get_period(filename):
-        return split_filename(filename)[1]
+        try:
+            return split_filename(filename)[1]
+        except IndexError:
+            print(f"FAILED on {filename}")
+            raise
 
     filenames_ = list(filenames)
     # sort by descending period
