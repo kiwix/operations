@@ -21,7 +21,7 @@ spec:
               - secretRef:
                   name: backup-credentials
               - secretRef:
-                  name: api-db-backup-credentials
+                  name: api-postgres-db-backup-credentials
               env:
                 - name: BITWARDEN_EMAIL
                   value: "contact+bitwarden-slave@kiwix.org"
