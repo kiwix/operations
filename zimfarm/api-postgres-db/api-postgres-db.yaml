@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zimfarm
+  labels:
+    app: api-postgres-db-app
+  name: api-postgres-db-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-postgres-db-app
+  template:
+    metadata:
+      labels:
+        app: api-postgres-db-app
+    spec:
+      containers:
+      - image: docker.io/library/postgres:15.2-bullseye
+        imagePullPolicy: Always
+        name: postgresdb
+        envFrom:
+        - secretRef:
+            name: api-postgres-db-secrets
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/var/lib/postgresql"
+          readOnly: false
+        ports:
+        - containerPort: 5432
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "500m"
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: zimfarm-api-postgres-db-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zimfarm
+  name: api-postgres-db-service
+  labels:
+    app: api-postgres-db-app
+spec:
+  selector:
+    app: api-postgres-db-app
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
