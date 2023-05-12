@@ -36,8 +36,17 @@ data:
 
     openzim_releases = {
         "libzim/libzim.tar.xz": "libzim-*.tar.xz",
+        "libzim/libzim_linux-x86_64-bionic.tar.gz": "libzim_linux-x86_64-bionic-*.tar.gz",
+        "libzim/libzim_linux-aarch64-bionic.tar.gz": "libzim_linux-aarch64-bionic-*.tar.gz",
         "libzim/libzim_linux-x86_64.tar.gz": "libzim_linux-x86_64-*.tar.gz",
+        "libzim/libzim_linux-aarch64.tar.gz": "libzim_linux-aarch64-*.tar.gz",
         "libzim/libzim_macos-x86_64.tar.gz": "libzim_macos-x86_64-*.tar.gz",
+        "libzim/libzim_macos-arm64.tar.gz": "libzim_macos-arm64-*.tar.gz",
+        "libzim/libzim_wasm-emscripten.tar.gz": "libzim_wasm-emscripten-*.tar.gz",
+        "libzim/libzim_android-arm.tar.gz": "libzim_android-arm-*.tar.gz",
+        "libzim/libzim_android-arm64.tar.gz": "libzim_android-arm64-*.tar.gz",
+        "libzim/libzim_android-x86.tar.gz": "libzim_android-x86-*.tar.gz",
+        "libzim/libzim_android-x86_64.tar.gz": "libzim_android-x86_64-*.tar.gz",
         "zim-tools/zim-tools.tar.xz": "zim-tools-*.tar.xz",
         "zim-tools/zim-tools_linux-x86_64.tar.gz": "zim-tools_linux-x86_64-*.tar.gz",
         "zimwriterfs/zimwriterfs.tar.xz": "zimwriterfs-*.tar.xz",
@@ -50,6 +59,9 @@ data:
         "kiwix-tools/kiwix-tools_linux-i586.tar.gz": ("kiwix-tools_linux-i586-*.tar.gz"),
         "kiwix-tools/kiwix-tools_linux-x86_64.tar.gz": (
             "kiwix-tools_linux-x86_64-*.tar.gz"
+        ),
+        "kiwix-tools/kiwix-tools_linux-aarch64.tar.gz": (
+            "kiwix-tools_linux-aarch64-*.tar.gz"
         ),
         "kiwix-tools/kiwix-tools_win-i686.zip": "kiwix-tools_win-i686-*.zip",
         "kiwix-desktop/kiwix-desktop.tar.gz": "kiwix-desktop-*.tar.gz",
