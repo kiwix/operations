@@ -23,3 +23,4 @@ data:
   SUPPORT_EMAIL: "hotspot@kiwix.org"
   # time to cache the catalog for
   CACHE_TIMEOUT: "3600"
+  DATA_DIR: "/data"
