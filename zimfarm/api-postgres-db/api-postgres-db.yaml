@@ -1,15 +1,16 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   namespace: zimfarm
   labels:
     app: api-postgres-db-app
-  name: api-postgres-db-deployment
+  name: api-postgres-db-sts
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: api-postgres-db-app
+  serviceName: api-postgres-db-service
   template:
     metadata:
       labels:
@@ -24,14 +25,10 @@ spec:
             name: api-postgres-db-secrets
         volumeMounts:
         - name: data-volume
-          mountPath: "/var/lib/postgresql"
+          mountPath: "/var/lib/postgresql/data"
           readOnly: false
         ports:
         - containerPort: 5432
-        resources:
-          requests:
-            memory: "4Gi"
-            cpu: "500m"
       volumes:
       - name: data-volume
         persistentVolumeClaim:
