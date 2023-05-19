@@ -1,41 +1,38 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   namespace: zimit
   labels:
-    app: api-db-app
-  name: api-db-deployment
+    app: api-postgres-db-app
+  name: api-postgres-db-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: api-db-app
+      app: api-postgres-db-app
+  serviceName: api-postgres-db-service
   template:
     metadata:
       labels:
-        app: api-db-app
+        app: api-postgres-db-app
     spec:
       containers:
-      - image: docker.io/mongo:4.2.9
+      - image: docker.io/library/postgres:15.2-bullseye
         imagePullPolicy: Always
-        name: mongodb
+        name: postgresdb
         envFrom:
         - secretRef:
-            name: api-db-secrets
+            name: api-postgres-db-secrets
         volumeMounts:
         - name: data-volume
-          mountPath: "/data/db"
+          mountPath: "/var/lib/postgresql/data"
           readOnly: false
         ports:
-        - containerPort: 27017
-        resources:
-          requests:
-            memory: "384Mi"
-            cpu: "200m"
+        - containerPort: 5432
       volumes:
       - name: data-volume
         persistentVolumeClaim:
-          claimName: zimit-api-db-pvc
+          claimName: zimit-api-postgres-db-pvc
       nodeSelector:
         k8s.kiwix.org/role: "services"
 ---
@@ -43,13 +40,14 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: zimit
-  name: api-db-service
+  name: api-postgres-db-service
   labels:
-    app: api-db-app
+    app: api-postgres-db-app
 spec:
   selector:
-    app: api-db-app
+    app: api-postgres-db-app
+  clusterIP: None
   ports:
   - protocol: TCP
-    port: 27017
-    targetPort: 27017
+    port: 5432
+    targetPort: 5432

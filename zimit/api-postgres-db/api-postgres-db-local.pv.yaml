@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: zimit-api-db-local-pv
+  name: zimit-api-postgres-db-local-pv
 spec:
   capacity:
     storage: 10Gi
@@ -11,9 +11,9 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage
   local:
-    path: /data/zimit/mongodb
+    path: /data/zimit/postgresql
   claimRef:
-    name: zimit-api-db-pvc
+    name: zimit-api-postgres-db-pvc
     namespace: zimit
   nodeAffinity:
     required:
