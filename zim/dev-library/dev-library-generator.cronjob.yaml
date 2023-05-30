@@ -28,7 +28,7 @@ spec:
                 subPath: dev_library.xml
                 mountPath: "/library/dev.xml"
                 readOnly: false
-              args: ["library-maint", "--zim-root", "/data", "--with-hidden", "--library-dest", "/public.xml", "--internal-zim-root", "/data", "--internal-library-dest", "/library/dev.xml", "read", "write-libraries"]
+              args: ["library-maint", "--zim-root", "/data", "--with-hidden", "--library-dest", "/public.xml", "--internal-zim-root", "/data", "--internal-library-dest", "/library/dev.xml", "--download-url-root", "https://mirror.download.kiwix.org/zim/.hidden/", "read", "write-libraries"]
               resources:
                 limits:
                   cpu: 200m
