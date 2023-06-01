@@ -29,17 +29,18 @@ data:
     local-infile=1
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   namespace: stats
   labels:
     app: matomo-db
-  name: matomo-db-deployment
+  name: matomo-db-sts
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: matomo-db
+  serviceName: matomo-db-service
   template:
     metadata:
       labels:
