@@ -44,7 +44,7 @@ data:
         "libzim/libzim_android-x86_64.tar.gz": "libzim_android-x86_64-*.tar.gz",
         "libzim/libzim_linux-aarch64-bionic.tar.gz": "libzim_linux-aarch64-bionic-*.tar.gz",
         "libzim/libzim_linux-x86_64-bionic.tar.gz": "libzim_linux-x86_64-bionic-*.tar.gz",
-        "libzim/libzim_linux-armhf.tar.gz": "libzim_linux-armhf-*.tar.gz",
+        "libzim/libzim_linux-armhf.tar.gz": "libzim_linux-armv6-*.tar.gz",
         "libzim/libzim_linux-armv6.tar.gz": "libzim_linux-armv6-*.tar.gz",
         "libzim/libzim_linux-armv8.tar.gz": "libzim_linux-armv8-*.tar.gz",
         "libzim/libzim_linux-x86_64-bionic.tar.gz": "libzim_linux-x86_64-bionic-*.tar.gz",
@@ -55,7 +55,7 @@ data:
         "libzim/libzim_linux-aarch64.tar.gz": "libzim_linux-aarch64-bionic-*.tar.gz",
         "zim-tools/zim-tools.tar.xz": "zim-tools-*.tar.xz",
         "zim-tools/zim-tools_linux-aarch64.tar.gz": "zim-tools_linux-aarch64-*.tar.gz",
-        "zim-tools/zim-tools_linux-armhf.tar.gz": "zim-tools_linux-armhf-*.tar.gz",
+        "zim-tools/zim-tools_linux-armhf.tar.gz": "zim-tools_linux-armv6-*.tar.gz",
         "zim-tools/zim-tools_linux-armv6.tar.gz": "zim-tools_linux-armv6-*.tar.gz",
         "zim-tools/zim-tools_linux-armv8.tar.gz": "zim-tools_linux-armv8-*.tar.gz",
         "zim-tools/zim-tools_linux-i586.tar.gz": "zim-tools_linux-i586-*.tar.gz",
@@ -92,7 +92,7 @@ data:
         "kiwix-js-electron/kiwix-js-electron_i386.appimage": "kiwix-js-electron_i386_*.appimage",
         "kiwix-js-windows/kiwix-js-windows.appxbundle": ("kiwix-js-windows_*.appxbundle"),
         "kiwix-tools/kiwix-tools.tar.xz": "kiwix-tools-*.tar.xz",
-        "kiwix-tools/kiwix-tools_linux-armhf.tar.gz": ("kiwix-tools_linux-armhf-*.tar.gz"),
+        "kiwix-tools/kiwix-tools_linux-armhf.tar.gz": ("kiwix-tools_linux-armv6-*.tar.gz"),
         "kiwix-tools/kiwix-tools_linux-i586.tar.gz": ("kiwix-tools_linux-i586-*.tar.gz"),
         "kiwix-tools/kiwix-tools_linux-x86_64.tar.gz": (
             "kiwix-tools_linux-x86_64-*.tar.gz"
