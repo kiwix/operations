@@ -55,8 +55,21 @@ spec:
     - hosts:
       - moz-extension.kiwix.org
       secretName: moz-extension-kiwix-org-tls
+    - hosts:
+      - extension.kiwix.org
+      secretName: extension-kiwix-org-tls
   rules:
   - host: moz-extension.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: mozext-service
+            port:
+              number: 80
+  - host: extension.kiwix.org
     http:
       paths:
       - path: /
