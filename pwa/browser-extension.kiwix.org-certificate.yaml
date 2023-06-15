@@ -1,13 +1,13 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: extension-kiwix-org
+  name: browser-extension-kiwix-org
   namespace: pwa
 spec:
-  secretName: extension-kiwix-org-tls
+  secretName: browser-extension-kiwix-org-tls
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt-prod
-  commonName: extension.kiwix.org
+  commonName: browser-extension.kiwix.org
   dnsNames:
-  - extension.kiwix.org
+  - browser-extension.kiwix.org
