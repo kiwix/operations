@@ -126,9 +126,10 @@ function scaleway_multicloud {
   pool_id=$3
   region=$4
 
-  curl -fsSL -k -d {} -H "X-Auth-Token: ${scw_token}" \
+  curl -fsSL -k -d {} -H "Content-Type: application/json" \
+    -H "X-Auth-Token: ${scw_token}" \
     -X POST \
-    ${scw_api}/k8s-private/v1beta2/regions/${region}/pools/${pool_id}/node > /tmp/call
+    ${scw_api}/k8s/v1/regions/${region}/pools/${pool_id}/external-nodes > /tmp/call
 
   # shellcheck disable=SC2181
   if [[ ${?} -ne 0 ]]; then
@@ -138,7 +139,7 @@ function scaleway_multicloud {
   fi
 
   # cluster version
-  cluster_version=$(jq -r ".cluster_version" < /tmp/call)
+  cluster_version=$(jq -r ".pool_version" < /tmp/call)
 
   # kube node token
   node_token=$(jq -r ".kube_token" < /tmp/call)
