@@ -47,7 +47,7 @@ jobs:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         REPO: kiwix/k8s
         LABELS: maint
-        ASSIGNEES: rgaudin
+        ASSIGNEES: rgaudin,benoit74
         ISSUE_BODY: |
           ## Infra
 
