@@ -54,5 +54,5 @@ spec:
                   memory: 256Mi
           restartPolicy: Never
           nodeSelector:
-            k8s.kiwix.org/role: "system"
+            k8s.kiwix.org/role: "services"
 
