@@ -14,7 +14,7 @@ spec:
         spec:
           containers:
             - name: matomo
-              image: ghcr.io/kiwix/matomo:4.14.2-fpm
+              image: ghcr.io/kiwix/matomo:4.15.0-fpm
               imagePullPolicy: IfNotPresent
               env:
               # URL to internal web service
