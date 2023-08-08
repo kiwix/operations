@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: api-db-backup
+  namespace: nautilus
+spec:
+  schedule: "5 10 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            - name: borg-backup
+              image: ghcr.io/kiwix/borg-backup:latest
+              imagePullPolicy: Always
+              envFrom:
+              - secretRef:
+                  name: backup-credentials
+              - secretRef:
+                  name: api-db-backup-credentials
+              env:
+                - name: BITWARDEN_EMAIL
+                  value: "contact+bitwarden-slave@kiwix.org"
+                - name: BORGBASE_NAME
+                  value: "nautilus-api-db"
+              command: ["single-backup"]
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+          volumes:
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "services"

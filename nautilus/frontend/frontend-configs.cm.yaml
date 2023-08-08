@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: frontend-configs
+  namespace: nautilus
+data:
+  NAUTILUS_WEB_API: "https://api.nautilus.openzim.org/v1"

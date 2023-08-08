@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-configs
+  namespace: nautilus
+data:
+  ALLOWED_ORIGINS: "https://nautilus.openzim.org"
+  WEB_CONCURRENCY: "1"
+  TRANSIENT_STORAGE_PATH: "/tmp/transient"
+  COOKIE_DOMAIN: "nautilus.openzim.org"
+  COOKIE_EXPIRATION_DAYS: "31"
+  PROJECT_QUOTA: "100MiB"
+  CHUNK_SIZE: "2MiB"

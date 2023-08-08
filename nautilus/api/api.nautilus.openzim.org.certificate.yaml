@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: api-nautilus-openzim-org
+  namespace: nautilus
+spec:
+  secretName: api-nautilus-openzim-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: api.nautilus.openzim.org
+  dnsNames:
+  - api.nautilus.openzim.org
