@@ -6,7 +6,7 @@ metadata:
     app: overview-app
   name: overview-deployment
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: overview-app
@@ -48,7 +48,7 @@ spec:
       - name: webroot-volume
         emptyDir: {}
       nodeSelector:
-        k8s.kiwix.org/role: "system"
+        k8s.kiwix.org/role: "services"
 ---
 apiVersion: v1
 kind: Service
