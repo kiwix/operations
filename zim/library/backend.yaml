@@ -6,7 +6,7 @@ metadata:
     app: library-demo-backend-app
   name: library-demo-backend-deployment
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: library-demo-backend-app
@@ -81,7 +81,7 @@ metadata:
     app: library-catalog-backend-app
   name: library-catalog-backend-deployment
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: library-catalog-backend-app
