@@ -5,7 +5,7 @@ metadata:
   namespace: zim
 spec:
   schedule: "10 * * * *"
-  successfulJobsHistoryLimit: 0
+  successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
   jobTemplate:
