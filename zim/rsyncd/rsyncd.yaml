@@ -37,7 +37,7 @@ data:
     max connections = 11
     lock file = /var/lock/mirrors.lock
     list = no
-    hosts allow = ftp.rrze.uni-erlangen.de 131.188.12.211 2001:638:a000:1021:21::1 mirrors.dotsrc.org 130.225.254.116 2001:878:346::116 www.mirrorservice.org 212.219.56.128/26 2001:630:341:0012::/64 ftp.nluug.nl 145.220.21.40 poincare.acc.umu.se 130.239.18.154 2001:6b0:e:2018::154 192.115.2.70 192.115.2.0/24 ftpmirror.your.org.219.237.163.in-addr.arpa 163.237.219.7 md.mirrors.hacktegic.com 185.181.228.68 2a0a:d580:802:68::68 mirror-sites-fr.mblibrary.info 79.137.65.154
+    hosts allow = hippo.yeleman.com ftp.rrze.uni-erlangen.de 131.188.12.211 2001:638:a000:1021:21::1 mirrors.dotsrc.org 130.225.254.116 2001:878:346::116 www.mirrorservice.org 212.219.56.128/26 2001:630:341:0012::/64 ftp.nluug.nl 145.220.21.40 poincare.acc.umu.se 130.239.18.154 2001:6b0:e:2018::154 192.115.2.70 192.115.2.0/24 ftpmirror.your.org.219.237.163.in-addr.arpa 163.237.219.7 md.mirrors.hacktegic.com 185.181.228.68 2a0a:d580:802:68::68 mirror-sites-fr.mblibrary.info 79.137.65.154
 
     # Our mirrors
     # [X] ftp.fau.de (Michael Meier <rrze-ftp-admins@fau.de>): ftp.rrze.uni-erlangen.de 131.188.12.211 2001:638:a000:1021:21::1
