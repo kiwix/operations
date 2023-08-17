@@ -15,7 +15,6 @@ spec:
         spec:
           containers:
             - image: ghcr.io/kiwix/mirrorbrain:latest
-              imagePullPolicy: IfNotPresent
               name: mirrorbrain
               command: ["update_mirrorbrain_db.sh"]
               volumeMounts:
