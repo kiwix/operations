@@ -1,16 +1,20 @@
+# pyright: reportImplicitStringConcatenation=false
 import os
 import requests
 
 SCHEMES = ([] if os.getenv("HTTP_ONLY") else ["https"]) + ["http"]
 DEFAULT_SCHEME = SCHEMES[0]
 LIBRARY_HOST = os.getenv("LIBRARY_HOST", "library.kiwix.org")
-OPDS_NAV_MIMETYPE = "application/atom+xml;profile=opds-catalog;kind=navigation"
+OPDS_NAV_MIMETYPE = (
+    "application/atom+xml;profile=opds-catalog;kind=navigation;charset=utf-8"
+)
 OPDS_ENDPOINTS = {
-    "/catalog/root.xml": "application/atom+xml; profile=opds-catalog; "
-    "kind=acquisition; charset=utf-8",
+    "/catalog/root.xml": "application/atom+xml;profile=opds-catalog;"
+    "kind=acquisition;charset=utf-8",
     "/catalog/v2/root.xml": OPDS_NAV_MIMETYPE,
     "/catalog/v2/searchdescription.xml": "application/opensearchdescription+xml",
-    "/catalog/v2/entries": "application/atom+xml;profile=opds-catalog;kind=acquisition",
+    "/catalog/v2/entries": "application/atom+xml;profile=opds-catalog;"
+    "kind=acquisition;charset=utf-8",
     "/catalog/v2/categories": OPDS_NAV_MIMETYPE,
     "/catalog/v2/languages": OPDS_NAV_MIMETYPE,
 }
