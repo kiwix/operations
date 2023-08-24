@@ -1,8 +1,9 @@
 # pyright: reportImplicitStringConcatenation=false
 import os
+
 import requests
 
-SCHEMES = ([] if os.getenv("HTTP_ONLY") else ["https"]) + ["http"]
+SCHEMES = os.getenv("SCHEMES", "https").split(",")
 DEFAULT_SCHEME = SCHEMES[0]
 LIBRARY_HOST = os.getenv("LIBRARY_HOST", "library.kiwix.org")
 OPDS_NAV_MIMETYPE = (

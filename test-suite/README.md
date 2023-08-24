@@ -8,7 +8,7 @@ A collection of tests to ensure our SPOF that is the centralized [library.kiwix.
 You must have a working python3 environments with a few dependencies.
 
 ```sh
-pip install -U pytest requests
+pip install -r requirements.txt
 ```
 
 # Usage
@@ -19,13 +19,21 @@ pytest -v
 
 ## Options
 
-- You can disable testing over HTTPS/TLS by setting `HTTP_ONLY` environment variable.
+- You can change the target host by setting `LIBRARY_HOST` environment variable.
+- You can select which schemes (http, https) to check using `SCHEMES` environment variable.
 - You can disable Varnish-related tests using `-m "not varnish"` flag.
 
-Example testing a local kiwix-serve:
+Examples:
 
 ```sh
-HTTP_ONLY=1 LIBRARY_HOST="localhost:9000" pytest -v -m "not varnish"
+# local kiwix-serve
+SCHEMES=http LIBRARY_HOST="localhost:9000" pytest -v -m "not varnish"
+
+# dev library
+LIBRARY_HOST="dev.library.kiwix.org" pytest -v -m "not varnish"
+
+# main online library
+pytest -v
 ```
 
 ## Sample output
