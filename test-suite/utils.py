@@ -36,11 +36,13 @@ def get_url(
 
 def get_response_headers(path, method="HEAD", scheme=DEFAULT_SCHEME):
     return requests.request(
-        method=method, url=get_url(path=path, scheme=scheme)
+        method=method,
+        url=get_url(path=path, scheme=scheme),
+        headers={"Accept-Encoding": "gzip, deflate, br"},
     ).headers
 
 
-def is_cached(path, method="HEAD", scheme=DEFAULT_SCHEME):
+def is_cached(path, method="GET", scheme=DEFAULT_SCHEME):
     for _ in range(2):
         ret = get_response_headers(path, method=method, scheme=scheme).get("X-Varnish")
     return len(ret.split(" ")) >= 2

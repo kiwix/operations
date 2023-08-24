@@ -25,7 +25,7 @@ def test_opds_mimetypes(path, mimetype):
 
 @pytest.mark.parametrize("path", COMPRESSABLE_OPDS_ENDPOINTS.keys())
 def test_opds_is_gzipped(path):
-    assert get_response_headers(path).get("Content-Encoding") == "gzip"
+    assert get_response_headers(path, method="GET").get("Content-Encoding") == "gzip"
 
 
 @pytest.mark.varnish
