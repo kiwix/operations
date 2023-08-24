@@ -197,6 +197,9 @@ data:
       # set beresp.grace = 24h;
       # set beresp.keep = 8m;
 
+      # important for it to go to cache
+      return (deliver);
+
     }
 
 ---
