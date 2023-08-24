@@ -36,5 +36,6 @@ jobs:
       - name: Test dev.library.kiwix.org
         working-directory: test-suite
         env:
+          SCHEMES: http,https
           LIBRARY_HOST: dev.library.kiwix.org
         run: pytest -vvv -m "not varnish"
