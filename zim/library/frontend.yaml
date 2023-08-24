@@ -224,7 +224,7 @@ spec:
         runAsUser: 0
         runAsGroup: 0
       containers:
-      - image: docker.io/library/varnish:7.1-alpine
+      - image: docker.io/library/varnish:7.3-alpine
         # command: ["varnishd", "-F", "-a", "http=:80,HTTP", "-p", "feature=+http2", "-f", "/etc/varnish/default.vcl", "-s", "malloc,384M"]
         command: ["entrypoint"]
         imagePullPolicy: IfNotPresent
