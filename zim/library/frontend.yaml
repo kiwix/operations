@@ -48,7 +48,7 @@ data:
 
     echo "Starting varnish with ${extra_opts}"
 
-    exec varnishd -P /var/run/varnishd.pid -F -a http=:80,HTTP -p feature=+http2 -f /etc/varnish/default.vcl -s malloc,$VARNISHSIZE $extra_opts
+    exec varnishd -P /var/run/varnishd.pid -F -a http=:80,HTTP -p feature=+http2 -f /etc/varnish/default.vcl -s default,$VARNISHSIZE $extra_opts
   varnish.vcl: |
     vcl 4.1;
 
