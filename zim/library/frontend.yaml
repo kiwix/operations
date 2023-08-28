@@ -161,8 +161,9 @@ data:
           set req.backend_hint = demo;
       }
 
-      # remove potential cookie from request (there should be none)
-      unset req.http.cookie;
+      # TEMP: disabling cache until https://github.com/kiwix/libkiwix/issues/995
+      # # remove potential cookie from request (there should be none)
+      # unset req.http.cookie;
 
       # set standard proxied ip header for getting original remote address
       # set req.http.X-Forwarded-For = client.ip;
@@ -197,8 +198,10 @@ data:
       # set beresp.grace = 24h;
       # set beresp.keep = 8m;
 
-      # important for it to go to cache
-      return (deliver);
+      # TEMP: disabling cache until https://github.com/kiwix/libkiwix/issues/995
+      # # important for it to go to cache
+      # unset bereq.http.cookie
+      # return (deliver);
 
     }
 
