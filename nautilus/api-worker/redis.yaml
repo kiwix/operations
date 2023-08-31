@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: nautilus
+  labels:
+    app: redis-app
+  name: redis-sts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis-app
+  serviceName: redis-service
+  template:
+    metadata:
+      labels:
+        app: redis-app
+    spec:
+      containers:
+      - image: docker.io/library/redis:7.2
+        imagePullPolicy: IfNotPresent
+        command: ["redis-server", "--save", "", "--appendonly", "no"]
+        name: redis
+        ports:
+        - containerPort: 6379
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: nautilus
+  name: redis-service
+  labels:
+    app: redis-app
+spec:
+  selector:
+    app: redis-app
+  ports:
+  - protocol: TCP
+    port: 6379
+    targetPort: 6379

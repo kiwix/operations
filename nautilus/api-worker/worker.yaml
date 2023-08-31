@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: nautilus
+  labels:
+    app: worker-app
+  name: api-worker-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: worker-app
+  template:
+    metadata:
+      labels:
+        app: worker-app
+    spec:
+      containers:
+      - image: ghcr.io/openzim/nautilus-webui-api:latest
+        imagePullPolicy: Always
+        command: ["rq-worker"]
+        name: worker
+        envFrom:
+        - configMapRef:
+            name: api-configs
+        - secretRef:
+            name: api-secrets
+        volumeMounts:
+        - name: files-volume
+          mountPath: "/tmp/transient"
+          readOnly: false
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+      volumes:
+      # /!\ this is not backed-up (considered transient)
+      - name: files-volume
+        persistentVolumeClaim:
+          claimName: nautilus-api-files-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
