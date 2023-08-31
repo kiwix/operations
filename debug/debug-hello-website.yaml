@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: debug
+  labels:
+    app: webserv
+  name: debug-webserv
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webserv
+  template:
+    metadata:
+      labels:
+        app: webserv
+    spec:
+      containers:
+      - image: crccheck/hello-world:latest
+        imagePullPolicy: Always
+        name: api
+        ports:
+        - containerPort: 8000
+      nodeSelector:
+        k8s.kiwix.org/role: system
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: debug
+  name: debug-webserv
+  labels:
+    app: webserv
+spec:
+  selector:
+    app: webserv
+  ports:
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: debug-webserv
+  namespace: debug
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+spec:
+  rules:
+  - host: debug-webserv.acme.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: debug-webserv
+            port:
+              number: 8000
