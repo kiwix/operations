@@ -13,3 +13,4 @@ data:
   CHUNK_SIZE: "2MiB"
   REDIS_URI: "redis://redis-service:6379/0"
   CHANNEL_NAME: "s3_upload"
+  FORWARDED_ALLOW_IPS: "*"
