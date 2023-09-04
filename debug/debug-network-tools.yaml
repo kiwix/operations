@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: debug-network-tools-daemonset
+  namespace: debug
+  labels:
+    app: debug-network-tools
+spec:
+  selector:
+    matchLabels:
+      app: debug-network-tools-daemonset
+  template:
+    metadata:
+      labels:
+        app: debug-network-tools-daemonset
+    spec:
+      containers:
+      - image: jonlabelle/network-tools:latest
+        imagePullPolicy: Always
+        name: network-tools
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+        command: ["sh", "-c", "sleep infinity"]
