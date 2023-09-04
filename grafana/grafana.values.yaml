@@ -14,48 +14,48 @@ externalServices:
 
 metrics:
   kube-state-metrics:
-    enabled: false
+    enabled: true
 
   node-exporter:
-    enabled: false
+    enabled: true
 
   kubelet:
-    enabled: false
+    enabled: true
 
   cadvisor:
-    enabled: false
+    enabled: true
 
   cost:
-    enabled: false
+    enabled: true
 
   podMonitors:
-    enabled: false
+    enabled: true
 
   serviceMonitors:
-    enabled: false
+    enabled: true
 
 logs:
   enabled: true
 
   pod_logs:
-    enabled: false
+    enabled: true
 
   cluster_events:
-    enabled: false
+    enabled: true
 
 kube-state-metrics:
-  enabled: false
+  enabled: true
   image:
     tag: v2.4.2
 
 prometheus-node-exporter:
-  enabled: false
+  enabled: true
 
 prometheus-operator-crds:
-  enabled: false
+  enabled: true
 
 opencost:
-  enabled: false
+  enabled: true
   opencost:
     exporter:
       defaultClusterId: "kiwix-prod"

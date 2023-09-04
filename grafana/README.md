@@ -30,3 +30,7 @@ Then install the helm chart with custom values are stored in this repo:
     --values grafana.values.secret.yaml
 ```
 
+Remark:
+Do not mind about `policy/v1beta1 PodSecurityPolicy is deprecated in v1.21+, unavailable in v1.25+` warnings, 
+they are indeed gracefully handled depending on the cluster capabilities.
+
