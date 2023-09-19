@@ -49,4 +49,8 @@ data:
   UWSGI_PROCESSES: "64"
   UWSGI_CHEAPER_INITIAL: "8"
   ALEMBIC_UPGRADE_HEAD_ON_START: ""
+  # Timeout for requests to other services
+  REQ_TIMEOUT_NOTIFICATIONS: "5"
+  REQ_TIMEOUT_CMS: "50"
+  REQ_TIMEOUT_GHCR: "10"
 
