@@ -63,7 +63,7 @@ metadata:
   namespace: cardshop
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+    nginx.ingress.kubernetes.io/proxy-body-size: "5m"
 spec:
   tls:
     - hosts:
