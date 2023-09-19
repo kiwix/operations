@@ -200,7 +200,7 @@ data:
 
       # TEMP: disabling cache until https://github.com/kiwix/libkiwix/issues/995
       # # important for it to go to cache
-      # unset bereq.http.cookie
+      # unset bereq.http.cookie;
       # return (deliver);
 
     }
