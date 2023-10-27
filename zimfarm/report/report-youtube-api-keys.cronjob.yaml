@@ -25,7 +25,7 @@ spec:
               - name: GITHUB_REPO
                 value: openzim/zim-requests
               - name: GITHUB_ISSUE_ASSIGNEES
-                value: qqq
+                value: RavanJAltaie,Popolechien,benoit74
               - name: GITHUB_ISSUE_LABELS
                 value: task
               - name: CREATE_ISSUE
@@ -35,7 +35,7 @@ spec:
                 mountPath: /app/maint-scripts/report_youtube_api_keys.conf.json
                 subPath: report_youtube_api_keys.conf.json
                 readOnly: true
-              command: [/app/maint-scripts/report_youtube_api_keys.py"]
+              command: ["/app/maint-scripts/report_youtube_api_keys.py"]
               resources:
                 requests:
                   cpu: 100m
