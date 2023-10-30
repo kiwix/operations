@@ -13,9 +13,11 @@ spec:
       backoffLimit: 2
       template:
         spec:
+          restartPolicy: Never
           containers:
             - image: ghcr.io/openzim/zimfarm-dispatcher:latest
               imagePullPolicy: IfNotPresent
+              name: zimfarm
               envFrom:
               - secretRef:
                   name: report-youtube-api-keys
@@ -35,6 +37,7 @@ spec:
                 mountPath: /app/maint-scripts/report_youtube_api_keys.conf.json
                 subPath: report_youtube_api_keys.conf.json
                 readOnly: true
+              workingDir: /app/maint-scripts
               command: ["/app/maint-scripts/report_youtube_api_keys.py"]
               resources:
                 requests:
@@ -43,6 +46,6 @@ spec:
           volumes:
           - name: report-youtube-api-keys-config
             configMap:
-              name: report-youtube-api-keys-config
+              name: report-youtube-api-keys
           nodeSelector:
             k8s.kiwix.org/role: "services"

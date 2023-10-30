@@ -4,7 +4,7 @@ metadata:
   name: report-youtube-api-keys
   namespace: zimfarm
 data:
-  list_youtube_api_keys_used.conf.json: |
+  report_youtube_api_keys.conf.json: |
     {
         "cc319f3e8ee3f586646b98c55bc0a7b3d9f27ac3393d1bc982aaef5930cc313a": "large-crashcourse-1",
         "9dc879afd8f9a95e7eb30167311dd7346bcc6bdfafc6bd1e217460830323c7ef": "large-mathtiques-2",
