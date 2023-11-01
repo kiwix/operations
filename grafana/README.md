@@ -34,3 +34,23 @@ Remark:
 Do not mind about `policy/v1beta1 PodSecurityPolicy is deprecated in v1.21+, unavailable in v1.25+` warnings, 
 they are indeed gracefully handled depending on the cluster capabilities.
 
+To upgrade (e.g. kube-state-metrics version):
+```
+helm upgrade grafana-k8s-monitoring grafana/k8s-monitoring \
+    --namespace "grafana" --values grafana.values.yaml \
+    --values grafana.values.secret.yaml
+```
+
+If you face issues while upgrading due to deprecated API version in objects, you might benefit from using the
+mapkubeapis plugin.
+
+First, install the plugin:
+```
+helm plugin install https://github.com/helm/helm-mapkubeapis
+```
+
+Then, update release with mapkubeapis (will delete obsoleted objects and map old api to new ones):
+```
+helm mapkubeapis grafana-k8s-monitoring --namespace "grafana"
+```
+
