@@ -321,7 +321,7 @@ subjects:
 apiVersion: v1
 data:
   allow-snippet-annotations: "true"
-  use-proxy-protocol: "true"
+  use-proxy-protocol: "false"
 kind: ConfigMap
 metadata:
   labels:
@@ -392,7 +392,7 @@ spec:
   type: ClusterIP
 ---
 apiVersion: apps/v1
-kind: Deployment
+kind: DaemonSet
 metadata:
   labels:
     app.kubernetes.io/component: controller
