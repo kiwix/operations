@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: tmp-cleanup-files
+  namespace: zim
+spec:
+  schedule: "0 2 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - image: docker.io/nginx:1.21
+              imagePullPolicy: IfNotPresent
+              name: jobrunner
+              volumeMounts:
+              - mountPath: "/data/tmp"
+                name: tmp-kiwix-volume
+                readOnly: true
+              workingDir: /data/tmp
+              command: ["/bin/sh","-c"]
+              args: ["find /data/tmp/ci/dev_preview -type f -mtime +30 | wc -l; find /data/tmp/ci/dev_preview -type f -mtime +30 --delete; find /data/tmp/ci/dev_preview -type d -empty | wc -l; find /data/tmp/ci/dev_preview -type d -empty --delete"]
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 64Mi
+          volumes:
+          - name: tmp-kiwix-volume
+            persistentVolumeClaim:
+              # /!\ name is inverted compared to this file
+              claimName: kiwix-tmp-pvc
+          nodeSelector:
+            k8s.kiwix.org/role: "storage"
