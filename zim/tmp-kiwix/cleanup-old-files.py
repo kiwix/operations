@@ -16,7 +16,6 @@ Options:
     -n, --days      Delete files older than this many days. Default is 30 days.
 """
 
-import os
 import argparse
 import datetime
 from pathlib import Path
@@ -27,6 +26,8 @@ def list_files_to_delete(folder_path: Path, days: int) -> list[Path]:
     minimum_time = (datetime.datetime.now() - datetime.timedelta(days=days)).timestamp()
     files_to_delete: list[Path] = []
     for file_path in folder_path.rglob("*"):
+        if not file_path.is_file():
+            continue
         if file_path.stat().st_mtime < minimum_time:
             files_to_delete.append(file_path)
 
@@ -40,20 +41,23 @@ def list_directories_to_delete(
     empty_directories_to_delete: list[Path] = []
 
     for file in files_to_delete:
-        parent = Path(file).parent
+        current_parent = file.parent
 
-        # Check recursively if the parent directory is already empty or contains only
-        # files/directories that will be deleted
-        while all(
-            item in files_to_delete or item in empty_directories_to_delete
-            for item in parent.iterdir()
+        # Check recursively if the parent directory is not the root processing folder
+        # and if it is still relative to this root folder (probably a no brainer)
+        # and it is not already selected for deletion
+        # and it is already empty or contains only files/directories that will be deleted
+        while (
+            current_parent != folder_path
+            and current_parent.is_relative_to(folder_path)
+            and current_parent not in empty_directories_to_delete
+            and all(
+                item in files_to_delete or item in empty_directories_to_delete
+                for item in current_parent.iterdir()
+            )
         ):
-            # Abort if parent is already marked for deletion
-            if parent in empty_directories_to_delete:
-                break
-            empty_directories_to_delete.append(parent)
-
-            parent = parent.parent
+            empty_directories_to_delete.append(current_parent)
+            current_parent = current_parent.parent
 
     return empty_directories_to_delete
 
@@ -64,24 +68,24 @@ def process_deletion(
     """Process file and directory deletion based on the dry-run status."""
     if dry_run:
         print(f"These files would be deleted:")
-        print("\n".join([str(path) for path in files_to_delete]))
+        print("\n".join(sorted(str(path) for path in files_to_delete)))
         print("\nEmpty subdirectories that would be deleted:")
-        print("\n".join([str(path) for path in empty_directories_to_delete]))
+        print("\n".join(sorted(str(path) for path in empty_directories_to_delete)))
     else:
         print(f"Deleting files:")
         for file_path in files_to_delete:
-            os.remove(file_path)
+            file_path.unlink()
             print(f"Deleted: {file_path}")
 
         print(f"\nDeleting empty subdirectories:")
         for directory_path in empty_directories_to_delete:
             try:
-                os.rmdir(directory_path)
+                directory_path.rmdir()
                 print(f"Deleted empty directory: {directory_path}")
             except OSError as ex:
                 # do not fail script when we fail to delete a directory since this has
-                # almost zero impact on storage + it might happen that a file appears
-                # between our inventory and the real deletion
+                # almost zero impact on storage + it might happen that a file is created
+                # between our inventory and the real directory deletion
                 print(f"Failed to delete directory {directory_path}:\n{ex}")
 
 
