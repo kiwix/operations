@@ -19,76 +19,54 @@ Options:
 import os
 import argparse
 import datetime
+from pathlib import Path
 
-def list_files_to_delete(folder_path, days):
-    """
-    List files that are older than a specified number of days.
 
-    Args:
-        folder_path (str): The path to the target folder.
-        days (int): Delete files older than this many days.
-
-    Returns:
-        list: A list of file paths to be deleted.
-    """
-    current_time = datetime.datetime.now()
-    files_to_delete = []
-
-    def list_files(folder_path):
-        for foldername, subfolders, filenames in os.walk(folder_path):
-            for filename in filenames:
-                file_path = os.path.join(foldername, filename)
-                yield file_path
-
-    for file_path in list_files(folder_path):
-        # Get the last modification time of the file
-        file_time = datetime.datetime.fromtimestamp(os.path.getmtime(file_path))
-
-        # Calculate the difference in days
-        days_difference = (current_time - file_time).days
-
-        if days_difference > days:
+def list_files_to_delete(folder_path: Path, days: int) -> list[Path]:
+    """List files that are older than a specified number of days."""
+    minimum_time = (datetime.datetime.now() - datetime.timedelta(days=days)).timestamp()
+    files_to_delete: list[Path] = []
+    for file_path in folder_path.rglob("*"):
+        if file_path.stat().st_mtime < minimum_time:
             files_to_delete.append(file_path)
 
     return files_to_delete
 
-def list_directories_to_delete(folder_path, files_to_delete):
-    """
-    List empty subdirectories or subdirectories containing only files to be deleted.
 
-    Args:
-        folder_path (str): The path to the target folder.
-        files_to_delete (list): A list of file paths to be deleted.
+def list_directories_to_delete(
+    folder_path: Path, files_to_delete: list[Path]
+) -> list[Path]:
+    """List empty subdirectories or subdirectories containing only files to be deleted."""
+    empty_directories_to_delete: list[Path] = []
 
-    Returns:
-        list: A list of empty subdirectories to be deleted.
-    """
-    empty_directories_to_delete = []
+    for file in files_to_delete:
+        parent = Path(file).parent
 
-    for foldername, subfolders, filenames in os.walk(folder_path):
-        for subfolder in subfolders:
-            subfolder_path = os.path.join(foldername, subfolder)
-            
-            # Check if the directory is already empty or contains only files that will be deleted
-            if not os.listdir(subfolder_path) or all(os.path.join(subfolder_path, filename) in files_to_delete for filename in os.listdir(subfolder_path)):
-                empty_directories_to_delete.append(subfolder_path)
+        # Check recursively if the parent directory is already empty or contains only
+        # files/directories that will be deleted
+        while all(
+            item in files_to_delete or item in empty_directories_to_delete
+            for item in parent.iterdir()
+        ):
+            # Abort if parent is already marked for deletion
+            if parent in empty_directories_to_delete:
+                break
+            empty_directories_to_delete.append(parent)
+
+            parent = parent.parent
 
     return empty_directories_to_delete
 
-def process_deletion(dry_run, files_to_delete, empty_directories_to_delete):
-    """
-    Process file and directory deletion based on the dry-run status.
 
-    Args:
-        dry_run (bool): True for dry-run, False for actual deletion.
-        files_to_delete (list): A list of file paths to be deleted.
-        empty_directories_to_delete (list): A list of empty subdirectories to be deleted.
-    """
+def process_deletion(
+    dry_run: bool, files_to_delete: list[Path], empty_directories_to_delete: list[Path]
+):
+    """Process file and directory deletion based on the dry-run status."""
     if dry_run:
         print(f"These files would be deleted:")
-        print("\n".join(files_to_delete))
+        print("\n".join([str(path) for path in files_to_delete]))
         print("\nEmpty subdirectories that would be deleted:")
-        print("\n".join(empty_directories_to_delete))
+        print("\n".join([str(path) for path in empty_directories_to_delete]))
     else:
         print(f"Deleting files:")
         for file_path in files_to_delete:
@@ -97,24 +75,49 @@ def process_deletion(dry_run, files_to_delete, empty_directories_to_delete):
 
         print(f"\nDeleting empty subdirectories:")
         for directory_path in empty_directories_to_delete:
-            os.rmdir(directory_path)
-            print(f"Deleted empty directory: {directory_path}")
+            try:
+                os.rmdir(directory_path)
+                print(f"Deleted empty directory: {directory_path}")
+            except OSError as ex:
+                # do not fail script when we fail to delete a directory since this has
+                # almost zero impact on storage + it might happen that a file appears
+                # between our inventory and the real deletion
+                print(f"Failed to delete directory {directory_path}:\n{ex}")
+
 
 def main():
-    """
-    Main function to parse arguments and initiate the deletion process.
-    """
-    parser = argparse.ArgumentParser(description="Delete old files and empty subdirectories.")
-    parser.add_argument("-d", "--dry-run", action="store_true", default=False, help="Perform a dry run (default: False)")
-    parser.add_argument("-f", "--folder", required=True, help="Path to the target folder")
-    parser.add_argument("-n", "--days", type=int, default=30, help="Delete files older than this many days (default: 30)")
+    """Main function to parse arguments and initiate the deletion process."""
+    parser = argparse.ArgumentParser(
+        description="Delete old files and empty subdirectories."
+    )
+    parser.add_argument(
+        "-d",
+        "--dry-run",
+        action="store_true",
+        default=False,
+        help="Perform a dry run (default: False)",
+    )
+    parser.add_argument(
+        "-f", "--folder", required=True, help="Path to the target folder"
+    )
+    parser.add_argument(
+        "-n",
+        "--days",
+        type=int,
+        default=30,
+        help="Delete files older than this many days (default: 30)",
+    )
 
     args = parser.parse_args()
 
-    files_to_delete = list_files_to_delete(args.folder, args.days)
-    empty_directories_to_delete = list_directories_to_delete(args.folder, files_to_delete)
+    folder_path = Path(args.folder)
+    files_to_delete = list_files_to_delete(folder_path, args.days)
+    empty_directories_to_delete = list_directories_to_delete(
+        folder_path, files_to_delete
+    )
 
     process_deletion(args.dry_run, files_to_delete, empty_directories_to_delete)
+
 
 if __name__ == "__main__":
     main()
