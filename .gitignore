@@ -16,3 +16,5 @@ kubeconfig-*.yaml
 # any secret
 *.secret.yaml
 *.secrets.yaml
+
+.vscode
