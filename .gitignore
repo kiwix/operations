@@ -17,4 +17,5 @@ kubeconfig-*.yaml
 *.secret.yaml
 *.secrets.yaml
 
+# editor config not maintained
 .vscode
