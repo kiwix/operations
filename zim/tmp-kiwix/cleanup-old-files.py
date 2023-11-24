@@ -62,6 +62,10 @@ def list_directories_to_delete(
     return empty_directories_to_delete
 
 
+def get_mtime_iso(path: Path) -> str:
+    return datetime.datetime.fromtimestamp(path.stat().st_mtime).isoformat()
+
+
 def process_deletion(
     dry_run: bool, files_to_delete: list[Path], empty_directories_to_delete: list[Path]
 ):
@@ -70,7 +74,7 @@ def process_deletion(
         print(f"{len(files_to_delete)} files would be deleted:")
         print(
             "\n".join(
-                sorted(f"{path} ({path.stat().st_mtime})" for path in files_to_delete)
+                sorted(f"{path} ({get_mtime_iso(path)})" for path in files_to_delete)
             )
         )
         print(
@@ -80,7 +84,7 @@ def process_deletion(
     else:
         print(f"Deleting {len(files_to_delete)} files:")
         for file_path in files_to_delete:
-            message = f"Deleted: {file_path} ({file_path.stat().st_mtime})"
+            message = f"Deleted: {file_path} ({get_mtime_iso(file_path)})"
             file_path.unlink()
             print(message)
 
