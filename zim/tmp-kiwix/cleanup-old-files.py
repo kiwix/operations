@@ -67,17 +67,24 @@ def process_deletion(
 ):
     """Process file and directory deletion based on the dry-run status."""
     if dry_run:
-        print(f"These files would be deleted:")
-        print("\n".join(sorted(str(path) for path in files_to_delete)))
-        print("\nEmpty subdirectories that would be deleted:")
+        print(f"{len(files_to_delete)} files would be deleted:")
+        print(
+            "\n".join(
+                sorted(f"{path} ({path.stat().st_mtime})" for path in files_to_delete)
+            )
+        )
+        print(
+            f"\n{len(empty_directories_to_delete)} empty subdirectories would be deleted:"
+        )
         print("\n".join(sorted(str(path) for path in empty_directories_to_delete)))
     else:
-        print(f"Deleting files:")
+        print(f"Deleting {len(files_to_delete)} files:")
         for file_path in files_to_delete:
+            message = f"Deleted: {file_path} ({file_path.stat().st_mtime})"
             file_path.unlink()
-            print(f"Deleted: {file_path}")
+            print(message)
 
-        print(f"\nDeleting empty subdirectories:")
+        print(f"\nDeleting {len(empty_directories_to_delete)} empty subdirectories:")
         for directory_path in empty_directories_to_delete:
             try:
                 directory_path.rmdir()
