@@ -26,7 +26,7 @@ spec:
         app: matomo-app
     spec:
       containers:
-      - image: ghcr.io/kiwix/matomo:4.15.1-fpm
+      - image: ghcr.io/kiwix/matomo:4.16.0-fpm
         imagePullPolicy: IfNotPresent
         name: matomo
         env:
