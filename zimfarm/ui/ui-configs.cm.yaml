@@ -7,6 +7,8 @@ data:
   ZIMFARM_KIWIX_DOWNLOAD_URL: "https://mirror.download.kiwix.org/zim"
   ZIMFARM_WEBAPI: "https://api.farm.openzim.org/v1"
   ZIMFARM_LOGS_URL: "https://s3.us-west-1.wasabisys.com/org-kiwix-zimfarm-logs/logs"
+  ZIMFARM_TASKS_LOAD_SCHEDULES_CHUNK_SIZE: "5"
+  ZIMFARM_TASKS_LOAD_SCHEDULES_DELAY: "100"
   # obsolete keys
   # SOCKET_PORT: "32029"
   # SOCKET_URI: "tcp://tcplb01.sloppy.io:32029"
