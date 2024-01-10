@@ -161,9 +161,8 @@ data:
           set req.backend_hint = data;
       }
 
-      # TEMP: disabling cache until https://github.com/kiwix/libkiwix/issues/995
-      # # remove potential cookie from request (there should be none)
-      # unset req.http.cookie;
+      # remove potential cookie from request (there should be none)
+      unset req.http.cookie;
 
       # set standard proxied ip header for getting original remote address
       # set req.http.X-Forwarded-For = client.ip;
