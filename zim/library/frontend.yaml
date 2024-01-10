@@ -177,7 +177,10 @@ data:
 
       # let's cache everything except /random.
       # all endpoints listed above
-      if (req.url !~ "^/random") {
+      if (req.url !~ "^/random"
+          # temporarily dont cache viewer settings as it contains default (Accept-Language based)
+          # UI language to use. UNTIL: https://github.com/kiwix/libkiwix/issues/1039
+          && req.url !~ "^/viewer_settings.js") {
           return(hash);
       }
 
