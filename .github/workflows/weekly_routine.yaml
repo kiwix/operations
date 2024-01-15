@@ -81,14 +81,14 @@ jobs:
           - [ ] Check whether [matomo](https://stats.kiwix.org) should be upgraded
 
           ## Grafana
-          
+
           - [ ] Alert list is [normal](https://kiwixorg.grafana.net/alerting/list)
-          - [ ] Zimfarm dashboard is [normal](https://kiwixorg.grafana.net/d/d2803d94-7c40-4338-bf80-f3cd7cd796bf/zimfarms) (look after last week data)
+          - [ ] Zimfarm dashboard is [normal](https://kiwixorg.grafana.net/d/d2803d94-7c40-4338-bf80-f3cd7cd796bf/zimfarms?from=now-7d&to=now)
           - [ ] Mirrorbrain dashboard is [normal](https://kiwixorg.grafana.net/d/bb0f0990-04c5-4314-8afc-6185ac49c668/mirrorbrain?orgId=1)
           - [ ] There is no abnormal behaviors on [cluster resources consumption](https://kiwixorg.grafana.net/d/efa86fd1d0c121a26444b636a3f509a8/kubernetes-compute-resources-cluster?orgId=1&refresh=30s&from=now-7d&to=now)
 
           ## Projects
-          
+
           - [ ] UptimeRobot [has no alert](https://uptimerobot.com/dashboard#tvMode)
           - [ ] [youzim.it backlog](https://farm.youzim.it/pipeline/filter-todo) is reasonable
           - [ ] No [systematic failure](https://farm.youzim.it/pipeline/filter-failed) in tasks.
