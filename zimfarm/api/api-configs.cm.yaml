@@ -54,4 +54,6 @@ data:
   REQ_TIMEOUT_CMS: "50"
   REQ_TIMEOUT_GHCR: "10"
   ALEMBIC_UPGRADE_HEAD_ON_START: "y"
+  # Default publisher to set in ZIMs
+  DEFAULT_PUBLISHER: "openZIM"
 

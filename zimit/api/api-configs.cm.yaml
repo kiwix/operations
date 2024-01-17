@@ -13,3 +13,5 @@ data:
   REQ_TIMEOUT_NOTIFICATIONS: "5"
   REQ_TIMEOUT_CMS: "50"
   REQ_TIMEOUT_GHCR: "10"
+  # Default publisher to set in ZIMs
+  DEFAULT_PUBLISHER: "openZIM"
