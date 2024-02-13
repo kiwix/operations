@@ -8,9 +8,9 @@ data:
   CARDSHOP_API_INTERNAL_URL: "https://api.imager.kiwix.org"
   CARDSHOP_API_URL: "https://api.imager.kiwix.org"
   # url to the manager API to create user accountd
-  MANAGER_API_URL: "https://cardshop.hotspot.kiwix.org/api"
+  MANAGER_API_URL: "https://imager.kiwix.org/api"
   # public url to display link to
-  PUBLIC_URL: "https://cardshop.hotspot.kiwix.org"
+  PUBLIC_URL: "https://imager.kiwix.org"
   SHOP_PUBLIC_URL: "https://www.kiwix.org/en/cardshop-access/"
   # URLS for download/upload warehouses
   DEFAULT_WAREHOUSE_DOWNLOAD_URI: "s3://s3.us-west-1.wasabisys.com/?bucketName=org-kiwix-hotspot-cardshop-warehouse"
