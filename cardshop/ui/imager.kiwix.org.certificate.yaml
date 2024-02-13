@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: imager-kiwix-org
+  namespace: cardshop
+spec:
+  secretName: imager-kiwix-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: imager.kiwix.org
+  dnsNames:
+  - imager.kiwix.org

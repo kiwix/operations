@@ -67,10 +67,10 @@ metadata:
 spec:
   tls:
     - hosts:
-      - cardshop.hotspot.kiwix.org
-      secretName: cardshop-hotspot-kiwix-org-tls
+      - imager.kiwix.org
+      secretName: imager-kiwix-org-tls
   rules:
-  - host: cardshop.hotspot.kiwix.org
+  - host: imager.kiwix.org
     http:
       paths:
       - path: /
