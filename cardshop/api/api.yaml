@@ -61,8 +61,21 @@ spec:
     - hosts:
       - api.cardshop.hotspot.kiwix.org
       secretName: api-cardshop-hotspot-kiwix-org-tls
+    - hosts:
+      - api.imager.kiwix.org
+      secretName: api-imager-kiwix-org-tls
   rules:
   - host: api.cardshop.hotspot.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: api-service
+            port:
+              number: 80
+  - host: api.imager.kiwix.org
     http:
       paths:
       - path: /

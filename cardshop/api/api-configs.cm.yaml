@@ -5,8 +5,8 @@ metadata:
   namespace: cardshop
 data:
   # previous hosting (sloppy) required different internal-usage URL
-  CARDSHOP_API_INTERNAL_URL: "https://api.cardshop.hotspot.kiwix.org"
-  CARDSHOP_API_URL: "https://api.cardshop.hotspot.kiwix.org"
+  CARDSHOP_API_INTERNAL_URL: "https://api.imager.kiwix.org"
+  CARDSHOP_API_URL: "https://api.imager.kiwix.org"
   # url to the manager API to create user accountd
   MANAGER_API_URL: "https://cardshop.hotspot.kiwix.org/api"
   # public url to display link to
@@ -19,7 +19,7 @@ data:
   DOWNLOAD_WAREHOUSE_UPLOAD_URI: "s3://s3.us-west-1.wasabisys.com/?bucketName=org-kiwix-hotspot-cardshop-download"
   # mail sending via mailgun
   MAILGUN_API_URL: "https://api.mailgun.net/v3/cardshop.hotspot.kiwix.org"
-  MAIL_FROM: "Hotspot Cardshop <hotspot@kiwix.org>"
+  MAIL_FROM: "Kiwix Imager <imager@kiwix.org>"
   # Stripe shop configuration
   STRIPE_PUBLIC_API_KEY: "pk_live_GEcXcJPSS1WkxsOtEQceoIWo"
   STRIPE_METHOD_ACCESS1M: "payment"
