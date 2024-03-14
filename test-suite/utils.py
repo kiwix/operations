@@ -40,6 +40,7 @@ def get_response_headers(path, method="HEAD", scheme=DEFAULT_SCHEME):
         method=method,
         url=get_url(path=path, scheme=scheme),
         headers={"Accept-Encoding": "gzip, deflate, br"},
+        timeout=5
     ).headers
 
 
