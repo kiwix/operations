@@ -177,10 +177,7 @@ data:
 
       # let's cache everything except /random.
       # all endpoints listed above
-      if (req.url !~ "^/random"
-          # temporarily dont cache viewer settings as it contains default (Accept-Language based)
-          # UI language to use. UNTIL: https://github.com/kiwix/libkiwix/issues/1039
-          && req.url !~ "^/viewer_settings.js") {
+      if (req.url !~ "^/random") {
           return(hash);
       }
 
@@ -200,10 +197,9 @@ data:
       # set beresp.grace = 24h;
       # set beresp.keep = 8m;
 
-      # TEMP: disabling cache until https://github.com/kiwix/libkiwix/issues/995
-      # # important for it to go to cache
-      # unset bereq.http.cookie;
-      # return (deliver);
+      # important for it to go to cache
+      unset bereq.http.cookie;
+      return (deliver);
 
     }
 
