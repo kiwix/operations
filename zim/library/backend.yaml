@@ -22,7 +22,7 @@ spec:
       - image: ghcr.io/kiwix/kiwix-tools:3.7.0
         imagePullPolicy: IfNotPresent
         name: kiwix-tools
-        args: ["kiwix-serve", "--library", "-v", "--monitorLibrary", "--threads", "16", "--searchLimit", "5", "--nodatealias", "/data/library/internal_library.xml"]
+        args: ["kiwix-serve", "--library", "--monitorLibrary", "--threads", "16", "--searchLimit", "5", "--nodatealias", "/data/library/internal_library.xml"]
         ports:
         - containerPort: 80
         livenessProbe:
@@ -95,7 +95,7 @@ spec:
       - image: ghcr.io/kiwix/kiwix-tools:3.7.0
         imagePullPolicy: IfNotPresent
         name: kiwix-tools
-        args: ["kiwix-serve", "--library", "-v", "--monitorLibrary", "--threads", "16", "--searchLimit", "5", "--nodatealias", "/data/library/internal_library.xml"]
+        args: ["kiwix-serve", "--library", "--monitorLibrary", "--threads", "16", "--searchLimit", "5", "--nodatealias", "/data/library/internal_library.xml"]
         ports:
         - containerPort: 80
         livenessProbe:

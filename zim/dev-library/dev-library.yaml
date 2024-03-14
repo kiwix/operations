@@ -18,7 +18,7 @@ spec:
       containers:
       - image: ghcr.io/rgaudin/kiwix-tools:nightly
         imagePullPolicy: Always
-        command: ["kiwix-serve", "-v", "--library", "--monitorLibrary", "--searchLimit", "5", "/library/dev_library.xml"]
+        command: ["kiwix-serve", "--library", "--monitorLibrary", "--searchLimit", "5", "/library/dev_library.xml"]
         name: kiwix-tools
         ports:
         - containerPort: 80
