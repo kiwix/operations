@@ -4,6 +4,7 @@ metadata:
   name: api-db-backup
   namespace: cardshop
 spec:
+  # suspend: true
   schedule: "3 10 * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1

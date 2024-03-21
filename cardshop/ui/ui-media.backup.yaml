@@ -4,6 +4,7 @@ metadata:
   name: ui-media-backup
   namespace: cardshop
 spec:
+  # suspend: true
   schedule: "@daily"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
