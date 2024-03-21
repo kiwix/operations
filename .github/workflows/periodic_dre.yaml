@@ -50,7 +50,7 @@ jobs:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         REPO: kiwix/k8s
         LABELS: recovery
-        ASSIGNEES: rgaudin,kelson42
+        ASSIGNEES: rgaudin,benoit74,kelson42
         ISSUE_BODY: |
           In order to strengthen our infrastructure, we want to:
 
