@@ -7,7 +7,7 @@ spec:
   secretName: mirror-download-kiwix-org-tls
   issuerRef:
     kind: ClusterIssuer
-    name: letsencrypt-prod
+    name: letsencrypt-prod-identrust
   commonName: mirror.download.kiwix.org
   dnsNames:
   - mirror.download.kiwix.org

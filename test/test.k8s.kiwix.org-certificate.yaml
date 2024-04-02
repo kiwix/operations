@@ -7,7 +7,7 @@ spec:
   secretName: test-k8s-kiwix-org-tls
   issuerRef:
     kind: ClusterIssuer
-    name: letsencrypt-prod
+    name: letsencrypt-prod-identrust
   commonName: test.k8s.kiwix.org
   dnsNames:
   - test.k8s.kiwix.org

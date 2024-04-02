@@ -7,7 +7,7 @@ spec:
   secretName: download-kiwix-org-tls
   issuerRef:
     kind: ClusterIssuer
-    name: letsencrypt-prod
+    name: letsencrypt-prod-identrust
   commonName: download.kiwix.org
   dnsNames:
   - download.kiwix.org
