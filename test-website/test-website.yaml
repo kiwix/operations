@@ -1,0 +1,98 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: test
+  labels:
+    app: test-website-app
+  name: test-website-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-website-app
+  template:
+    metadata:
+      labels:
+        app: test-website-app
+    spec:
+      containers:
+      - image: ghcr.io/openzim/test-website:latest
+        imagePullPolicy: Always
+        name: test-website
+        env:
+          - name: SITE_ADDRESS
+            value: ":80"
+          - name: STANDARD_NETLOC
+            value: https:\/\/website.test.openzim.org
+          - name: NOT_STANDARD_NETLOC_NOT_ENCODED
+            value: https:\/\/wébsite.test.openzim.org
+          - name: NOT_STANDARD_NETLOC_PUNNY_ENCODED
+            value: https:\/\/xn--wbsite-bva.test.openzim.org # wébsite.test.openzim.org for humans
+          
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "200m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: test
+  name: test-website-service
+  labels:
+    app: test-website-app
+spec:
+  selector:
+    app: test-website-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: test-website-ingress
+  namespace: test
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+      location /robots.txt {
+        add_header Content-Type "text/plain";
+        return 200 "User-agent: *\nDisallow: /";
+      }
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - website.test.openzim.org
+      - xn--wbsite-bva.test.openzim.org # wébsite.test.openzim.org for humans
+      secretName: website-test-openzim-org-tls
+  rules:
+  - host: website.test.openzim.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: test-website-service
+            port:
+              name: http
+  - host: xn--wbsite-bva.test.openzim.org # wébsite.test.openzim.org for humans
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: test-website-service
+            port:
+              name: http

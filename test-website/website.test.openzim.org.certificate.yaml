@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: website-test-openzim-org
+  namespace: test
+spec:
+  secretName: website-test-openzim-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: website.test.openzim.org
+  dnsNames:
+  - website.test.openzim.org
+  - xn--wbsite-bva.test.openzim.org # wébsite.test.openzim.org for humans
