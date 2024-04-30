@@ -1,13 +1,13 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: youzim-it
+  name: farm-zimit-kiwix-org
   namespace: zimit
 spec:
-  secretName: youzim-it-tls
+  secretName: farm-zimit-kiwix-org-tls
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt-prod
-  commonName: youzim.it
+  commonName: farm.zimit.kiwix.org
   dnsNames:
-  - youzim.it
+  - farm.zimit.kiwix.org

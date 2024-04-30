@@ -58,10 +58,10 @@ metadata:
 spec:
   tls:
     - hosts:
-      - youzim.it
-      secretName: youzim-it-tls
+      - zimit.kiwix.org
+      secretName: zimit-kiwix-org-tls
   rules:
-  - host: youzim.it
+  - host: zimit.kiwix.org
     http:
       paths:
       - path: /

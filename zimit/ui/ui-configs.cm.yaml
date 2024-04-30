@@ -5,17 +5,17 @@ metadata:
   namespace: zimit
 data:
   # farm-api URLs
-  ZIMFARM_WEBAPI: "https://api.farm.youzim.it/v1"
-  INTERNAL_ZIMFARM_WEBAPI: "https://api.farm.youzim.it/v1"
+  ZIMFARM_WEBAPI: "https://api.farm.zimit.kiwix.org/v1"
+  INTERNAL_ZIMFARM_WEBAPI: "https://api.farm.zimit.kiwix.org/v1"
   # where to download ZIM from (for links)
   ZIM_DOWNLOAD_URL: "https://s3.us-west-1.wasabisys.com/org-kiwix-zimit"
   # user to authenticate with to farm-api
   _ZIMFARM_USERNAME: "zimit"
   # url of callback farm-api should call on task completion
-  CALLBACK_BASE_URL: "https://youzim.it/api/v1/requests/hook"
+  CALLBACK_BASE_URL: "https://zimit.kiwix.org/api/v1/requests/hook"
   # mail sending details
-  MAILGUN_API_URL: "https://api.mailgun.net/v3/mg.youzim.it"
-  MAILGUN_FROM: "Youzim.it <info@youzim.it>"
+  MAILGUN_API_URL: "https://api.mailgun.net/v3/mg.zimit.kiwix.org"
+  MAILGUN_FROM: "Zimit <info@zimit.kiwix.org>"
   # task configuration
   ZIMIT_SIZE_LIMIT: "4294967296"
   ZIMIT_TIME_LIMIT: "7200"
@@ -24,3 +24,5 @@ data:
   TASK_DISK: "4GiB"
   TASK_CPU: "2"
   TASK_WORKER: "sisyphus"
+  PUBLIC_URL: "https://zimit.kiwix.org"
+  PUBLIC_API_URL: "https://zimit.kiwix.org/api/v1"

@@ -56,10 +56,10 @@ metadata:
 spec:
   tls:
     - hosts:
-      - farm.youzim.it
-      secretName: farm-youzim-it-tls
+      - farm.zimit.kiwix.org
+      secretName: farm-zimit-kiwix-org-tls
   rules:
-  - host: farm.youzim.it
+  - host: farm.zimit.kiwix.org
     http:
       paths:
       - path: /
