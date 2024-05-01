@@ -11,3 +11,4 @@ spec:
   commonName: test.k8s.kiwix.org
   dnsNames:
   - test.k8s.kiwix.org
+  - test-redirect.k8s.kiwix.org

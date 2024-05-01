@@ -84,9 +84,20 @@ spec:
   tls:
     - hosts:
       - test.k8s.kiwix.org
+      - test-redirect.k8s.kiwix.org
       secretName: test-k8s-kiwix-org-tls
   rules:
   - host: test.k8s.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: test-service
+            port:
+              number: 80
+  - host: test-redirect.k8s.kiwix.org
     http:
       paths:
       - path: /
