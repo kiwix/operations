@@ -95,6 +95,7 @@ data:
         "kiwix-desktop-macos/kiwix-desktop-macos_3.1.0.dmg": "kiwix-macos_3.1.0.dm*",
         "kiwix-desktop-macos/kiwix-desktop-macos_3.3.0.dmg": "kiwix-macos_3.3.0.dm*",
         "kiwix-desktop-macos/kiwix-macos.dmg": "kiwix-macos_*.dmg",
+        "kiwix-macos/kiwix-macos.dmg": "kiwix-macos_*.dmg",
 
         "kiwix-desktop/kiwix-desktop.tar.gz": "kiwix-desktop-*.tar.gz",
         "kiwix-desktop/kiwix-desktop_windows_x64.zip": ("kiwix-desktop_windows_x64_*.zip"),
