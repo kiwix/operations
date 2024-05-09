@@ -86,7 +86,15 @@ data:
 
         "kiwix-android/kiwix.apk": "kiwix-*.apk",
 
-        "kiwix-desktop-macos/kiwix-desktop-macos.dmg": "kiwix-desktop-macos_*.dmg",
+        "kiwix-desktop-macos/kiwix-desktop-macos.dmg": "kiwix-macos_*.dmg",
+        "kiwix-desktop-macos/kiwix-desktop-macos_2.0.0.dmg": "kiwix-macos_2.0.0.dm*",
+        "kiwix-desktop-macos/kiwix-desktop-macos_2.1.0.dmg": "kiwix-macos_2.1.0.dm*",
+        "kiwix-desktop-macos/kiwix-desktop-macos_2.1.1.dmg": "kiwix-macos_2.1.1.dm*",
+        "kiwix-desktop-macos/kiwix-desktop-macos_2.1.2.dmg": "kiwix-macos_2.1.2.dm*",
+        "kiwix-desktop-macos/kiwix-desktop-macos_3.0.0.dmg": "kiwix-macos_3.0.0.dm*",
+        "kiwix-desktop-macos/kiwix-desktop-macos_3.1.0.dmg": "kiwix-macos_3.1.0.dm*",
+        "kiwix-desktop-macos/kiwix-desktop-macos_3.3.0.dmg": "kiwix-macos_3.3.0.dm*",
+        "kiwix-desktop-macos/kiwix-macos.dmg": "kiwix-macos_*.dmg",
 
         "kiwix-desktop/kiwix-desktop.tar.gz": "kiwix-desktop-*.tar.gz",
         "kiwix-desktop/kiwix-desktop_windows_x64.zip": ("kiwix-desktop_windows_x64_*.zip"),
