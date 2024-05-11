@@ -8,6 +8,7 @@ data:
     #!/bin/sh
     set -e
 
+    python3 -m pip install packaging
     create-releases-maps kiwix openzim
     create-wp1-map
 
@@ -22,6 +23,7 @@ data:
     import pathlib
     import re
     from dataclasses import dataclass
+    from packaging.version import Version
 
 
     @dataclass
@@ -87,13 +89,6 @@ data:
         "kiwix-android/kiwix.apk": "kiwix-*.apk",
 
         "kiwix-desktop-macos/kiwix-desktop-macos.dmg": "kiwix-macos_*.dmg",
-        "kiwix-desktop-macos/kiwix-desktop-macos_2.0.0.dmg": "kiwix-macos_2.0.0.dm*",
-        "kiwix-desktop-macos/kiwix-desktop-macos_2.1.0.dmg": "kiwix-macos_2.1.0.dm*",
-        "kiwix-desktop-macos/kiwix-desktop-macos_2.1.1.dmg": "kiwix-macos_2.1.1.dm*",
-        "kiwix-desktop-macos/kiwix-desktop-macos_2.1.2.dmg": "kiwix-macos_2.1.2.dm*",
-        "kiwix-desktop-macos/kiwix-desktop-macos_3.0.0.dmg": "kiwix-macos_3.0.0.dm*",
-        "kiwix-desktop-macos/kiwix-desktop-macos_3.1.0.dmg": "kiwix-macos_3.1.0.dm*",
-        "kiwix-desktop-macos/kiwix-desktop-macos_3.3.0.dmg": "kiwix-macos_3.3.0.dm*",
         "kiwix-desktop-macos/kiwix-macos.dmg": "kiwix-macos_*.dmg",
         "kiwix-macos/kiwix-macos.dmg": "kiwix-macos_*.dmg",
 
@@ -171,7 +166,7 @@ data:
             # on their version number ; keeping last of list
             latest_version, lastest_fpath = sorted(
                 [(version_reg.match(p.name).groupdict()["version"], p) for p in files],
-                key=lambda v: v[0],
+                key=lambda v: Version(re.sub(r"[^\d\.]", "", v[0])),
             )[-1]
 
             return lastest_fpath.relative_to(content_fpath)
