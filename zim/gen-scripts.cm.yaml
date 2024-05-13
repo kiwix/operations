@@ -153,6 +153,23 @@ data:
         if not release_fpath.exists():
             raise IOError(f"release folder {release_fpath} does not exist.")
 
+        def version_key(item: tuple[str, str]):
+            version = item[0]
+            try:
+                return Version(version)
+            except Exception:
+                ...
+            for sep in ("_", "-"):
+                if sep in version:
+                    try:
+                        parts = version.split(sep)
+                        for part in parts:
+                            if part[0].isdigit():
+                                return Version(part)
+                    except Exception:
+                        ...
+            return Version(re.sub(r"[^\d\.]", "", version))
+
         def get_latest_release_path(pattern):
             """content_fpath-relative path of latest matching file"""
 
@@ -166,7 +183,7 @@ data:
             # on their version number ; keeping last of list
             latest_version, lastest_fpath = sorted(
                 [(version_reg.match(p.name).groupdict()["version"], p) for p in files],
-                key=lambda v: Version(re.sub(r"[^\d\.]", "", v[0])),
+                key=version_key,
             )[-1]
 
             return lastest_fpath.relative_to(content_fpath)
