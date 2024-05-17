@@ -35,7 +35,7 @@ spec:
             memory: "256Mi"
             cpu: "200m"
           limits:
-            memory: "1Gi"
+            memory: "1.5Gi"
             cpu: "300m"
       volumes:
       - name: hidden-volume
