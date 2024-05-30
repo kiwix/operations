@@ -202,24 +202,29 @@ def open_chmod(file: pathlib.Path, *args, **kwargs):
 
 
 def get_zim_files(
-    root: pathlib.Path, with_hidden: bool = False
+    root: pathlib.Path, *, with_hidden: bool = False
 ) -> Generator[pathlib.Path, None, None]:
     """ZIM (*.zim) file paths from a root folder, recursively.
 
-    Optionnaly includes hidden (.-prefixed) ZIM files or ZIM in hidden folders"""
+    Optionnaly includes ZIM files in hidden folders (not hidden ZIMs!)"""
+
+    def no_hidden_file_filter(fp: pathlib.Path) -> bool:
+        return not fp.name.startswith(".") or fp.name == "."
 
     if with_hidden:  # faster than os.walk in this case
-        yield from root.rglob("*.zim")
-        return
+        filter_ = no_hidden_file_filter
+    else:
 
-    for folder, dirnames, filenames in os.walk(root):
-        if not with_hidden:
-            _ = [dirnames.remove(name) for name in dirnames if name.startswith(".")]
-            _ = [filenames.remove(name) for name in filenames if name.startswith(".")]
-        _ = [filenames.remove(name) for name in filenames if not name.endswith(".zim")]
+        def filter_(fp: pathlib.Path) -> bool:
+            return all(
+                [
+                    no_hidden_file_filter(parent)
+                    for parent in fp.relative_to(root).parents
+                ]
+                + [no_hidden_file_filter(fp)]
+            )
 
-        for filename in filenames:
-            yield pathlib.Path(folder).joinpath(filename)
+    yield from filter(filter_, root.rglob("*.zim"))
 
 
 def is_latest(fpath: pathlib.Path) -> bool:
@@ -495,7 +500,7 @@ class LibraryMaintainer:
                     f" -- {exc}"
                 )
 
-        all_zim_files = get_zim_files(self.zim_root, self.with_hidden)
+        all_zim_files = get_zim_files(self.zim_root, with_hidden=self.with_hidden)
         for index, zim_path in enumerate(sort_filenames_for_recent(all_zim_files)):
             relpath = zim_path.relative_to(self.zim_root)
             alias = to_human_alias(relpath)
