@@ -208,20 +208,20 @@ def get_zim_files(
 
     Optionnaly includes ZIM files in hidden folders (not hidden ZIMs!)"""
 
-    def no_hidden_file_filter(fp: pathlib.Path) -> bool:
-        return not fp.name.startswith(".") or fp.name == "."
+    def excluded_filter(fp: pathlib.Path) -> bool:
+        """excludes both special patterns and hidden files"""
+        return not fp.name.startswith("speedtest_") and (
+            not fp.name.startswith(".") or fp.name == "."
+        )
 
     if with_hidden:  # faster than os.walk in this case
-        filter_ = no_hidden_file_filter
+        filter_ = excluded_filter
     else:
 
         def filter_(fp: pathlib.Path) -> bool:
             return all(
-                [
-                    no_hidden_file_filter(parent)
-                    for parent in fp.relative_to(root).parents
-                ]
-                + [no_hidden_file_filter(fp)]
+                [excluded_filter(parent) for parent in fp.relative_to(root).parents]
+                + [excluded_filter(fp)]
             )
 
     yield from filter(filter_, root.rglob("*.zim"))
