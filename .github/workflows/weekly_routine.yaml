@@ -70,8 +70,8 @@ jobs:
           ```
           - [ ] Check if k8s should/could be upgraded
           ```sh
-          curl -s -H "X-Auth-Token: $SCW_SECRET_KEY" https://api.scaleway.com/k8s/v1/regions/fr-par/clusters/$KIWIX_PROD_CLUSTER|jq ".version,.upgrade_available"
-          curl -s -H "X-Auth-Token: $SCW_SECRET_KEY" https://api.scaleway.com/k8s/v1/regions/fr-par/versions|jq ".versions[].name"
+          curl -s -H "X-Auth-Token: $SCW_SECRET_KEY" https://api.scaleway.com/k8s/v1/regions/fr-par/clusters/$KIWIX_PROD_CLUSTER | jq ".version,.upgrade_available"
+          curl -s -H "X-Auth-Token: $SCW_SECRET_KEY" https://api.scaleway.com/k8s/v1/regions/fr-par/versions | jq ".versions[].name"
           ```
           - [ ] [Upgrade k8s](https://github.com/kiwix/k8s/wiki/Cluster-Setup#upgrading-kubernetes) if applicable
 
