@@ -38,4 +38,5 @@ jobs:
         env:
           SCHEMES: http,https
           LIBRARY_HOST: dev.library.kiwix.org
+          TIMEOUT: 30
         run: pytest -vvv -m "not varnish"

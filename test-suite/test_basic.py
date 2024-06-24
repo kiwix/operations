@@ -6,6 +6,7 @@ from utils import (
     COMPRESSABLE_OPDS_ENDPOINTS,
     OPDS_ENDPOINTS,
     SCHEMES,
+    TIMEOUT,
     get_response_headers,
     get_url,
     is_cached,
@@ -14,7 +15,10 @@ from utils import (
 
 @pytest.mark.parametrize("scheme", SCHEMES)
 def test_reachable(scheme):
-    assert requests.head(get_url("/", scheme), timeout=5).status_code == HTTPStatus.OK
+    assert (
+        requests.head(get_url("/", scheme), timeout=TIMEOUT).status_code
+        == HTTPStatus.OK
+    )
 
 
 @pytest.mark.parametrize("path, mimetype", OPDS_ENDPOINTS.items())
@@ -49,6 +53,7 @@ def test_illus_is_cached(illus_endpoint):
 @pytest.mark.varnish
 def test_random_is_not_cached():
     assert not is_cached("/random/")
+
 
 @pytest.mark.varnish
 def test_viewer_settings_is_cached():

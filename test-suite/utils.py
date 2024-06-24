@@ -3,6 +3,7 @@ import os
 
 import requests
 
+TIMEOUT = int(os.getenv("TIMEOUT") or "5")
 SCHEMES = os.getenv("SCHEMES", "https").split(",")
 DEFAULT_SCHEME = SCHEMES[0]
 LIBRARY_HOST = os.getenv("LIBRARY_HOST", "library.kiwix.org")
@@ -27,6 +28,7 @@ COMPRESSABLE_OPDS_ENDPOINTS = {
 }
 
 
+
 def get_url(
     path="/",
     scheme=DEFAULT_SCHEME,
@@ -40,7 +42,7 @@ def get_response_headers(path, method="HEAD", scheme=DEFAULT_SCHEME):
         method=method,
         url=get_url(path=path, scheme=scheme),
         headers={"Accept-Encoding": "gzip, deflate, br"},
-        timeout=5
+        timeout=TIMEOUT
     ).headers
 
 
