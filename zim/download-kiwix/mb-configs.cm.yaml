@@ -160,7 +160,7 @@ data:
     #LoadModule unique_id_module modules/mod_unique_id.so
     LoadModule setenvif_module modules/mod_setenvif.so
     LoadModule version_module modules/mod_version.so
-    #LoadModule remoteip_module modules/mod_remoteip.so
+    LoadModule remoteip_module modules/mod_remoteip.so
     #LoadModule proxy_module modules/mod_proxy.so
     #LoadModule proxy_connect_module modules/mod_proxy_connect.so
     #LoadModule proxy_ftp_module modules/mod_proxy_ftp.so
@@ -218,7 +218,7 @@ data:
     #LoadModule userdir_module modules/mod_userdir.so
     LoadModule alias_module modules/mod_alias.so
     LoadModule rewrite_module     modules/mod_rewrite.so
-    LoadModule geoip_module       modules/mod_geoip.so
+    LoadModule maxminddb_module   modules/mod_maxminddb.so
     LoadModule form_module        modules/mod_form.so
     LoadModule mirrorbrain_module modules/mod_mirrorbrain.so
     LoadModule autoindex_mb_module modules/mod_autoindex_mb.so
@@ -324,7 +324,7 @@ data:
         # Custom `vhost` log format that we use on nginx as well
         # and which is adapted for matomo-log-uploader
         # log_format vhost '$host $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"';
-        LogFormat "%v %{X-Forwarded-For}i - %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" vhost
+        LogFormat "%v %h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" vhost
 
         <IfModule logio_module>
           # You need to enable mod_logio.c to use %I and %O
@@ -386,6 +386,11 @@ data:
         # socket used to communicate with the CGI daemon of mod_cgid.
         #
         #Scriptsock cgisock
+    </IfModule>
+
+    <IfModule remoteip_module>
+        # Use the X-Forwarded-For header as useragent IP
+        RemoteIPHeader X-Forwarded-For
     </IfModule>
 
     #
@@ -669,6 +674,8 @@ data:
       ServerAdmin contact+download@kiwix.org
       DocumentRoot /var/www/download.kiwix.org
 
+      Alias /static/ /var/www/static/
+
       MirrorBrainMetalinkPublisher "Kiwix project" https://kiwix.org
       MirrorBrainTorrentTrackerURL "http://tracker.openzim.org:6969/announce"
       MirrorBrainTorrentTrackerURL "udp://tracker.openzim.org:6969/announce"
@@ -693,10 +700,18 @@ data:
          ExpiresByType text/xml "access plus 60 minutes"
       </IfModule>
 
-      <IfModule mod_geoip.c>
-         GeoIPEnable On
-         GeoIPEnableUTF8 On
-         GeoIPScanProxyHeaders On
+      <IfModule maxminddb_module>
+         MaxMindDBEnable On
+         #MaxMindDBFile COUNTRY_DB /usr/share/GeoIP/GeoLite2-Country.mmdb
+         MaxMindDBFile CITY_DB    /usr/share/GeoIP/GeoLite2-City.mmdb
+         # we use old DBEnv names to not modify mirrorbrain code
+         MaxMindDBEnv GEOIP_COUNTRY_CODE CITY_DB/country/iso_code
+         MaxMindDBEnv GEOIP_COUNTRY_NAME CITY_DB/country/names/en
+         MaxMindDBEnv GEOIP_CONTINENT_CODE CITY_DB/continent/code
+         MaxMindDBEnv GEOIP_LONGITUDE CITY_DB/location/longitude
+         MaxMindDBEnv GEOIP_LATITUDE CITY_DB/location/latitude
+         MaxMindDBEnv GEOIP_REGION CITY_DB/subdivisions/0/iso_code
+         MaxMindDBEnv GEOIP_REGION_NAME CITY_DB/subdivisions/0/names/en
       </IfModule>
 
       # This is a hack to avoid counting twice a same
@@ -750,3 +765,23 @@ data:
           IndexOrderDefault Descending Date
      </Directory>
     </VirtualHost>
+  mirrorlist_header.txt: |
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+      <head>
+        <base href="http://download.kiwix.org/static/" />
+
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>%(title)s</title>
+        <link type="text/css" rel="stylesheet" href="mirrorbrain.css" />
+        <link href="/favicon.ico" rel="shortcut icon" />
+
+        <meta http-equiv="Language" content="en" />
+        <meta name="description" content="Download Mirrors" />
+        <meta name="keywords" content="download metalink redirector mirror mirrors" />
+        <meta name="author" content="MirrorBrain" />
+        <meta name="robots" content="index, nofollow" />
+      </head>
+
+      <body>
