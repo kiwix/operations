@@ -20,6 +20,8 @@ spec:
               env:
               - name: INSTALL_SCRIPTS
                 value: "library-maint#github://kiwix/k8s/zim/library-mgmt/library-maint.py\n"
+              - name: ZIM_DIRENTLOOKUPCACHE
+                value: "1"
               volumeMounts:
               - name: hidden-volume
                 mountPath: "/data"

@@ -35,6 +35,8 @@ spec:
                     key: password
               - name: WIKI_PAGE
                 value: "Template:ZIMdumps/content"
+              - name: ZIM_DIRENTLOOKUPCACHE
+                value: "1"
               volumeMounts:
               - name: kiwix-download
                 subPath: library/library_zim.xml
