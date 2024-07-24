@@ -6,7 +6,7 @@ on:
 
 jobs:
   job:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
     - name: Create routine issue
       shell: python
@@ -19,7 +19,7 @@ jobs:
         import requests
 
         payload = {
-            "title": f"Week {datetime.datetime.now().strftime('%W')} routine",
+            "title": f"Week {datetime.datetime.now().strftime('%W %Y')} routine",
             "body": os.getenv("ISSUE_BODY"),
             "labels": re.sub(r"\s", "", os.getenv("LABELS", "")).split(",") or None,
             "assignees": re.sub(r"\s", "", os.getenv("ASSIGNEES", "")).split(",") or None,
@@ -49,17 +49,32 @@ jobs:
         LABELS: maint
         ASSIGNEES: rgaudin,benoit74
         ISSUE_BODY: |
-          ## Infra
 
-          - [ ] Check nodes free space
+          ## Check nodes free space
+
           ```sh
           df -h / && df -h /data
           ```
-          - [ ] Nodes and worker system upgrades
+
+          - [ ] create a report in issue comment
+
+          ## Nodes system upgrades
+
           ```sh
           apt update && apt upgrade
           ```
+
+          - [ ] run systematically the upgrade on bastion, stats, services, storage, demo nodes
+          - [ ] check for and apply important security upgrade on worker nodes asap (imager-worker, ondemand, sisyphus)
+
+          (regular workers updates are done separately on a monthly basis for worker nodes to not impact production)
+
+          ## Backups
+
           - [ ] Ensure [all borg repositories](https://www.borgbase.com/) are being updated
+
+          ## k8s cluster
+
           - [ ] Check Pod errors
           ```sh
           k get pods -A -o wide|grep Error
@@ -73,12 +88,14 @@ jobs:
           curl -s -H "X-Auth-Token: $SCW_SECRET_KEY" https://api.scaleway.com/k8s/v1/regions/fr-par/clusters/$KIWIX_PROD_CLUSTER | jq ".version,.upgrade_available"
           curl -s -H "X-Auth-Token: $SCW_SECRET_KEY" https://api.scaleway.com/k8s/v1/regions/fr-par/versions | jq ".versions[].name"
           ```
-          - [ ] [Upgrade k8s](https://github.com/kiwix/k8s/wiki/Cluster-Setup#upgrading-kubernetes) if applicable
+          - [ ] [Upgrade k8s](https://github.com/kiwix/k8s/wiki/Cluster-Setup#upgrading-kubernetes) if applicable/possible
 
-          ### Stats
+          ## Stats
+
+          [matomo - stats.kiwix.org](https://stats.kiwix.org)
 
           - [ ] Ensure download.kiwix.org stats are being recorded
-          - [ ] Check whether [matomo](https://stats.kiwix.org) should be upgraded
+          - [ ] Check whether matomo should be upgraded
 
           ## Grafana
 

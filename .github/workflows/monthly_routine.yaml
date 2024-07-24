@@ -1,28 +1,25 @@
-name: Periodic DRE Issue
+name: Monthly routine Issue
 
 on:
   schedule:
-    - cron: "8 0 1 */3 *"
+    - cron: "0 8 1 * *"
 
 jobs:
   job:
     runs-on: ubuntu-24.04
     steps:
-    - name: Create periodic DRE issue
+    - name: Create routine issue
       shell: python
       run: |
         import datetime
-        import math
         import os
         import re
         import sys
 
         import requests
 
-        quarter = math.ceil(datetime.date.today().month/3.)
-
         payload = {
-            "title": f"Q{quarter} Disaster Recovery Exercise",
+            "title": f"Month {datetime.datetime.now().strftime('%m %Y')} routine",
             "body": os.getenv("ISSUE_BODY"),
             "labels": re.sub(r"\s", "", os.getenv("LABELS", "")).split(",") or None,
             "assignees": re.sub(r"\s", "", os.getenv("ASSIGNEES", "")).split(",") or None,
@@ -49,21 +46,24 @@ jobs:
       env:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         REPO: kiwix/k8s
-        LABELS: recovery
-        ASSIGNEES: rgaudin,benoit74,kelson42
+        LABELS: maint
+        ASSIGNEES: rgaudin,benoit74
         ISSUE_BODY: |
-          In order to strengthen our infrastructure, we want to:
 
-          - Document our Disaster Recovery Plan
-          - Simulate a Disaster and recover the service to ensure documentation exists and is up to date
+          ## Worker system upgrades
+        
+          Find a maintenance window for the service:
+          - wait for no more ongoing task on imager then put it in maintenance
+          - run `zimfarm stop` on zimfarm worker
 
-          This ticket requests the assignees to:
+          Then:
+          ```sh
+          apt update && apt upgrade
+          ```
 
-          - [ ] Pick a Service from [Kiwix](https://github.com/kiwix)/[openZIM](https://github.com/openzim)/[Offspot](https://github.com/offspot)
-          - [ ] Redeploy it completly using its backup, using the documentation or writing it.
-
-          See [Zimfarm documentation](https://github.com/openzim/zimfarm/wiki/Restore-from-a-backup).
-
-
+          - [ ] imager-worker
+          - [ ] ondemand
+          - [ ] sisyphus
+          
           **Note**: this is an *automatic reminder* intended for the assignee(s).
 
