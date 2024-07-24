@@ -1,0 +1,69 @@
+name: Monthly routine Issue
+
+on:
+  schedule:
+    - cron: "0 8 1 * *"
+
+jobs:
+  job:
+    runs-on: ubuntu-24.04
+    steps:
+    - name: Create routine issue
+      shell: python
+      run: |
+        import datetime
+        import os
+        import re
+        import sys
+
+        import requests
+
+        payload = {
+            "title": f"Month {datetime.datetime.now().strftime('%m %Y')} routine",
+            "body": os.getenv("ISSUE_BODY"),
+            "labels": re.sub(r"\s", "", os.getenv("LABELS", "")).split(",") or None,
+            "assignees": re.sub(r"\s", "", os.getenv("ASSIGNEES", "")).split(",") or None,
+        }
+        api_url = f"https://api.github.com/repos/{os.getenv('REPO')}/issues"
+        url = f"https://github.com/{os.getenv('REPO')}/issues"
+        headers = {
+            "Accept": "application/vnd.github.v3+json",
+            "Authorization": f"token {os.getenv('ACCESS_TOKEN')}",
+        }
+        resp = requests.get(api_url, headers=headers)
+        if resp.status_code != 200:
+            print(f"❌ Couldn't retrieve issues for {url} using {api_url}.")
+            print(f"HTTP {resp.status_code} {resp.reason} - {resp.text}")
+            print("Check your `ACCESS_TOKEN` secret.")
+            sys.exit(1)
+        resp = requests.post(api_url, headers=headers, json=payload)
+        if resp.status_code != 201:
+            print(f"❌ Couldn't create issue for {url}")
+            print(f"HTTP {resp.status_code} {resp.reason} - {resp.text}")
+            sys.exit(1)
+        print(f"✅ Issue successfully created at {url}/{resp.json().get('number')}")
+        sys.exit(0)
+      env:
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        REPO: kiwix/k8s
+        LABELS: maint
+        ASSIGNEES: rgaudin,benoit74
+        ISSUE_BODY: |
+
+          ## Worker system upgrades
+        
+          Find a maintenance window for the service:
+          - wait for no more ongoing task on imager then put it in maintenance
+          - run `zimfarm stop` on zimfarm worker
+
+          Then:
+          ```sh
+          apt update && apt upgrade
+          ```
+
+          - [ ] imager-worker
+          - [ ] ondemand
+          - [ ] sisyphus
+          
+          **Note**: this is an *automatic reminder* intended for the assignee(s).
+
