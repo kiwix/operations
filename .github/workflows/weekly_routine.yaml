@@ -106,7 +106,7 @@ jobs:
 
           ## Projects
 
-          - [ ] UptimeRobot [has no alert](https://uptimerobot.com/dashboard#tvMode)
+          - [ ] UptimeRobot [has no alert](https://dashboard.uptimerobot.com/monitors)
           - [ ] [zimit backlog](https://farm.zimit.kiwix.org/pipeline/filter-todo) is reasonable
           - [ ] Analyze [zimit failed tasks](https://farm.zimit.kiwix.org/pipeline/filter-failed)
           - [ ] [PRs awaiting your review](https://github.com/notifications?query=reason%3Areview-requested)
