@@ -54,7 +54,7 @@ jobs:
         
           Find a maintenance window for the service:
           - wait for no more ongoing task on imager then put it in maintenance
-          - run `zimfarm stop` on zimfarm worker
+          - run `zimfarm stop manager` on zimfarm worker
 
           Then:
           ```sh
