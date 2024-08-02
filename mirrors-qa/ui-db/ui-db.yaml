@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: mirrors-qa
+  labels:
+    app: ui-db-app
+  name: ui-db-sts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ui-db-app
+  serviceName: ui-db-service
+  template:
+    metadata:
+      labels:
+        app: ui-db-app
+    spec:
+      containers:
+      - image: docker.io/library/postgres:16.3-bookworm
+        imagePullPolicy: Always
+        name: postgresdb
+        envFrom:
+        - secretRef:
+            name: ui-db-secrets
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/var/lib/postgresql/data"
+          readOnly: false
+        ports:
+        - containerPort: 5432
+        readinessProbe:
+          exec:
+            command: ["pg_isready", "-q", "-d", "dbname=metabase user=metabase"]
+          initialDelaySeconds: 1
+          periodSeconds: 1
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: mirrors-qa-ui-db-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: mirrors-qa
+  name: ui-db-service
+  labels:
+    app: ui-db-app
+spec:
+  selector:
+    app: ui-db-app
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432

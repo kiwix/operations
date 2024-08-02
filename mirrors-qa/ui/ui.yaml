@@ -1,0 +1,76 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: mirrors-qa
+  labels:
+    app: ui-app
+  name: ui-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ui-app
+  template:
+    metadata:
+      labels:
+        app: ui-app
+    spec:
+      containers:
+      - image: docker.io/metabase/metabase:v0.50.18
+        imagePullPolicy: Always
+        name: ui
+        envFrom:
+        - configMapRef:
+            name: ui-configs
+        - secretRef:
+            name: ui-secrets
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: mirrors-qa
+  name: ui-service
+  labels:
+    app: ui-app
+spec:
+  selector:
+    app: ui-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 3000
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ui-ingress
+  namespace: mirrors-qa
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: "30m"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - mirrors-qa.kiwix.org
+      secretName: mirrors-qa-kiwix-org-tls
+  rules:
+  - host: mirrors-qa.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: ui-service
+            port:
+              number: 80

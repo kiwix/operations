@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: mirrors-qa
+  labels:
+    app: api-db-app
+  name: api-db-sts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-db-app
+  serviceName: api-db-service
+  template:
+    metadata:
+      labels:
+        app: api-db-app
+    spec:
+      containers:
+      - image: docker.io/library/postgres:16.3-bookworm
+        imagePullPolicy: Always
+        name: postgresdb
+        envFrom:
+        - secretRef:
+            name: api-db-secrets
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/var/lib/postgresql/data"
+          readOnly: false
+        - name: init-extensions
+          mountPath: /docker-entrypoint-initdb.d/init-extensions.sh
+          readOnly: true
+          subPath: init-extensions.sh
+        ports:
+        - containerPort: 5432
+        readinessProbe:
+          exec:
+            command: ["pg_isready", "-q", "-d", "dbname=mirrors-qa user=mirrors-qa"]
+          initialDelaySeconds: 1
+          periodSeconds: 1
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: mirrors-qa-api-db-pvc
+      - name: init-extensions
+        configMap:
+          name: api-configs
+          defaultMode: 0755
+          optional: false
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: mirrors-qa
+  name: api-db-service
+  labels:
+    app: api-db-app
+spec:
+  selector:
+    app: api-db-app
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432

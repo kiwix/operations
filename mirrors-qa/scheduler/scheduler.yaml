@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: mirrors-qa
+  labels:
+    app: scheduler-app
+  name: scheduler-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: scheduler-app
+  template:
+    metadata:
+      labels:
+        app: scheduler-app
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/mirrors-qa-backend:latest
+        imagePullPolicy: Always
+        name: scheduler
+        command: ["mirrors-qa-backend", "scheduler"]
+        envFrom:
+        - configMapRef:
+            name: api-configs
+        - secretRef:
+            name: api-secrets
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+      nodeSelector:
+        k8s.kiwix.org/role: "services"

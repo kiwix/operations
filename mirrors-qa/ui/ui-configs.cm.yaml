@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ui-configs
+  namespace: mirrors-qa
+data:
+  JAVA_TIMEZONE: "UTC"
+  MB_SITE_NAME: "mirrors-qa"
+  MB_DB_TYPE: "postgres"

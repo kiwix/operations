@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: mirrors-qa
+  labels:
+    app: api-app
+  name: api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api-app
+  template:
+    metadata:
+      labels:
+        app: api-app
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/mirrors-qa-backend:latest
+        imagePullPolicy: Always
+        name: api
+        envFrom:
+        - configMapRef:
+            name: api-configs
+        - secretRef:
+            name: api-secrets
+        ports:
+        - containerPort: 80
+        # readinessProbe:
+        #   exec:
+        #     command: ["curl", "-f", "http://localhost/tests?page_size=1"]
+        #   initialDelaySeconds: 5
+        #   periodSeconds: 1
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "800m"
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: mirrors-qa
+  name: api-service
+  labels:
+    app: api-app
+spec:
+  selector:
+    app: api-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-ingress
+  namespace: mirrors-qa
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/proxy-body-size: "2m"
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - api.mirrors-qa.kiwix.org
+      secretName: api-mirrors-qa-kiwix-org-tls
+  rules:
+  - host: api.mirrors-qa.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: api-service
+            port:
+              number: 80
