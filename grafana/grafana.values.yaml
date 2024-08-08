@@ -50,6 +50,8 @@ kube-state-metrics:
 
 prometheus-node-exporter:
   enabled: true
+  extraArgs:
+    - --collector.mdadm
 
 prometheus-operator-crds:
   enabled: true
