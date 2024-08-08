@@ -103,6 +103,7 @@ jobs:
           - [ ] Zimfarm dashboard is [normal](https://kiwixorg.grafana.net/d/d2803d94-7c40-4338-bf80-f3cd7cd796bf/zimfarms?from=now-7d&to=now)
           - [ ] Jobs durations dashboard is [normal](https://kiwixorg.grafana.net/d/bb0f0990-04c5-4314-8afc-6185ac49c668/jobs?orgId=1)
           - [ ] There is no abnormal behaviors on [cluster resources consumption](https://kiwixorg.grafana.net/a/grafana-k8s-app/navigation/cluster/kiwix-prod)
+          - [ ] All [mdadm](https://kiwixorg.grafana.net/d/edu6v6ekri77kd/mdadm) RAID arrays are OK (check all instances in the top left combobox)
 
           ## Projects
 

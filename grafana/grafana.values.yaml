@@ -18,6 +18,9 @@ metrics:
 
   node-exporter:
     enabled: true
+    metricsTuning:
+      includeMetrics:
+        - node_md_.*
 
   kubelet:
     enabled: true
