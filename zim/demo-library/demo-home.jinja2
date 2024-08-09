@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Kiwix demo library</title>
+        <link rel="icon" href="../favicon.ico" type="image/x-icon">
+        <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+        <style>
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                min-height: 100vh;
+                margin: 0;
+                font-family: 'Roboto', sans-serif; 
+                background-color: #f4f4f4;
+                text-align: center;
+            }
+            .content {
+                max-width: 800px;
+                margin: 0 auto;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin: 25px 0;
+                font-size: 18px;
+                text-align: left;
+            }
+            th, td {
+                padding: 12px;
+                border-bottom: 1px solid #ddd;
+                max-width: 150px;
+                word-wrap: break-word;
+            }
+            th {
+                background-color: #f4f4f4;
+            }
+            tr:hover {
+                background-color: #f1f1f1;
+            }
+            a {
+                color: #3498db;
+                text-decoration: none;
+            }
+            a:hover {
+                text-decoration: underline;
+                color: #2c3e50;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Illustration</th>
+                        <th>Title</th>
+                        <th>Description</th>
+                        <th>Lang(s)</th>
+                        <th>Tag(s)</th>
+                        <th>Size</th>
+                    </tr>
+                </thead>
+                {% for zim in zims %}
+                <tr>
+                    <td><img src="../favicons/{{zim["id"]}}.png"></td>
+                    <td><a href="/viewer#{{zim["name"]}}">{{zim["title"]}}</a></td>
+                    <td>{{zim["description"]}}</td>
+                    <td>{{zim["language"]}}</td>
+                    <td>{{zim["tags"]}}</td>
+                    <td>{{zim["rsize"] | human_size}}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </body>
+    </html>

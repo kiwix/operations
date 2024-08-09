@@ -1,0 +1,255 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: demo-library-webcache-configs
+  namespace: zim
+data:
+  # not really secret, not exposing port outside
+  secret.txt: |
+    varnishadmin
+  entrypoint.sh: |
+    #!/bin/sh
+    extra_opts=""
+    if [ -z "$VARNISHSIZE" ]; then
+      # WARN: uses at least double that amount
+      VARNISHSIZE=384M
+    fi
+
+    if [ ! -z "$VARNISH_SECRET_PATH" ]; then
+      extra_opts="${extra_opts} -S $VARNISH_SECRET_PATH"
+    fi
+
+    if [ ! -z "$VARNISH_ADMIN_IP" ]; then
+      extra_opts="${extra_opts} -T $VARNISH_ADMIN_IP:6082"
+    fi
+
+    if [ -z "$VARNISH_LOG" ]; then
+      VARNISH_LOG="/dev/stdout"
+    fi
+
+    function varnishncsa_after_varnishd {
+      echo "Awaiting varnishd startup "
+      while :
+      do
+        if [ -f /var/run/varnishd.pid ] ; then
+          echo ""
+          break
+        fi
+        echo -n "."
+        sleep 1
+      done
+      echo "Varnishd running at PID=$(cat /var/run/varnishd.pid)."
+
+      echo "Starting varnishncsa to record logs to $VARNISH_LOG"
+      varnishncsa -D -P /var/run/varnishncsa.pid -c -a -F '%{Host}i %{X-Forwarded-For}i - %u %t "%r" %s %b "%{Referer}i" "%{User-agent}i"' -q 'ReqURL ~ "^/catalog/"' -w $VARNISH_LOG
+    }
+
+    varnishncsa_after_varnishd &
+
+    echo "Starting varnish with ${extra_opts}"
+
+    exec varnishd -P /var/run/varnishd.pid -F -a http=:80,HTTP -p feature=+http2 -f /etc/varnish/default.vcl -s default,$VARNISHSIZE $extra_opts
+  varnish.vcl: |
+    vcl 4.1;
+
+    import std;
+    import dynamic;
+
+    # ACL for manual purge requests
+    acl purge {
+      "localhost";
+      "100.64.0.0"/16; // k8s cluster
+    }
+
+    # kiwix-server to serve ZIMs
+    backend kiwixserve {
+        .host = "demo-library-kiwixserve-service";
+        .port = "80";
+    }
+
+    # minimal server for static HTML home pages
+    backend staticserver {
+        .host = "demo-library-staticserver-service";
+        .port = "80";
+    }
+
+    sub vcl_recv {
+
+      if (req.method == "PURGE") {
+        if (!client.ip ~ purge) {
+          return(synth(403, "Not allowed."));
+        }
+
+        # Purge all
+        # curl -X PURGE -H "X-Purge-Type: all" localhost
+        if (req.http.X-Purge-Type == "all") {
+          if (
+            std.ban("req.url ~ ^.*")
+          ) {
+            return(synth(200, "Purged all endpoints"));
+          }
+        }
+
+        return(synth(400, "Missing or invalid X-Purge-Type"));
+      }
+
+      if (req.url ~ "^/home/") {
+          # Case where the path is /home/
+          set req.backend_hint = staticserver;
+      } else if (req.url ~ "^/?$" || req.url ~ "^/?\?.*$") {
+          # Case where the path is / or empty including query strings
+          set req.backend_hint = staticserver;
+      } else {
+          # Default behavior, forward to kiwixserve
+          set req.backend_hint = kiwixserve;
+      }
+      
+      # remove potential cookie from request (there should be none)
+      unset req.http.cookie;
+
+      # set standard proxied ip header for getting original remote address
+      # set req.http.X-Forwarded-For = client.ip;
+      set req.http.X-Forwarded-For = req.http.x-real-ip;
+
+      # let's cache everything except /random.
+      # all endpoints listed above
+      if (req.url !~ "^/random") {
+          return(hash);
+      }
+
+      # default to not caching (to save space)
+      return (pass);
+    }
+
+    sub vcl_backend_response {
+
+      # make sure to not cache backend errors
+      if (beresp.status >= 500 && bereq.is_bgfetch) {
+          return (abandon);
+      }
+
+      # set ttl to 1d for everything that's returned by backends
+      set beresp.ttl = 1d;
+      # set beresp.grace = 24h;
+      # set beresp.keep = 8m;
+
+      # important for it to go to cache
+      unset bereq.http.cookie;
+      return (deliver);
+
+    }
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: demo-library-webcache-app
+  name: demo-library-webcache-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: demo-library-webcache-app
+  template:
+    metadata:
+      labels:
+        app: demo-library-webcache-app
+    spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+      containers:
+      - image: docker.io/library/varnish:7.3-alpine
+        command: ["entrypoint"]
+        imagePullPolicy: IfNotPresent
+        name: varnish
+        env:
+        - name: VARNISHSIZE
+          value: "8G"
+        - name: VARNISH_SECRET_PATH
+          value: /etc/varnish/secret
+        - name: VARNISH_ADMIN_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.podIP
+        - name: VARNISH_LOG
+          value: "/data/logs/access.log"
+        ports:
+        - containerPort: 80
+        - containerPort: 6082
+        volumeMounts:
+        - name: configs
+          mountPath: "/usr/sbin/entrypoint"
+          subPath: entrypoint.sh
+          readOnly: true
+        - name: configs
+          mountPath: "/etc/varnish/secret"
+          subPath: secret.txt
+          readOnly: true
+        - name: configs
+          mountPath: "/etc/varnish/default.vcl"
+          subPath: varnish.vcl
+          readOnly: true
+        resources:
+          requests:
+            memory: "16Gi"
+            cpu: "200m"
+      volumes:
+      - name: configs
+        configMap:
+          name: demo-library-webcache-configs
+          defaultMode: 0755
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: demo-library-webcache-service
+  labels:
+    app: demo-library-webcache-app
+spec:
+  selector:
+    app: demo-library-webcache-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
+  - name: varnishadm
+    protocol: TCP
+    port: 6082
+    targetPort: 6082
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: demo-library-webcache-ingress
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/server-snippet: |
+        location /robots.txt {
+          add_header Content-Type "text/plain";
+          return 200 "User-agent: *\nDisallow: /";
+        }
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - demo.library.kiwix.org
+      secretName: demo-library-kiwix-org-tls
+  rules:
+  - host: demo.library.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: demo-library-webcache-service
+            port:
+              name: http

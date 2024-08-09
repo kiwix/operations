@@ -1,0 +1,51 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: demo-generator
+  namespace: zim
+spec:
+  schedule: "0 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - name: debian
+              image: ghcr.io/kiwix/maintenance:latest
+              imagePullPolicy: Always
+              env:
+              - name: INSTALL_SCRIPTS
+                value: "demo-generator#github://kiwix/k8s/zim/library-mgmt/demo-generator.py\n"
+              volumeMounts:
+              - mountPath: "/data/demo"
+                subPath: demo
+                name: library-volume
+              - mountPath: "/data/zim"
+                subPath: zim
+                name: download-volume
+                readOnly: true
+              - mountPath: "/data/hidden-zim"
+                name: hidden-volume
+                readOnly: true
+              args: ["demo-generator"]
+              resources:
+                limits:
+                  cpu: 200m
+                  memory: 256Mi
+          volumes:
+          - name: library-volume
+            persistentVolumeClaim:
+              claimName: kiwix-library-pvc
+          - name: download-volume
+            persistentVolumeClaim:
+              claimName: kiwix-download-pvc
+          - name: hidden-volume
+            persistentVolumeClaim:
+              claimName: hidden-zim-pvc
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "storage"
