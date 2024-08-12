@@ -71,6 +71,11 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/server-snippet: |
+        location /robots.txt {
+          add_header Content-Type "text/plain";
+          return 200 "User-agent: *\nDisallow: /";
+        }
 spec:
   ingressClassName: nginx
   tls:
