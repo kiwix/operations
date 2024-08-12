@@ -4,8 +4,8 @@ metadata:
   name: api-configs
   namespace: mirrors-qa
 data:
-  SCHEDULER_SLEEP_DURATION: "3h"
-  IDLE_WORKER_DURATION: "1h"
+  SCHEDULER_SLEEP_DURATION: "1m"
+  IDLE_WORKER_DURATION: "15m"
   EXPIRE_TEST_DURATION: "1d"
   MAX_PAGE_SIZE: "10"
   # comma-separated
