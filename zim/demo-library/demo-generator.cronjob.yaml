@@ -19,7 +19,7 @@ spec:
               imagePullPolicy: Always
               env:
               - name: INSTALL_SCRIPTS
-                value: "demo-generator#github://kiwix/k8s/zim/library-mgmt/demo-generator.py\n"
+                value: "demo-generator#github://kiwix/k8s/zim/demo-library/demo-generator.py\n"
               volumeMounts:
               - mountPath: "/data/demo"
                 subPath: demo
@@ -34,7 +34,7 @@ spec:
               args: ["demo-generator"]
               resources:
                 limits:
-                  cpu: 200m
+                  cpu: 20m
                   memory: 256Mi
           volumes:
           - name: library-volume
