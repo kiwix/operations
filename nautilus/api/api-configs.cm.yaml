@@ -14,3 +14,8 @@ data:
   REDIS_URI: "redis://redis-service:6379/0"
   CHANNEL_NAME: "s3_upload"
   FORWARDED_ALLOW_IPS: "*"
+  DOWNLOAD_URL: "https://s3.eu-west-2.wasabisys.com/org-kiwix-dev-nautilus"
+  ZIMFARM_CALLBACK_BASE_URL: "https://api.nautilus.openzim.org/v1"
+  ZIMFARM_TASK_WORKER: "sisyphus"
+  MAILGUN_API_URL: "https://api.mailgun.net/v3/mg.zimit.kiwix.org"
+  MAILGUN_FROM: "Nautilus ZIM <nautilus@zimit.kiwix.org>"
