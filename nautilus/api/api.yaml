@@ -64,7 +64,7 @@ metadata:
   namespace: nautilus
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/proxy-body-size: "105m"
+    nginx.ingress.kubernetes.io/proxy-body-size: "525m"
 spec:
   tls:
     - hosts:
