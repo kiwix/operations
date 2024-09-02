@@ -72,7 +72,7 @@ metadata:
     nginx.ingress.kubernetes.io/server-snippet: |
       location /robots.txt {
         add_header Content-Type "text/plain";
-        return 200 "User-agent: *\nDisallow: /";
+        return 200 "User-agent: *\ncrawl-delay: 10";
       }
 spec:
   tls:
