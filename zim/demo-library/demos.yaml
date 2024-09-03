@@ -8,9 +8,9 @@ demos:
 - name: Orange #le nom est case-sensitive
   zims: #On peut en lister autant qu'on veut.
     - videos/deus-ex-silicium_fr_all #Les fichiers dev se retrouvent sur mirror.download.kiwix.org/zim/.hidden
-    - .hidden/dev/womenshistory.si.edu_en_all #Enlever la portion _date.zim permet d'avoir une mise à jour automatique
+    - .hidden/dev/hansard-botswana_en #Enlever la portion _date.zim permet d'avoir une mise à jour automatique
     - .hidden/dev/Bundesministerium_fuer_Inneres_2024-07.zim 
-  expired_on: 2024-09-01  #Toujours laisser une date, si pas d'expiration mettre une date loin dans le futur. Expire à 00:01 le jour indiqué (et pas 23:59) 
+  expired_on: 2044-09-01  #Toujours laisser une date, si pas d'expiration mettre une date loin dans le futur. Expire à 00:01 le jour indiqué (et pas 23:59) 
 - name: bob 
   zims:
     - .hidden/dev/devhints.io_en_all_2024-08.zim
