@@ -1,0 +1,16 @@
+---
+# this file (in kiwix/operations repository) is the configuration
+# for the hotspot multi demos hosted at http://demo.hotspot.kiwix.org
+# It is periodically fecthed (every 15mn usually) and refreshes the multi-demo
+# should it has changed.
+demos:
+  - ident: preppers
+    name: Preppers Package
+  - ident: ted
+    name: TED Talks Package
+  - ident: computers
+    alias: compsci
+    name: Computer Science Package
+  - ident: wikipedia-en
+    alias: wikipedia
+    name: Wikipedia Package
