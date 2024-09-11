@@ -1,28 +1,3 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: nginx-configs
-  namespace: zimfarm
-data:
-  drive.conf: |
-    server {
-      listen 80;
-      client_body_buffer_size 1M;  # was 16k
-      client_max_body_size 8192m;
-
-      root /data;
-
-      rewrite /_admin/logo.png /.branding/logo-512x512.png;
-      rewrite /api/favicon /.branding/logo-256x256.png;
-      rewrite /favicon.ico /.branding/favicon.ico;
-
-      location / {
-        autoindex on;
-        autoindex_exact_size off;
-        autoindex_localtime off;
-      }
-    }
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -41,10 +16,14 @@ spec:
         app: drive-app
     spec:
       containers:
-      - image: ghcr.io/openzim/surfer:latest
+      - image: ghcr.io/kiwix/nginx-webdav:latest
         imagePullPolicy: Always
-        name: surfer
+        name: nginx
         env:
+          - name: NAME
+            value: zimfarm-drive
+          - name: USERNAME
+            value: admin
           - name: PASSWORD
             valueFrom:
               secretKeyRef:
@@ -56,38 +35,15 @@ spec:
           mountPath: "/data"
           readOnly: false
         ports:
-        - containerPort: 3000
-        resources:
-          requests:
-            memory: "256Mi"
-            cpu: "200m"
-          limits:
-            memory: "256Mi"
-            cpu: "200m"
-      - image: docker.io/nginx:1.21
-        imagePullPolicy: IfNotPresent
-        name: nginx
-        volumeMounts:
-        - name: data-volume
-          mountPath: "/data"
-          readOnly: true
-        - name: nginx-configs
-          mountPath: "/etc/nginx/conf.d/default.conf"
-          subPath: drive.conf
-          readOnly: true
-        ports:
         - containerPort: 80
         resources:
           requests:
-            memory: "512Mi"
+            memory: "256Mi"
             cpu: "100m"
       volumes:
       - name: data-volume
         persistentVolumeClaim:
           claimName: drive-local-pvc
-      - name: nginx-configs
-        configMap:
-          name: nginx-configs
       nodeSelector:
         k8s.kiwix.org/role: "storage"
 ---
@@ -106,10 +62,6 @@ spec:
     port: 80
     targetPort: 80
     name: http
-  - protocol: TCP
-    port: 3000
-    targetPort: 3000
-    name: surfer
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -118,7 +70,22 @@ metadata:
   namespace: zimfarm
   annotations:
     nginx.ingress.kubernetes.io/proxy-body-size: 8196m
+    # see offspot/drive/drive.yaml
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      set $destination $http_destination;
+      if ($destination ~ ^https://(.*)) {
+          set $destination http://$1;
+          more_set_input_headers "Destination: $destination";
+          #more_set_input_headers -t 'text/plain' Destination $destination;
+      }
+
+    nginx.ingress.kubernetes.io/server-snippet: |
+      location /robots.txt {
+        add_header Content-Type "text/plain";
+        return 200 "User-agent: *\nDisallow: /";
+      }
 spec:
+  ingressClassName: nginx
   tls:
     - hosts:
       - drive.farm.openzim.org
@@ -127,61 +94,6 @@ spec:
   - host: drive.farm.openzim.org
     http:
       paths:
-      # using welcome page from surfer
-      - path: /
-        pathType: Exact
-        backend:
-          service:
-            name: drive-service
-            port:
-              name: surfer
-      # welcome page link to /_admin without trailing slash
-      - path: /_admin
-        pathType: Exact
-        backend:
-          service:
-            name: drive-service
-            port:
-              name: surfer
-      # the admin UI
-      - path: /_admin/
-        pathType: Prefix
-        backend:
-          service:
-            name: drive-service
-            port:
-              name: surfer
-      # webdav support
-      - path: /_webdav/
-        pathType: Prefix
-        backend:
-          service:
-            name: drive-service
-            port:
-              name: surfer
-      # API is used by UI
-      - path: /api/
-        pathType: Prefix
-        backend:
-          service:
-            name: drive-service
-            port:
-              name: surfer
-      # branding that we overwrite
-      - path: /_admin/logo.png
-        pathType: Exact
-        backend:
-          service:
-            name: drive-service
-            port:
-              name: http
-      - path: /api/favicon
-        pathType: Exact
-        backend:
-          service:
-            name: drive-service
-            port:
-              name: http
       - path: /
         pathType: Prefix
         backend:

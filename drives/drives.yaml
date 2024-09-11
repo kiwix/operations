@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: drives
+  labels:
+    app: drives-app
+  name: drives-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drives-app
+  template:
+    metadata:
+      labels:
+        app: drives-app
+    spec:
+      containers:
+      - image: docker.io/machines/filestash:latest
+        imagePullPolicy: IfNotPresent
+        name: filestash
+        ports:
+        - containerPort: 8334
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/app/data"
+          readOnly: false
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "100m"
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: drives-files-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: drives
+  name: drives-service
+  labels:
+    app: drives-app
+spec:
+  selector:
+    app: drives-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8334
+    name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: drives-drive-ingress
+  namespace: drives
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: https://drives.kiwix.org$1$2
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - drive.kiwix.org
+      secretName: drive-kiwix-org-tls
+  rules:
+    - host: drive.kiwix.org
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: drives-ingress
+  namespace: drives
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - drives.kiwix.org
+      secretName: drives-kiwix-org-tls
+  rules:
+  - host: drives.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: drives-service
+            port:
+              name: http
