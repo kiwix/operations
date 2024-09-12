@@ -103,7 +103,7 @@ data:
         }
 
         # Purge for a single Book references with http.X-Book-Id AND req.http.X-Book-Name
-        # curl -X PURGE -H "X-Purge-Type: book" -H "X-Book-Id: uuid" -H "X-Book-Name: name" localhost
+        # curl -X PURGE -H "X-Purge-Type: book" -H "X-Book-Id: uuid" -H "X-Book-Name: name" -H "X-Book-Name-Nodate: " localhost
         if (req.http.X-Purge-Type == "book") {
           if (
               # metadata updates
@@ -126,7 +126,8 @@ data:
               # std.ban("req.url ~ ^/" + req.http.X-Book-Name + "/") &&
 
               # no-date must be purged as redirect may point to a new location
-              std.ban("req.url ~ ^/" + req.http.X-Book-Name-Nodate + "/")) {
+              std.ban("req.url ~ ^/" + req.http.X-Book-Name-Nodate + "/") &&
+              std.ban("req.url ~ ^/content/" + req.http.X-Book-Name-Nodate + "/")) {
             return(synth(200, "Purged Book endpoints"));
           } else {
             # return ban error in 400 response
