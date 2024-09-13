@@ -36,6 +36,9 @@ spec:
             subPath: zim
             mountPath: "/data/download/zim"
             readOnly: false
+          - name: hidden-volume
+            mountPath: "/data/hidden-zim"
+            readOnly: false
           args: ["bash", "-c", "sleep infinity"]
           resources:
             requests:
@@ -45,6 +48,9 @@ spec:
       - name: kiwix-download
         persistentVolumeClaim:
           claimName: kiwix-download-pvc
+      - name: hidden-volume
+        persistentVolumeClaim:
+          claimName: hidden-zim-pvc
       restartPolicy: Never
       nodeSelector:
         k8s.kiwix.org/role: "storage"
