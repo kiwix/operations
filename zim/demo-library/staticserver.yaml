@@ -58,11 +58,8 @@ spec:
           readOnly: true
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "200m"
-          limits:
-            memory: "256Mi"
-            cpu: "200m"
+            memory: "16Mi"
+            cpu: "1m"
       volumes:
       - name: library-volume
         persistentVolumeClaim:

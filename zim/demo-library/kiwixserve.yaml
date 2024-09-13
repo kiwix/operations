@@ -47,8 +47,8 @@ spec:
           readOnly: true
         resources:
           requests:
-            memory: "2Gi"
-            cpu: "500m"
+            memory: "16Mi"
+            cpu: "1m"
       volumes:
       - name: download-volume
         persistentVolumeClaim:

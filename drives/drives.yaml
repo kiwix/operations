@@ -27,8 +27,8 @@ spec:
           readOnly: false
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "100m"
+            memory: "50Mi"
+            cpu: "10m"
       volumes:
       - name: data-volume
         persistentVolumeClaim:

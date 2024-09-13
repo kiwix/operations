@@ -105,8 +105,8 @@ spec:
           readOnly: false
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "100m"
+            memory: "20Mi"
+            cpu: "1m"
       volumes:
       - name: openzim-volume
         persistentVolumeClaim:

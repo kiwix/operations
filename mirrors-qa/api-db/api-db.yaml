@@ -38,6 +38,10 @@ spec:
             command: ["pg_isready", "-q", "-d", "dbname=mirrors-qa user=mirrors-qa"]
           initialDelaySeconds: 1
           periodSeconds: 1
+        resources:
+          requests:
+            memory: "50Mi"
+            cpu: "100m"
       volumes:
       - name: data-volume
         persistentVolumeClaim:

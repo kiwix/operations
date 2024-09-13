@@ -20,6 +20,6 @@ spec:
         name: network-tools
         resources:
           requests:
-            memory: "128Mi"
-            cpu: "100m"
+            memory: "8Mi"
+            cpu: "1m"
         command: ["sh", "-c", "sleep infinity"]

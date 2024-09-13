@@ -41,8 +41,8 @@ spec:
           readOnly: true
         resources:
           requests:
-            memory: "1Gi"
-            cpu: "500m"
+            memory: "512Mi"
+            cpu: "10m"
         livenessProbe:
           httpGet:
             path: /api/v1/info

@@ -33,11 +33,8 @@ spec:
         - containerPort: 80
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "200m"
-          limits:
-            memory: "256Mi"
-            cpu: "200m"
+            memory: "32Mi"
+            cpu: "1m"
       nodeSelector:
         k8s.kiwix.org/role: "services"
 ---

@@ -21,8 +21,8 @@ spec:
         name: opentracker
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "100m"
+            memory: "5Mi"
+            cpu: "5m"
         ports:
           # we specifically want port 6969
         - containerPort: 6969

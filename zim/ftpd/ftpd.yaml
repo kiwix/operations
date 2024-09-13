@@ -26,7 +26,7 @@ spec:
           readOnly: true
         resources:
           requests:
-            memory: "256Mi"
+            memory: "8Mi"
             cpu: "100m"
         ports:
           # using hostPort is reliable with any FTP client for passive mode

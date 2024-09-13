@@ -46,7 +46,7 @@ spec:
         resources:
           requests:
             memory: "2Gi"
-            cpu: "500m"
+            cpu: "50m"
       volumes:
       - name: download-volume
         persistentVolumeClaim:
@@ -120,7 +120,7 @@ spec:
         resources:
           requests:
             memory: "512Mi"
-            cpu: "200m"
+            cpu: "50m"
       volumes:
       # https://github.com/kiwix/libkiwix/issues/754
       - name: download-volume

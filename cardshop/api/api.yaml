@@ -29,7 +29,7 @@ spec:
         resources:
           requests:
             memory: "512Mi"
-            cpu: "300m"
+            cpu: "150m"
       nodeSelector:
         k8s.kiwix.org/role: "services"
 ---

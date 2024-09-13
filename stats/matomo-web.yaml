@@ -99,8 +99,8 @@ spec:
         - containerPort: 80
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "300m"
+            memory: "16Mi"
+            cpu: "1m"
       volumes:
       - name: files-volume
         persistentVolumeClaim:

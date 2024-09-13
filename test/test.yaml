@@ -45,7 +45,7 @@ spec:
           name: test-webroot-volume
         resources:
           requests:
-            memory: "16Mi"
+            memory: "8Mi"
             cpu: "1m"
           limits:
             memory: "16Mi"

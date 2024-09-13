@@ -29,6 +29,10 @@ spec:
           readOnly: false
         ports:
         - containerPort: 5432
+        resources:
+          requests:
+            memory: "20Mi"
+            cpu: "10m"
       volumes:
       - name: data-volume
         persistentVolumeClaim:

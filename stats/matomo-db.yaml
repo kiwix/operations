@@ -67,7 +67,7 @@ spec:
         resources:
           requests:
             memory: "10Gi"
-            cpu: "3000m"
+            cpu: "1000m"
       volumes:
       - name: data-volume
         persistentVolumeClaim:

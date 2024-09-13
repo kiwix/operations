@@ -47,6 +47,10 @@ spec:
           readOnly: false
         ports:
           - containerPort: 22
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "500m"
       volumes:
       - name: download-volume
         persistentVolumeClaim:

@@ -31,8 +31,8 @@ spec:
           readOnly: false
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "200m"
+            memory: "64Mi"
+            cpu: "10m"
       volumes:
       # /!\ this is not backed-up (considered transient)
       - name: files-volume

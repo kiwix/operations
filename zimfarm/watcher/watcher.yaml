@@ -39,8 +39,8 @@ spec:
         args: ["watcher", "--debug", "--dir", "/data", "--threads", "10", "--dont-schedule-on-update", "--every", "1d"]
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "200m"
+            memory: "128Mi"
+            cpu: "10m"
           limits:
             memory: "512Mi"
             cpu: "200m"

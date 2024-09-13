@@ -34,6 +34,10 @@ spec:
             command: ["pg_isready", "-q", "-d", "dbname=metabase user=metabase"]
           initialDelaySeconds: 1
           periodSeconds: 1
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "80m"
       volumes:
       - name: data-volume
         persistentVolumeClaim:

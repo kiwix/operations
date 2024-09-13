@@ -33,7 +33,7 @@ spec:
         resources:
           requests:
             memory: "512Mi"
-            cpu: "1000m"
+            cpu: "100m"
       volumes:
       - name: secrets
         secret:

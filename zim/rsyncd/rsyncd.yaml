@@ -118,7 +118,7 @@ spec:
           readOnly: true
         resources:
           limits:
-            memory: "2Gi"
+            memory: "32Mi"
             cpu: "1000m"
         ports:
         # we don't want to request mirrors to use an alternate port

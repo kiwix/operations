@@ -264,8 +264,8 @@ spec:
           readOnly: false
         resources:
           requests:
-            memory: "16Gi"
-            cpu: "200m"
+            memory: "12Gi"
+            cpu: "30m"
       volumes:
       - name: configs
         configMap:

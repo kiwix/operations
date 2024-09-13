@@ -30,8 +30,8 @@ spec:
         - containerPort: 5432
         resources:
           requests:
-            memory: "1Gi"
-            cpu: "300m"
+            memory: "100Mi"
+            cpu: "20m"
       volumes:
       - name: data-volume
         persistentVolumeClaim:

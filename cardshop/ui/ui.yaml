@@ -28,8 +28,8 @@ spec:
         - containerPort: 80
         resources:
           requests:
-            memory: "512Mi"
-            cpu: "300m"
+            memory: "1Gi"
+            cpu: "100m"
         volumeMounts:
         - name: data-volume
           mountPath: "/data/media"
