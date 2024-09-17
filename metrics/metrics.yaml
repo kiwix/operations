@@ -6,7 +6,7 @@ metadata:
     app: metrics-app
   name: metrics-deployment
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: metrics-app
