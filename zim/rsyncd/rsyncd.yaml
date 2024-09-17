@@ -84,6 +84,8 @@ metadata:
     app: rsyncd-app
   name: rsyncd-deployment
 spec:
+  strategy:
+    type: Recreate
   replicas: 1
   selector:
     matchLabels:

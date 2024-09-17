@@ -6,6 +6,8 @@ metadata:
     app: ftpd-app
   name: ftpd-deployment
 spec:
+  strategy:
+    type: Recreate
   replicas: 1
   selector:
     matchLabels:

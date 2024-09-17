@@ -6,6 +6,8 @@ metadata:
     app: tracker-app
   name: tracker-deployment
 spec:
+  strategy:
+    type: Recreate
   replicas: 1
   selector:
     matchLabels:
