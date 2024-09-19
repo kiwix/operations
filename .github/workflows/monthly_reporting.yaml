@@ -1,0 +1,26 @@
+name: Monthly reporting
+
+on:
+  schedule:
+    - cron: "0 8 1 * *"
+  workflow_dispatch:
+
+jobs:
+
+  zimit-tasks:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/setup-python@v5
+        with:
+          python-version: 3.12
+          architecture: x64
+      - name: Install dependencies
+        run: pip install requests==2.32.3 python-dateutil==2.9.0.post0 
+      - name: Download script
+        run: curl -O https://raw.githubusercontent.com/openzim/zimfarm/refs/heads/main/dispatcher/backend/maint-scripts/monthly_report_tasks.py
+      - name: Create report
+        run: ZF_URI="https://api.farm.zimit.kiwix.org/v1" FILE_PREFIX="farm.zimit.kiwix.org_tasks_" python monthly_report_tasks.py --
+      - name: List files
+        run: ls -lah *.csv
+      - name: Upload report
+        run: curl -u "${{ secrets.ZIMIT_DRIVE_WEBDAV_CREDENTIALS }}" -T farm.zimit.kiwix.org_tasks_*.csv -sw '%{http_code}' "https://drive.zimit.kiwix.org/reports/"
