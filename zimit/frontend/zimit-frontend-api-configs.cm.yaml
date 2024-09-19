@@ -1,11 +1,11 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ui-configs
+  name: zimit-frontend-api-configs
   namespace: zimit
 data:
+  ALLOWED_ORIGINS: "https://zimit.kiwix.org"
   # farm-api URLs
-  ZIMFARM_WEBAPI: "https://api.farm.zimit.kiwix.org/v1"
   INTERNAL_ZIMFARM_WEBAPI: "https://api.farm.zimit.kiwix.org/v1"
   # where to download ZIM from (for links)
   ZIM_DOWNLOAD_URL: "https://s3.us-west-1.wasabisys.com/org-kiwix-zimit"
@@ -26,3 +26,6 @@ data:
   TASK_WORKER: "sisyphus"
   PUBLIC_URL: "https://zimit.kiwix.org"
   PUBLIC_API_URL: "https://zimit.kiwix.org/api/v1"
+  ZIMFARM_REQUESTS_TIMEOUT: 10s
+  MAILGUN_REQUESTS_TIMEOUT: 10s
+  CONTACT_US_URL: "https://www.kiwix.org/en/contact/"

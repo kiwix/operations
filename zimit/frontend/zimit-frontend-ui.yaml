@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zimit
+  labels:
+    app: zimit-frontend-ui-app
+  name: zimit-frontend-ui-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zimit-frontend-ui-app
+  template:
+    metadata:
+      labels:
+        app: zimit-frontend-ui-app
+    spec:
+      containers:
+      - image: ghcr.io/openzim/zimit-frontend-ui:latest
+        imagePullPolicy: Always
+        name: zimit-frontend-ui
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "10m"
+        volumeMounts:
+        - name: configs
+          mountPath: "/usr/share/caddy/config.json"
+          subPath: config.json
+          readOnly: true
+      volumes:
+      - name: configs
+        configMap:
+          name: zimit-frontend-ui-configs
+          defaultMode: 0755
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zimit
+  name: zimit-frontend-ui-service
+  labels:
+    app: zimit-frontend-ui-app
+spec:
+  selector:
+    app: zimit-frontend-ui-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80

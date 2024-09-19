@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zimit
+  labels:
+    app: zimit-frontend-api-app
+  name: zimit-frontend-api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: zimit-frontend-api-app
+  template:
+    metadata:
+      labels:
+        app: zimit-frontend-api-app
+    spec:
+      containers:
+      - image: ghcr.io/openzim/zimit-frontend-api:latest
+        imagePullPolicy: Always
+        name: zimit-frontend-api
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "10m"
+        envFrom:
+        - configMapRef:
+            name: zimit-frontend-api-configs
+        - secretRef:
+            name: zimit-frontend-api-secrets
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zimit
+  name: zimit-frontend-api-service
+  labels:
+    app: zimit-frontend-api-app
+spec:
+  selector:
+    app: zimit-frontend-api-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80

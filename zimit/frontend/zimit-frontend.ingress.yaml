@@ -1,0 +1,28 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: zimit-frontend-ui
+  namespace: zimit
+spec:
+  tls:
+    - hosts:
+      - zimit.kiwix.org
+      secretName: zimit-kiwix-org-tls
+  rules:
+  - host: zimit.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: zimit-frontend-ui-service
+            port:
+              number: 80
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: zimit-frontend-api-service
+            port:
+              number: 80
