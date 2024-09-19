@@ -4,7 +4,7 @@ metadata:
   name: mb-probe-mirrors
   namespace: zim
 spec:
-  schedule: "* * * * *"
+  schedule: "0 10 * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
@@ -17,16 +17,16 @@ spec:
             - image: ghcr.io/kiwix/mirrorbrain:latest
               imagePullPolicy: IfNotPresent
               name: mirrorbrain
-              command: ["mirrorprobe"]
+              command: ["geoipupdate -v"]
               volumeMounts:
               - name: mb-volume
                 subPath: geoip2
                 mountPath: "/usr/share/GeoIP"
+                readOnly: false
+              - name: mb-secrets
+                subPath: GeoIP.conf
                 readOnly: true
-              - name: configs
-                subPath: mirrorbrain.conf
-                mountPath: "/etc/mirrorbrain.conf"
-                readOnly: true
+                mountPath: "/etc/GeoIP.conf"
               resources:
                 requests:
                   memory: "64Mi"
@@ -35,9 +35,9 @@ spec:
           - name: mb-volume
             persistentVolumeClaim:
               claimName: mirrorbrain-support-pvc
-          - name: configs
-            configMap:
-              name: mb-configs
+          - name: mb-secrets
+            secret:
+              secretName: mb-secrets
           restartPolicy: Never
           nodeSelector:
             k8s.kiwix.org/role: "storage"

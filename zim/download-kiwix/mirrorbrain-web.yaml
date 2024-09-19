@@ -35,8 +35,8 @@ spec:
           mountPath: "/usr/share/mirrorbrain"
           readOnly: true
         - name: mb-volume
-          subPath: geoip
-          mountPath: "/usr/local/geoip/share/GeoIP"
+          subPath: geoip2
+          mountPath: "/usr/share/GeoIP"
           readOnly: true
         - name: configs
           subPath: mirrorbrain.conf
@@ -49,6 +49,10 @@ spec:
         - name: configs
           subPath: httpd-vhosts.conf
           mountPath: "/usr/local/apache2/conf/extra/httpd-vhosts.conf"
+          readOnly: true
+        - name: configs
+          subPath: mirrorlist_header.txt
+          mountPath: "/etc/mirrorlist_header.txt"
           readOnly: true
         - mountPath: "/usr/local/apache2/logs/custom"
           subPath: download-kiwix
