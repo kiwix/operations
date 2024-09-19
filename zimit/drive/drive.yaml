@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zimit
+  labels:
+    app: drive-app
+  name: drive-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: drive-app
+  template:
+    metadata:
+      labels:
+        app: drive-app
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/nginx-webdav:latest
+        imagePullPolicy: Always
+        name: nginx
+        env:
+          - name: NAME
+            value: zimit-drive
+          - name: USERNAME
+            value: admin
+          - name: PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: drive-password
+                key: value
+                optional: false
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/data"
+          readOnly: false
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "1m"
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: drive-local-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zimit
+  name: drive-service
+  labels:
+    app: drive-app
+spec:
+  selector:
+    app: drive-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: drive-ingress
+  namespace: zimit
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 8196m
+    # see offspot/drive/drive.yaml
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      set $destination $http_destination;
+      if ($destination ~ ^https://(.*)) {
+          set $destination http://$1;
+          more_set_input_headers "Destination: $destination";
+          #more_set_input_headers -t 'text/plain' Destination $destination;
+      }
+
+    nginx.ingress.kubernetes.io/server-snippet: |
+      location /robots.txt {
+        add_header Content-Type "text/plain";
+        return 200 "User-agent: *\nDisallow: /";
+      }
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - drive.zimit.kiwix.org
+      secretName: drive-zimit-kiwix-org-tls
+  rules:
+  - host: drive.zimit.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: drive-service
+            port:
+              name: http

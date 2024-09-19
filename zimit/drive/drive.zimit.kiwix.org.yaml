@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: drive-zimit-kiwix-org
+  namespace: zimit
+spec:
+  secretName: drive-zimit-kiwix-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: drive.zimit.kiwix.org
+  dnsNames:
+  - drive.zimit.kiwix.org
