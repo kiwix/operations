@@ -15,7 +15,7 @@ data:
   CALLBACK_BASE_URL: "https://zimit.kiwix.org/api/v1/requests/hook"
   # mail sending details
   MAILGUN_API_URL: "https://api.mailgun.net/v3/mg.zimit.kiwix.org"
-  MAILGUN_FROM: "Zimit <info@zimit.kiwix.org>"
+  MAILGUN_FROM: "Zimit <contact+zimit@kiwix.org>"
   # task configuration
   ZIMIT_SIZE_LIMIT: "4294967296"
   ZIMIT_TIME_LIMIT: "7200"
