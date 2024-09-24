@@ -54,5 +54,9 @@ data:
       ],
       "zimit_size_limit": 4294967296,
       "zimit_time_limit": 7200,
-      "zimit_refresh_after": 60
+      "zimit_refresh_after": 60,
+      "matomo_enabled": true,
+      "matomo_host": "https://stats.kiwix.org",
+      "matomo_site_id": 11,
+      "matomo_tracker_file_name": "matomo"
     }
