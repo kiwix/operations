@@ -5,7 +5,7 @@ demos:
     - other/litterature-audiobooks-poetry_fr
     - videos/ubongo_fr_all_2024-07.zim
   expired_on: 2024-08-14
-- name: Orange #le nom est case-sensitive
+- name: orange #le nom est case-sensitive
   zims: #On peut en lister autant qu'on veut.
     - videos/deus-ex-silicium_fr_all #Les fichiers dev se retrouvent sur mirror.download.kiwix.org/zim/.hidden
     - .hidden/dev/hansard-botswana_en #Enlever la portion _date.zim permet d'avoir une mise à jour automatique
