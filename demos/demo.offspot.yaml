@@ -14,3 +14,5 @@ demos:
   - ident: wikipedia-en
     alias: wikipedia
     name: Wikipedia Package
+  - ident: orange-demo
+    name: Demo Fondation Orange
