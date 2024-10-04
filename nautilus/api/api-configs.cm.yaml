@@ -18,4 +18,4 @@ data:
   ZIMFARM_CALLBACK_BASE_URL: "https://api.nautilus.openzim.org/v1"
   ZIMFARM_TASK_WORKER: "sisyphus"
   MAILGUN_API_URL: "https://api.mailgun.net/v3/mg.zimit.kiwix.org"
-  MAILGUN_FROM: "Nautilus ZIM <nautilus@zimit.kiwix.org>"
+  MAILGUN_FROM: "Nautilus ZIM <nautilus@kiwix.org>"
