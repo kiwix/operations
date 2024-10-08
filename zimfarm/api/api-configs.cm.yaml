@@ -31,13 +31,12 @@ data:
   USES_WORKERS_IPS_WHITELIST: "1"
   # wikimedia cloud: 185.15.56.0/24
   # cardshop worker: 195.154.81.22
-  # k8s storage node: 51.159.108.60
+  # k8s storage node: 135.181.224.247 and 2a01:4f9:3071:2d08::2/64
   # k8s services node: 51.159.30.163
   # bastion: 51.159.132.199
   # k8s stats: 51.159.31.32
   # pixelmemory v6 prefix: 2600:1700:2320:9090:d0cc::/80
-  # worker.youzim.it: 51.159.4.131 and 2001:bc8:6005:9:ec4:7aff:fe0e:dda8
-  WHITELISTED_IPS: "185.15.56.0/24,195.154.81.22,51.159.108.60,51.159.30.163,51.159.132.199,51.159.31.32,2600:1700:2320:9090:d0cc::/80,51.159.4.131,2001:bc8:6005:9:ec4:7aff:fe0e:dda8"
+  WHITELISTED_IPS: "185.15.56.0/24,195.154.81.22,135.181.224.247,2a01:4f9:3071:2d08::2/64,51.159.30.163,51.159.132.199,51.159.31.32,2600:1700:2320:9090:d0cc::/80"
   WASABI_WHITELIST_POLICY_ARN: "arn:aws:iam::100000050990:policy/ZimfarmWorker"
   WASABI_WHITELIST_STATEMENT_ID: "ZimfarmWorkersIPsWhiteList"
   # CMS connection
@@ -49,7 +48,6 @@ data:
   UWSGI_CHEAPER_STEP: "4"
   UWSGI_PROCESSES: "64"
   UWSGI_CHEAPER_INITIAL: "8"
-  ALEMBIC_UPGRADE_HEAD_ON_START: ""
   # Timeout for requests to other services
   REQ_TIMEOUT_NOTIFICATIONS: "5"
   REQ_TIMEOUT_CMS: "50"
