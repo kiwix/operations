@@ -75,9 +75,9 @@ jobs:
 
           ## k8s cluster
 
-          - [ ] Check Pod errors
+          - [ ] Check Pod errors or in CrashLoopBackoff
           ```sh
-          k get pods -A -o wide|grep Error
+          k get pods -A -o wide|grep -E 'Error|Crash'
           ```
           - [ ] Check Pod restarts
           ```sh
