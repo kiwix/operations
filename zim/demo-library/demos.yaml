@@ -17,8 +17,8 @@ demos:
     - zimit/hra-news.org_far_all
     - zimit/iranwire-com_far_all
   expired_on: 2025-01-01
-- name: bob 
+- name: datacup 
   zims:
-    - .hidden/dev/devhints.io_en_all_2024-08.zim
-    - .hidden/bard/stackoverflow.com_en_bard_2021-11.zim
-  expired_on: 2024-07-31
+    - .hidden/dev/telmidetice_fr_all_2024-10.zim
+    - .hidden/dev/telmidetice_ar_all_2024-10.zim
+  expired_on: 2024-10-31
