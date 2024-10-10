@@ -19,6 +19,22 @@ spec:
         fsGroup: 999
         runAsUser: 999
         runAsGroup: 999
+      initContainers:
+      - image: docker.io/busybox
+        name: chmod-pgdata
+        command: ["/bin/sh", "-c", "chmod 700 /var/lib/postgresql/data"]
+        volumeMounts:
+        - name: data-volume
+          subPath: data
+          mountPath: "/var/lib/postgresql/data"
+          readOnly: false
+        resources:
+          requests:
+            memory: "16Mi"
+            cpu: "1m"
+          limits:
+            memory: "16Mi"
+            cpu: "1m"
       containers:
       - image: docker.io/postgres:11
         imagePullPolicy: IfNotPresent
