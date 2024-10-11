@@ -19,7 +19,7 @@ data:
   # task configuration
   ZIMIT_SIZE_LIMIT: "4294967296"
   ZIMIT_TIME_LIMIT: "7200"
-  ZIMIT_IMAGE: "openzim/zimit:2.1.3"
+  ZIMIT_IMAGE: "openzim/zimit:2.1.4"
   TASK_MEMORY: "3840MiB"
   TASK_DISK: "4GiB"
   TASK_CPU: "1"
