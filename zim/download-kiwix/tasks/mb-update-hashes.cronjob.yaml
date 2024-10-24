@@ -14,7 +14,7 @@ spec:
       template:
         spec:
           containers:
-            - image: ghcr.io/kiwix/mirrorbrain:latest
+            - image: ghcr.io/kiwix/mirrorbrain:bookworm
               imagePullPolicy: IfNotPresent
               name: mirrorbrain
               command: ["mb", "makehashes", "/var/www/download.kiwix.org/", "-t", "/usr/share/mirrorbrain"]

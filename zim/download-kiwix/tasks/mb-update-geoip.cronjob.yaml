@@ -1,43 +1,44 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: mb-probe-mirrors
+  name: mb-update-geoip
   namespace: zim
 spec:
-  schedule: "* * * * *"
+  schedule: "4 0 * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
-      backoffLimit: 2
+      backoffLimit: 1
       template:
         spec:
           containers:
             - image: ghcr.io/kiwix/mirrorbrain:bookworm
               imagePullPolicy: IfNotPresent
               name: mirrorbrain
-              command: ["mirrorprobe"]
-              volumeMounts:
-              - name: mb-volume
-                subPath: geoip
-                mountPath: "/usr/local/geoip/share/GeoIP"
-                readOnly: true
-              - name: configs
-                subPath: mirrorbrain.conf
-                mountPath: "/etc/mirrorbrain.conf"
-                readOnly: true
+              command: ["/usr/bin/geoipupdate", "-f", "/etc/geoip/GeoIP.conf", "-v"]
               resources:
                 requests:
                   memory: "64Mi"
-                  cpu: "20m"
+                  cpu: "1000m"
+              volumeMounts:
+                - name: mb-volume
+                  subPath: geoip-maxmind
+                  mountPath: "/usr/share/GeoIP"
+                  readOnly: false
+                - name: secrets
+                  mountPath: "/etc/geoip"
+                  readOnly: true
           volumes:
+          - name: secrets
+            secret:
+              secretName: mirrorbrain-secrets
+              defaultMode: 0600
+              optional: false
           - name: mb-volume
             persistentVolumeClaim:
               claimName: mirrorbrain-support-pvc
-          - name: configs
-            configMap:
-              name: mb-configs
           restartPolicy: Never
           nodeSelector:
             k8s.kiwix.org/role: "storage"

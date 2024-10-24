@@ -160,7 +160,7 @@ data:
     #LoadModule unique_id_module modules/mod_unique_id.so
     LoadModule setenvif_module modules/mod_setenvif.so
     LoadModule version_module modules/mod_version.so
-    #LoadModule remoteip_module modules/mod_remoteip.so
+    LoadModule remoteip_module modules/mod_remoteip.so
     #LoadModule proxy_module modules/mod_proxy.so
     #LoadModule proxy_connect_module modules/mod_proxy_connect.so
     #LoadModule proxy_ftp_module modules/mod_proxy_ftp.so
@@ -218,7 +218,15 @@ data:
     #LoadModule userdir_module modules/mod_userdir.so
     LoadModule alias_module modules/mod_alias.so
     LoadModule rewrite_module     modules/mod_rewrite.so
-    LoadModule geoip_module       modules/mod_geoip.so
+    <IfModule remoteip_module>
+      RemoteIPHeader X-Forwarded-For
+    </IfModule>
+    <IfDefine UseMaxMind>
+      LoadModule maxminddb_module   modules/mod_maxminddb.so
+    </IfDefine>
+    <IfModule !maxminddb_module>
+      LoadModule geoip_module       modules/mod_geoip.so
+    </IfModule>
     LoadModule form_module        modules/mod_form.so
     LoadModule mirrorbrain_module modules/mod_mirrorbrain.so
     LoadModule autoindex_mb_module modules/mod_autoindex_mb.so
@@ -324,7 +332,7 @@ data:
         # Custom `vhost` log format that we use on nginx as well
         # and which is adapted for matomo-log-uploader
         # log_format vhost '$host $remote_addr - $remote_user [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"';
-        LogFormat "%v %{X-Forwarded-For}i - %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" vhost
+        LogFormat "%v %a - %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" vhost
 
         <IfModule logio_module>
           # You need to enable mod_logio.c to use %I and %O
@@ -696,7 +704,22 @@ data:
       <IfModule mod_geoip.c>
          GeoIPEnable On
          GeoIPEnableUTF8 On
-         GeoIPScanProxyHeaders On
+         # using client IP since we use remote_ip module
+         #GeoIPScanProxyHeaders On
+      </IfModule>
+
+      <IfModule mod_maxminddb.c>
+         MaxMindDBEnable On
+         #MaxMindDBFile COUNTRY_DB /usr/share/GeoIP/GeoLite2-Country.mmdb
+         MaxMindDBFile CITY_DB    /usr/share/GeoIP/GeoLite2-City.mmdb
+         # we use old DBEnv names to not modify mirrorbrain code
+         MaxMindDBEnv GEOIP_COUNTRY_CODE CITY_DB/country/iso_code
+         MaxMindDBEnv GEOIP_COUNTRY_NAME CITY_DB/country/names/en
+         MaxMindDBEnv GEOIP_CONTINENT_CODE CITY_DB/continent/code
+         MaxMindDBEnv GEOIP_LONGITUDE CITY_DB/location/longitude
+         MaxMindDBEnv GEOIP_LATITUDE CITY_DB/location/latitude
+         MaxMindDBEnv GEOIP_REGION CITY_DB/subdivisions/0/iso_code
+         MaxMindDBEnv GEOIP_REGION_NAME CITY_DB/subdivisions/0/names/en
       </IfModule>
 
       # This is a hack to avoid counting twice a same

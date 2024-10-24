@@ -16,10 +16,12 @@ spec:
         app: mirrorbrain-web
     spec:
       containers:
-      - image: ghcr.io/kiwix/mirrorbrain:latest
+      - image: ghcr.io/kiwix/mirrorbrain:bookworm
+      # - image: ghcr.io/kiwix/mirrorbrain:latest
         imagePullPolicy: Always
         name: apache
-        command: ["httpd-foreground"]
+        command: ["httpd-foreground", "-DUseMaxMind"]
+        # command: ["httpd-foreground"]
         volumeMounts:
         - mountPath: "/var/www/download.kiwix.org"
           name: download-volume
@@ -37,6 +39,10 @@ spec:
         - name: mb-volume
           subPath: geoip
           mountPath: "/usr/local/geoip/share/GeoIP"
+          readOnly: true
+        - name: mb-volume
+          subPath: geoip-maxmind
+          mountPath: "/usr/share/GeoIP"
           readOnly: true
         - name: configs
           subPath: mirrorbrain.conf
