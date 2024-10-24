@@ -1,15 +1,16 @@
 apiVersion: apps/v1
-kind: Deployment
+kind: StatefulSet
 metadata:
   namespace: zim
   labels:
     app: mirrorbrain-db
-  name: mirrorbrain-db-deployment
+  name: mirrorbrain-db-sts
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: mirrorbrain-db
+  serviceName: mirrorbrain-db-service
   template:
     metadata:
       labels:
