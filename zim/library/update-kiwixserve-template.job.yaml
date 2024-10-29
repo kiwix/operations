@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: update-kiwixserve-template
+  namespace: zim
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      containers:
+        - name: maintenance
+          image: ghcr.io/kiwix/maintenance:latest
+          imagePullPolicy: Always
+          env:
+          # this must be set according to the libkiwix version that is bundled in the
+          # kiwix-serve version we use in library-data-backend-deployment
+          # can be obtain with `kiwix-serve --version`
+          - name: LIBKIWIX_VERSION
+            value: "14.0.0"
+          - name: INSTALL_SCRIPTS
+            value: "update-template#github://kiwix/operations/zim/library/update-kiwixserve-template.sh\n"
+          volumeMounts:
+          - mountPath: "/data"
+            subPath: kiwix-serve-templates
+            name: library-volume
+            readOnly: false
+          args: ["/usr/local/bin/update-template"]
+          resources:
+            requests:
+              cpu: 200m
+              memory: 1Gi
+      volumes:
+      - name: library-volume
+        persistentVolumeClaim:
+          claimName: kiwix-library-pvc
+      restartPolicy: Never
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
