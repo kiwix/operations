@@ -23,7 +23,6 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from typing import Any, Dict, Generator, Tuple, List
 
-import mwclient
 import requests
 from lxml import etree
 from humanfriendly import format_size as human_size
@@ -83,11 +82,6 @@ class Defaults:
     NB_ZIM_VERSIONS_EXPOSED = 1
 
     VARNISH_URL = "http://localhost"
-
-    WIKI_DOMAIN = "wiki.kiwix.org"
-    WIKI_USERNAME = "bot"
-    WIKI_PASSWORD = "notset"
-    WIKI_PAGE = "notset"
 
     OFFSPOT_LIBRARY = "/data/download/library/ideascube.yml"
     MIRRORBRAIN_URL = "http://mirrorbrain-web-service"
@@ -329,7 +323,6 @@ class LibraryMaintainer:
         "write-libraries",
         "write-offspot",
         "purge-varnish",
-        "update-wiki",
     ]
 
     # former (old) filename format for ZIMs (period was MM_YYYY)
@@ -359,10 +352,6 @@ class LibraryMaintainer:
         nb_zim_versions_to_keep: int,
         nb_zim_versions_exposed: int,
         varnish_url: str,
-        wiki_domain: str,
-        wiki_username: str,
-        wiki_password: str,
-        wiki_page: str,
         offspot_library_dest: str,
         mirrorbrain_url: str,
         log_to: str,
@@ -387,10 +376,6 @@ class LibraryMaintainer:
         self.nb_zim_versions_exposed = nb_zim_versions_exposed
 
         self.varnish_url = varnish_url
-        self.wiki_domain = wiki_domain
-        self.wiki_username = wiki_username
-        self.wiki_password = wiki_password
-        self.wiki_page = wiki_page
 
         self.offspot_library_dest = pathlib.Path(offspot_library_dest)
         self.mirrorbrain_url = mirrorbrain_url
@@ -693,43 +678,6 @@ class LibraryMaintainer:
         #     headers={"X-Purge-Type": "kiwix-serve"},
         # )
 
-    def update_wiki(self):
-
-        logger.info(
-            f"[WIKI] Updating {self.wiki_username}@{self.wiki_domain}::{self.wiki_page}"
-        )
-
-        download_dir = self.zim_root.relative_to(self.redirects_root)
-        content = "<!-- PAGE IS GENERATED AUTOMATICALLY, DO NOT EDIT MANUALLY -->\n"
-        for entry in sorted(self.exposed_zims.values(), key=human_sort):
-            ident = without_period(entry["relpath"].stem)
-            try:
-                lang_name = get_language_details(entry["lang"])["native"]
-            except Exception:
-                lang_name = entry["lang"]
-            options = " ".join(
-                [opt.strip() for opt in entry["option"].split("_") if opt.strip()]
-            )
-            content += (
-                r"{{ZIMdumps/row|{{{2|}}}|{{{3|}}}|"
-                f"{entry['project']} ({lang_name}) | {entry['lang']} | "
-                f"{human_size(entry['rsize'])} | {entry['year']}-{entry['month']} "
-                f"| {options} |"
-                r"8={{DownloadLink|"
-                f"{ident}|"
-                r"{{{1}}}|"
-                f"{download_dir}"
-                "/}} }}\n"
-            )
-
-        logger.info(f"[WIKI] > OK. generated {len(content.splitlines()) -1 } links")
-
-        site = mwclient.Site(self.wiki_domain)
-        site.login(self.wiki_username, self.wiki_password)
-        page = site.pages[self.wiki_page]
-        page.save(content, summary="Auto update following library refresh")
-        logger.info(f"[WIKI] {self.wiki_page} updated")
-
     def run(self):
         if "all" in self.actions:
             self.actions = self.ACTIONS
@@ -763,10 +711,6 @@ class LibraryMaintainer:
 
         if "purge-varnish" in self.actions:
             self.purge_varnish()
-
-        if "update-wiki" in self.actions:
-            self.update_wiki()
-
 
 def entrypoint():
     parser = argparse.ArgumentParser(
@@ -864,34 +808,6 @@ def entrypoint():
         help="URL of the varnish cache to query for purge. Defaults to "
         f"`VARNISH_URL` environ or {Defaults.VARNISH_URL}",
         dest="varnish_url",
-    )
-    parser.add_argument(
-        "--wiki-domain",
-        default=os.getenv("WIKI_DOMAIN", Defaults.WIKI_DOMAIN),
-        help="Domain-name of the Mediawiki instance for Wiki Page update. Defaults to "
-        f"`WIKI_DOMAIN` environ or {Defaults.WIKI_DOMAIN}",
-        dest="wiki_domain",
-    )
-    parser.add_argument(
-        "--wiki-username",
-        default=os.getenv("WIKI_USERNAME", Defaults.WIKI_USERNAME),
-        help="Username to authenticate with on the Wiki to update the page. "
-        f"`Defaults to WIKI_USERNAME` environ or {Defaults.WIKI_USERNAME}",
-        dest="wiki_username",
-    )
-    parser.add_argument(
-        "--wiki-password",
-        default=os.getenv("WIKI_PASSWORD", Defaults.WIKI_PASSWORD),
-        help="Domain-name of the Mediawiki instance for Wiki Page update. Defaults to "
-        f"`WIKI_PASSWORD` environ or {Defaults.WIKI_PASSWORD}",
-        dest="wiki_password",
-    )
-    parser.add_argument(
-        "--wiki-page",
-        default=os.getenv("WIKI_PAGE", Defaults.WIKI_PAGE),
-        help="Password to authenticate with on the Wiki to update the page. "
-        f"`Defaults to WIKI_PAGE` environ or {Defaults.WIKI_PAGE}",
-        dest="wiki_page",
     )
     parser.add_argument(
         "--offspot-library",

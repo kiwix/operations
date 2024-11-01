@@ -16,17 +16,6 @@ spec:
             value: "http://library-frontend-service"
           - name: MIRRORBRAIN_URL
             value: "http://mirrorbrain-web-service"
-          - name: WIKI_DOMAIN
-            value: "wiki.kiwix.org"
-          - name: WIKI_USERNAME
-            value: "Reg@library-maint"
-          - name: WIKI_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: wiki-credentials
-                key: password
-          - name: WIKI_PAGE
-            value: "Template:ZIMdumps/content"
           volumeMounts:
           - name: kiwix-download
             subPath: library/library_zim.xml
