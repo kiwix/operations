@@ -27,7 +27,7 @@ spec:
               - name: GITHUB_REPO
                 value: openzim/zim-requests
               - name: GITHUB_ISSUE_ASSIGNEES
-                value: RavanJAltaie,Popolechien,benoit74
+                value: Popolechien,benoit74
               - name: GITHUB_ISSUE_LABELS
                 value: task
               - name: CREATE_ISSUE
