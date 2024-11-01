@@ -14,19 +14,17 @@ import os
 import pathlib
 import re
 import shutil
-import subprocess
 import sys
 import tempfile
-import unidecode
 import urllib.parse
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Any, Dict, Generator, Tuple, List
+from typing import Any, Dict, Generator, List, Tuple
 
 import requests
-from lxml import etree
+import unidecode
 from humanfriendly import format_size as human_size
-
+from lxml import etree
 from zimscraperlib.i18n import get_language_details
 from zimscraperlib.zim import Archive
 
@@ -82,9 +80,6 @@ class Defaults:
     NB_ZIM_VERSIONS_EXPOSED = 1
 
     VARNISH_URL = "http://localhost"
-
-    OFFSPOT_LIBRARY = "/data/download/library/ideascube.yml"
-    MIRRORBRAIN_URL = "http://mirrorbrain-web-service"
 
 
 def pathlib_relpath(data: Any) -> Any:
@@ -321,7 +316,6 @@ class LibraryMaintainer:
         "delete-zim",
         "write-redirects",
         "write-libraries",
-        "write-offspot",
         "purge-varnish",
     ]
 
@@ -352,8 +346,6 @@ class LibraryMaintainer:
         nb_zim_versions_to_keep: int,
         nb_zim_versions_exposed: int,
         varnish_url: str,
-        offspot_library_dest: str,
-        mirrorbrain_url: str,
         log_to: str,
         dump_fs: bool,
         load_fs: bool,
@@ -376,9 +368,6 @@ class LibraryMaintainer:
         self.nb_zim_versions_exposed = nb_zim_versions_exposed
 
         self.varnish_url = varnish_url
-
-        self.offspot_library_dest = pathlib.Path(offspot_library_dest)
-        self.mirrorbrain_url = mirrorbrain_url
 
         self.log_to = pathlib.Path(log_to) if log_to else False
         self.dump_fs = pathlib.Path(dump_fs) if dump_fs else False
@@ -629,16 +618,6 @@ class LibraryMaintainer:
             internal_zim_root=self.internal_zim_root,
         )
 
-    def write_offspot_library(self):
-        logger.info("[LIBS] Generating Offspot YAML Library")
-        env = dict(os.environ)
-        if self.mirrorbrain_url:
-            env.update({"MIRRORBRAIN_URL": self.mirrorbrain_url})
-        subprocess.run(
-            ["library-to-offspot", self.pub_library_dest, self.offspot_library_dest],
-            check=True,
-        )
-
     def purge_varnish(self):
         """Request varnish cache to expire updated Books and Paths"""
         if not self.updated_zims:
@@ -705,9 +684,6 @@ class LibraryMaintainer:
         if "write-libraries" in self.actions:
             self.write_public_library()
             self.write_internal_library()
-
-        if "write-offspot" in self.actions:
-            self.write_offspot_library()
 
         if "purge-varnish" in self.actions:
             self.purge_varnish()
@@ -808,20 +784,6 @@ def entrypoint():
         help="URL of the varnish cache to query for purge. Defaults to "
         f"`VARNISH_URL` environ or {Defaults.VARNISH_URL}",
         dest="varnish_url",
-    )
-    parser.add_argument(
-        "--offspot-library",
-        default=os.getenv("OFFSPOT_LIBRARY", Defaults.OFFSPOT_LIBRARY),
-        help="Path to (over)write Offspot's YAML Library to. "
-        f"`Defaults to OFFSPOT_LIBRARY` environ or {Defaults.OFFSPOT_LIBRARY}",
-        dest="offspot_library_dest",
-    )
-    parser.add_argument(
-        "--mirrorbrain-url",
-        default=os.getenv("MIRRORBRAIN_URL", Defaults.MIRRORBRAIN_URL),
-        help="URL to use to access mirrorbrain instead of default public on. "
-        f"`Defaults to MIRRORBRAIN_URL` environ or {Defaults.MIRRORBRAIN_URL}",
-        dest="mirrorbrain_url",
     )
 
     parser.add_argument(
