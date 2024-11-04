@@ -1,8 +1,12 @@
 ---
 # this file (in kiwix/operations repository) is the configuration
 # for the hotspot multi demos hosted at http://demo.hotspot.kiwix.org
-# It is periodically fecthed (every 15mn usually) and refreshes the multi-demo
+# It is periodically fetched (every 15mn usually) and refreshes the multi-demo
 # should it have changed.
+# Note that adding a new demo requires a manual icon upload on offspot/demo repo.
+#
+# !!! DO NOT PUSH directly ; submit a PR !!!
+#
 demos:
   - ident: preppers
     name: Preppers Package
