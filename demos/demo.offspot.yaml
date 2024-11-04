@@ -11,6 +11,9 @@ demos:
   - ident: computers
     alias: compsci
     name: Computer Science Package
+  - ident: medicine
+    alias: medical
+    name: Medical package
   - ident: wikipedia-en
     alias: wikipedia
     name: Wikipedia Package
