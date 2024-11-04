@@ -26,6 +26,7 @@ data:
   STRIPE_METHOD_ACCESS1Y: "payment"
   STRIPE_METHOD_WP: "payment"
   STRIPE_METHOD_PP: "payment"
+  STRIPE_METHOD_MD: "payment"
   STRIPE_METHOD_TED: "payment"
   STRIPE_METHOD_CS: "payment"
   STRIPE_PRICE_ACCESS1M: "price_1PCkyAFwbeEkT850KEbafpWT"
@@ -35,6 +36,7 @@ data:
   STRIPE_PRICE_WPES: "price_1Ho6CAFwbeEkT8503UK7o4TS"
   STRIPE_PRICE_WPFR: "price_1Ho6BwFwbeEkT850tNTrQi2c"
   STRIPE_PRICE_PP: "price_1Ojl2nFwbeEkT850LXg6Qxaf"
+  STRIPE_PRICE_MD: "price_1QGLrcFwbeEkT850Vw6yPkZp"
   STRIPE_PRICE_TED: "price_1Po0ZHFwbeEkT850XkZLrTgm"
   STRIPE_PRICE_CS: "price_1PNAHWFwbeEkT850aL3uk5sb"
   # debugging emails
