@@ -1,0 +1,24 @@
+name: Mirrors Check
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+  push:
+    branches:
+      - main
+
+jobs:
+
+  mirrors:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+          architecture: x64
+      - name: Install dependencies
+        run: pip install -r test-suite/requirements.txt
+      - name: Test mirrors
+        working-directory: test-suite
+        run: pytest -vvv test_mirrors.py
