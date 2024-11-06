@@ -21,3 +21,7 @@ demos: #Appear at demo.library.kiwix.org/home/name
   zims:
     - .hidden/dev/ashevillerelief.com_en_all
   expired_on: 2024-12-31
+- name: u-bourgogne # for Benoît contact there
+  zims:
+    - .hidden/dev/u-bourgogne.fr_mul_football-s
+  expired_on: 2024-12-31
