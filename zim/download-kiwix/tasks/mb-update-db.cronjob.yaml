@@ -30,6 +30,10 @@ spec:
                 subPath: mirrorbrain.conf
                 mountPath: "/etc/mirrorbrain.conf"
                 readOnly: true
+              - name: configs
+                subPath: mirrorlist_header.txt
+                mountPath: "/etc/mirrorlist_header.txt"
+                readOnly: true
               resources:
                 requests:
                   memory: "128Mi"
