@@ -50,7 +50,7 @@ data:
     # md.mirrors.hacktegic.com (Artiom Mocrenco <amocrenco@protonmail.com>) md.mirrors.hacktegic.com 185.181.228.68 2a0a:d580:802:68::68
     # mirror-sites-fr.mblibrary.info (Dr. Mamdouh Barakat <MB@mbgroup.global>) mirror-sites-fr.mblibrary.info 79.137.65.154 (+ 2 other mirrors in CA + IN, mirrored internally from this FR one)
     # ny.mirror.driftless.cc (Jim Neumann <jim@jneumann.com>) 162.249.172.160/29
-    # storage2 (temp): 135.181.224.247 2a01:4f9:3071:2d08::/64 
+    # storage2 (temp): 135.181.224.247 2a01:4f9:3071:2d08::/64
 
     [wmf.download.kiwix.org]
     # Ariel <ariel@wikimedia.org>
