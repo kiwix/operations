@@ -77,4 +77,6 @@ jobs:
           - [ ] Start compaction of Borgbase repositories manually through the UI (beware `wp1db` which needs you to stop `backup` container on `mwcurator` before to release lock)
           - [ ] Check compaction completed succesfully on all repositories (and not not forget to restart `backup` container on `mwcurator`
 
-          
+          ## Delayed task
+
+          - [ ] Review [delayed tasks](https://github.com/kiwix/operations/issues?q=is%3Aissue%20state%3Aopen%20label%3Adelayed) and act on them if expiration (set in title) is next month
