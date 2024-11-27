@@ -21,7 +21,6 @@ data:
   PLATFORM_shamela_MAX_TASKS_PER_WORKER: "1"
   PLATFORM_shamela_MAX_TASKS_TOTAL: "1"
   PLATFORM_libretexts_MAX_TASKS_PER_WORKER: "1"
-  PLATFORM_libretexts_MAX_TASKS_TOTAL: "1"
   # log and ZIM uploads. log-upload uri in secret (token inside)
   ZIM_UPLOAD_URI: "sftp://uploader@warehouse.farm.openzim.org:30122/zim"
   LOGS_EXPIRATION: "60"
