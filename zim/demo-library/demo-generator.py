@@ -271,7 +271,7 @@ def open_chmod(file: Path, mode: str = "r", chmod: int | None = None):
         file.chmod(chmod)
 
 
-logger.info(f"Downloading demo configuration…")
+logger.info("Downloading demo configuration…")
 resp = requests.get(
     assets_base_url + "demos.yaml",
     timeout=REQUESTS_TIMEOUT,
@@ -294,7 +294,7 @@ for static_file in [
         resp.raise_for_status()
         static_file.write_bytes(resp.content)
 
-logger.info(f"Preparing…")
+logger.info("Preparing…")
 zims: dict[str, ZimInfo] = {}
 
 jinja_env = Environment(
@@ -369,15 +369,19 @@ for file in demos_path.iterdir():
         continue
     shutil.rmtree(demos_path / file.name)
 
-logger.info(f"Requesting cache purge…")
-resp = requests.request(
-    method="PURGE",
-    url=varnish_cache_url,
-    headers={"X-Purge-Type": "all"},
-    timeout=REQUESTS_TIMEOUT,
-)
-if not resp.ok:
-    logger.error(f"Error while purging cache: HTTP {resp.status_code}/{resp.reason}")
+logger.info("Requesting cache purge…")
+try:
+    resp = requests.request(
+        method="PURGE",
+        url=varnish_cache_url,
+        headers={"X-Purge-Type": "all"},
+        timeout=REQUESTS_TIMEOUT,
+    )
+    if not resp.ok:
+        logger.error(
+            f"Error while purging cache: HTTP {resp.status_code}/{resp.reason}"
+        )
+except Exception as exc:
+    logger.error("Error while purging cache", exc_info=exc)
 
-
-logger.info(f"Done.")
+logger.info("Done.")
