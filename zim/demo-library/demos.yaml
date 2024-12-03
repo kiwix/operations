@@ -2,7 +2,7 @@ demos: #Appear at demo.library.kiwix.org/home/name
 - name: benoit
   zims:
     - ted/ted_mul_all
-  expired_on: 2024-08-14
+  expired_on: 2024-12-31
 # - name: orange #naem is case-sensitive
 #   zims: #no limit on number of zims listed
 #     # - videos/deus-ex-silicium_fr_all Files are at mirror.download.kiwix.org/zim/.hidden This particular link however points to a PROD file
