@@ -32,7 +32,6 @@ spec:
                 optional: false
         volumeMounts:
         - name: data-volume
-          subPath: dev
           mountPath: "/data"
           readOnly: false
         ports:
@@ -44,9 +43,9 @@ spec:
       volumes:
       - name: data-volume
         persistentVolumeClaim:
-          claimName: kiwix-download-pvc
+          claimName: dev-drive-pvc
       nodeSelector:
-        k8s.kiwix.org/role: "storage"
+        k8s.kiwix.org/role: "services"
 ---
 apiVersion: v1
 kind: Service
