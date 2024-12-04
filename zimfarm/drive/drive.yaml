@@ -45,7 +45,7 @@ spec:
         persistentVolumeClaim:
           claimName: drive-local-pvc
       nodeSelector:
-        k8s.kiwix.org/role: "storage"
+        k8s.kiwix.org/role: "services"
 ---
 apiVersion: v1
 kind: Service

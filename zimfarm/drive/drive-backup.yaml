@@ -42,4 +42,4 @@ spec:
               claimName: drive-local-pvc
           restartPolicy: Never
           nodeSelector:
-            k8s.kiwix.org/role: "storage"
+            k8s.kiwix.org/role: "services"

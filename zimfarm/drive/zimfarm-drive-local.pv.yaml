@@ -22,4 +22,4 @@ spec:
             - key: k8s.kiwix.org/role
               operator: In
               values:
-              - storage
+              - services
