@@ -30,6 +30,9 @@ COMPRESSABLE_OPDS_ENDPOINTS = {
     for endpoint, mime in OPDS_ENDPOINTS.items()
     if mime != "application/opensearchdescription+xml"
 }
+# https://github.com/kiwix/libkiwix/blob/main/src/server/response.cpp#L47
+KIWIX_MIN_CONTENT_SIZE_TO_COMPRESS = 1400
+
 
 
 def get_url(

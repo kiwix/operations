@@ -4,6 +4,7 @@ import pytest
 import requests
 from utils import (
     COMPRESSABLE_OPDS_ENDPOINTS,
+    KIWIX_MIN_CONTENT_SIZE_TO_COMPRESS,
     OPDS_ENDPOINTS,
     SCHEMES,
     TIMEOUT,
@@ -28,7 +29,26 @@ def test_opds_mimetypes(path, mimetype):
 
 @pytest.mark.parametrize("path", COMPRESSABLE_OPDS_ENDPOINTS.keys())
 def test_opds_is_gzipped(path):
-    assert get_response_headers(path, method="GET").get("Content-Encoding") == "gzip"
+    resp = requests.request(
+        method="GET",
+        url=get_url(path=path),
+        headers={"Accept-Encoding": "gzip, deflate, br"},
+        timeout=TIMEOUT,
+    )
+    encoding = resp.headers.get("Content-Encoding")
+    content_len = int(resp.headers.get("Content-Length", ""))
+    expected_encoding = "gzip"
+    # compression is conditionnaly applied server-side based on the actual content
+    # size which we dont know from the headers.
+    # in case compressed-content (content-length) is smaller than server threshold
+    # we download content to check if its size is actually lower and only in this
+    # case there should be no compression
+    if (
+        content_len <= KIWIX_MIN_CONTENT_SIZE_TO_COMPRESS
+        and len(resp.content) <= KIWIX_MIN_CONTENT_SIZE_TO_COMPRESS
+    ):
+        expected_encoding = None
+    assert encoding == expected_encoding
 
 
 @pytest.mark.varnish
