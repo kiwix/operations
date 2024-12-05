@@ -4,6 +4,8 @@ metadata:
   name: api-configs
   namespace: cardshop
 data:
+  # set to `y` to disable periodic-tasks (autoimages, etc)
+  DISABLE_PERIODIC_TASKS: "n"
   # previous hosting (sloppy) required different internal-usage URL
   CARDSHOP_API_INTERNAL_URL: "https://api.imager.kiwix.org"
   CARDSHOP_API_URL: "https://api.imager.kiwix.org"
