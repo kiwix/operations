@@ -1,20 +1,20 @@
-demos: #Appear at demo.library.kiwix.org/home/name
-- name: benoit
-  zims:
-    - ted/ted_mul_all
-  expired_on: 2024-12-31
-# - name: orange #naem is case-sensitive
-#   zims: #no limit on number of zims listed
+demos: # Appear at demo.library.kiwix.org/home/name
+# - name: benoit
+#   zims:
+#     - ted/ted_mul_all
+#   expired_on: 2024-11-31
+# - name: orange # name is case-sensitive
+#   zims: # no limit on number of zims listed
 #     # - videos/deus-ex-silicium_fr_all Files are at mirror.download.kiwix.org/zim/.hidden This particular link however points to a PROD file
 #     - .hidden/dev/hansard-botswana_en #Removing the _date.zim allows automatic update. Removing .zim only does not work
 #     - .hidden/dev/Bundesministerium_fuer_Inneres_2024-07.zim 
-#   expired_on: 2025-01-01  #Always set a date, even if far in the future. Expires at 00:01 on d day 
-# - name: opennet
-#   zims:
-#     - zimit/radiozamaneh-com_far_all
-#     - zimit/hra-news.org_far_all
-#     - zimit/iranwire-com_far_all
-#   expired_on: 2025-01-01
+#   expired_on: 2025-01-01  # Always set a date, even if far in the future. Expires at 00:01 on d day 
+- name: opennet
+  zims:
+    - zimit/radiozamaneh-com_far_all
+    - zimit/hra-news.org_far_all
+    - zimit/iranwire-com_far_all
+  expired_on: 2025-01-01
 # - name: asheville 
 #   zims:
 #     - .hidden/dev/ashevillerelief.com_en_all
