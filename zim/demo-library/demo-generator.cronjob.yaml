@@ -19,7 +19,7 @@ spec:
               imagePullPolicy: Always
               env:
               - name: INSTALL_SCRIPTS
-                value: "demo-generator#github://kiwix/k8s/zim/demo-library/demo-generator.py\n"
+                value: "demo-generator#github://kiwix/operations/zim/demo-library/demo-generator.py\n"
               volumeMounts:
               - mountPath: "/data/demo"
                 subPath: demo

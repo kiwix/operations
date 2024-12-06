@@ -190,7 +190,7 @@ def get_ziminfo(zim_archive: str) -> ZimInfo:
 
     values = filename_match.groupdict()
 
-    donwload_url = (
+    download_url = (
         f"https://mirror.download.kiwix.org/zim/.hidden/{zim_path.relative_to(base_path)}"
         if is_hidden
         else f"https://download.kiwix.org/zim/{zim_path.relative_to(base_path)}"
@@ -205,7 +205,8 @@ def get_ziminfo(zim_archive: str) -> ZimInfo:
             "core": zim_path.stem,
             "rsize": zim_path.stat().st_size,
             "size": str(int(zim_path.stat().st_size / 1024)),
-            "url": str(f"{donwload_url}.meta4"),
+            "url": str(f"{download_url}.meta4"),
+            "download_url": download_url,
         }
     )
 

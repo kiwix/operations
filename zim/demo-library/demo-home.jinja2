@@ -61,16 +61,25 @@
                         <th>Lang(s)</th>
                         <th>Tag(s)</th>
                         <th>Size</th>
+                        <th>Articles</th>
+                        <th>Medias</th>
+                        <th>Links</th>
                     </tr>
                 </thead>
                 {% for zim in zims %}
                 <tr>
                     <td><img src="../favicons/{{zim["id"]}}.png"></td>
-                    <td><a href="/viewer#{{zim["name"]}}">{{zim["title"]}}</a></td>
+                    <td><{{zim["title"]}}</td>
                     <td>{{zim["description"]}}</td>
                     <td>{{zim["language"]}}</td>
                     <td>{{zim["tags"]}}</td>
                     <td>{{zim["rsize"] | human_size}}</td>
+                    <td>{{zim["articleCount"]}}</td>
+                    <td>{{zim["mediaCount"]}}</td>
+                    <td>
+                        <p><a href="/viewer#{{zim["name"]}}">View online</a></p>
+                        <p><a href="{{zim["download_url"]}}">Download</a></p>
+                    </td>
                 </tr>
                 {% endfor %}
             </table>
