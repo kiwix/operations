@@ -5,7 +5,7 @@ metadata:
   namespace: zimfarm
 data:
   # comment-out to enable scheduler
-  DISABLE_SCHEDULER: "1"
+  # DISABLE_SCHEDULER: "1"
   # mail-sending, API-key in secret
   MAILGUN_API_URL: "https://api.mailgun.net/v3/mg.farm.openzim.org"
   MAILGUN_FROM: "Zimfarm <info@farm.openzim.org>"
