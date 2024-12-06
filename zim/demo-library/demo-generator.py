@@ -286,14 +286,13 @@ for static_file in [
     demo_dead_kiwix_png,
     demo_home_tmpl_path,
 ]:
-    if not static_file.exists():
-        logger.info(f"Downloading {static_file.name}…")
-        resp = requests.get(
-            assets_base_url + static_file.name,
-            timeout=REQUESTS_TIMEOUT,
-        )
-        resp.raise_for_status()
-        static_file.write_bytes(resp.content)
+    logger.info(f"Downloading {static_file.name}…")
+    resp = requests.get(
+        assets_base_url + static_file.name,
+        timeout=REQUESTS_TIMEOUT,
+    )
+    resp.raise_for_status()
+    static_file.write_bytes(resp.content)
 
 logger.info("Preparing…")
 zims: dict[str, ZimInfo] = {}
