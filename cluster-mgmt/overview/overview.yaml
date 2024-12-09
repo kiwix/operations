@@ -17,7 +17,7 @@ spec:
     spec:
       serviceAccountName: cluster-viewer
       containers:
-      - image: ghcr.io/rgaudin/debian:dev
+      - image: ghcr.io/kiwix/maintenance:latest
         imagePullPolicy: Always
         name: script
         # regen every 5mn

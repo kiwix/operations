@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: debian
-          image: ghcr.io/rgaudin/debian:dev
+          image: ghcr.io/kiwix/maintenance:latest
           imagePullPolicy: Always
           env:
           - name: ZIM_PATH
