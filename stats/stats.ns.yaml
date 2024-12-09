@@ -4,4 +4,4 @@ metadata:
   name: stats
   annotations:
     k8s.kiwix.org/client: https://github.com/kelson42
-    k8s.kiwix.org/source_repo: https://github.com/kiwix/k8s
+    k8s.kiwix.org/source_repo: https://github.com/kiwix/operations

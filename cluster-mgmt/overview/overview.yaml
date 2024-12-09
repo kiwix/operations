@@ -24,7 +24,7 @@ spec:
         args: ["sh", "-c", "while true; do startup; sleep 300; done"]
         env:
           - name: INSTALL_SCRIPTS
-            value: "startup#github://kiwix/k8s/cluster-mgmt/overview/build-overview.py"
+            value: "startup#github://kiwix/operations/cluster-mgmt/overview/build-overview.py"
           - name: OVERVIEW_DEST
             value: "/usr/share/nginx/html"
         volumeMounts:

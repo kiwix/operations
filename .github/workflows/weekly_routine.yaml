@@ -45,7 +45,7 @@ jobs:
         sys.exit(0)
       env:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        REPO: kiwix/k8s
+        REPO: kiwix/operations
         LABELS: maint
         ASSIGNEES: rgaudin,benoit74
         ISSUE_BODY: |
@@ -88,7 +88,7 @@ jobs:
           curl -s -H "X-Auth-Token: $SCW_SECRET_KEY" https://api.scaleway.com/k8s/v1/regions/fr-par/clusters/$KIWIX_PROD_CLUSTER | jq ".version,.upgrade_available"
           curl -s -H "X-Auth-Token: $SCW_SECRET_KEY" https://api.scaleway.com/k8s/v1/regions/fr-par/versions | jq ".versions[].name"
           ```
-          - [ ] [Upgrade k8s](https://github.com/kiwix/k8s/wiki/Cluster-Setup#upgrading-kubernetes) if applicable/possible
+          - [ ] [Upgrade k8s](https://github.com/kiwix/operations/wiki/Cluster-Setup#upgrading-kubernetes) if applicable/possible
 
           ## Stats
 

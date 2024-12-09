@@ -45,7 +45,7 @@ jobs:
         sys.exit(0)
       env:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        REPO: kiwix/k8s
+        REPO: kiwix/operations
         LABELS: maint
         ASSIGNEES: rgaudin,benoit74
         ISSUE_BODY: |

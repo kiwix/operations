@@ -20,7 +20,7 @@ spec:
           - name: ZIM_PATH
             value: "/data"
           - name: INSTALL_SCRIPTS
-            value: "startup#github://kiwix/k8s/debug/debug-startup.sh\n"
+            value: "startup#github://kiwix/operations/debug/debug-startup.sh\n"
           volumeMounts:
           - name: debug-files
             mountPath: "/data"
