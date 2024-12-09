@@ -441,8 +441,8 @@ class LibraryMaintainer:
         entry.update(
             {
                 "id": str(zim.uuid),
-                "mediaCount": str(zim.media_counter),
-                "articleCount": str(zim.article_counter),
+                "mediaCount": str(zim.media_count),
+                "articleCount": str(zim.article_count),
             }
         )
 
