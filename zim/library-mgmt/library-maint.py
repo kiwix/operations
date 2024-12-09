@@ -198,9 +198,16 @@ def get_zim_files(
     Optionnaly includes ZIM files in hidden folders (not hidden ZIMs!)"""
 
     def excluded_filter(fp: pathlib.Path) -> bool:
-        """excludes both special patterns and hidden files"""
-        return not fp.name.startswith("speedtest_") and (
-            not fp.name.startswith(".") or fp.name == "."
+        """excludes files not to consider
+
+        - special patterns
+        - hidden files
+        - files marked for deletion with .delete suffix
+        """
+        return (
+            not fp.name.startswith("speedtest_")
+            and (not fp.name.startswith(".") or fp.name == ".")
+            and (len(fp.name) == 0 or not fp.with_suffix(".delete").exists())
         )
 
     if with_hidden:  # faster than os.walk in this case
@@ -687,6 +694,7 @@ class LibraryMaintainer:
 
         if "purge-varnish" in self.actions:
             self.purge_varnish()
+
 
 def entrypoint():
     parser = argparse.ArgumentParser(
