@@ -19,7 +19,6 @@ spec:
               imagePullPolicy: Always
               volumeMounts:
               - name: data-volume
-                subPath: dev
                 mountPath: "/storage"
                 readOnly: true
               envFrom:
@@ -40,7 +39,7 @@ spec:
           volumes:
           - name: data-volume
             persistentVolumeClaim:
-              claimName: kiwix-download-pvc
+              claimName: dev-drive-pvc
           restartPolicy: Never
           nodeSelector:
-            k8s.kiwix.org/role: "storage"
+            k8s.kiwix.org/role: "services"
