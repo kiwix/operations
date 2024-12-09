@@ -20,7 +20,7 @@ spec:
               name: jobrunner
               env:
               - name: INSTALL_SCRIPTS
-                value: github://kiwix/k8s/zim/tmp-kiwix/cleanup-old-files.py
+                value: github://kiwix/operations/zim/tmp-kiwix/cleanup-old-files.py
               volumeMounts:
               - mountPath: "/data/tmp"
                 name: tmp-kiwix-volume

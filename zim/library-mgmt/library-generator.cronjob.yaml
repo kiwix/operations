@@ -19,7 +19,7 @@ spec:
               imagePullPolicy: Always
               env:
               - name: INSTALL_SCRIPTS
-                value: "library-maint#github://kiwix/k8s/zim/library-mgmt/library-maint.py"
+                value: "library-maint#github://kiwix/operations/zim/library-mgmt/library-maint.py"
               - name: VARNISH_URL
                 value: "http://library-frontend-service"
               - name: MIRRORBRAIN_URL
