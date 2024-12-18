@@ -16,7 +16,7 @@ spec:
         app: dev-library-app
     spec:
       containers:
-      - image: ghcr.io/rgaudin/kiwix-tools:nightly
+      - image: ghcr.io/kiwix/kiwix-tools-nightly:latest
         imagePullPolicy: Always
         command: ["kiwix-serve", "-b", "--library", "--monitorLibrary", "--searchLimit", "5", "/library/dev_library.xml"]
         name: kiwix-tools
