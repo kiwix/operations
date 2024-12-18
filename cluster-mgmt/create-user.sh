@@ -8,7 +8,7 @@ GROUPNAME=$3
 CLUSTERURL=https://api.scw.k8s.kiwix.org:6443
 NAMESPACE="${NAMESPACE:=default}"
 GROUPNAME="${GROUPNAME:=users}"  # users | gh-bots
-YEAR=$(date +"%Y")  # distinct files over the years
+YEAR="${YEAR:-$(date +"%Y")}"  # distinct files over the years
 ### CONFIG-END
 
 
@@ -17,7 +17,7 @@ if [ -z "$USERNAME" ] ; then
   exit 1
 fi
 
-read -r -n 1 -p "Ready for User creation with username=${USERNAME}, namespace=${NAMESPACE}, groupname=${GROUPNAME}. OK ? ^C if not. "
+read -r -n 1 -p "Ready for User creation with username=${USERNAME}, YEAR=${YEAR} namespace=${NAMESPACE}, groupname=${GROUPNAME}. OK ? ^C if not. "
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 CA_CERT="${SCRIPT_DIR}/users/ca.crt"
