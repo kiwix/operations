@@ -18,10 +18,10 @@ spec:
         app: ftpd-app
     spec:
       containers:
-      - image: docker.io/gimoh/pureftpd:latest
+      - image: ghcr.io/kiwix/ftpd:latest
         imagePullPolicy: IfNotPresent
         name: pureftpd
-        command: ["/usr/sbin/pure-ftpd", "-4", "-p", "2000:2050", "-c", "25", "-P", "master.download.kiwix.org", "-S", "0.0.0.0,21"]
+        command: ["/usr/sbin/pure-ftpd", "-4", "-p", "2000:2050", "-S", "0.0.0.0,21", "-P", "master.download.kiwix.org"]
         volumeMounts:
         - mountPath: "/var/lib/ftp"
           name: download-volume
