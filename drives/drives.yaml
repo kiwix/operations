@@ -19,6 +19,9 @@ spec:
       - image: docker.io/machines/filestash:latest
         imagePullPolicy: IfNotPresent
         name: filestash
+        env:
+          - name: "CANARY"
+            value: "true"
         ports:
         - containerPort: 8334
         volumeMounts:
