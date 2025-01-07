@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: db-backup
+  namespace: website
+spec:
+  schedule: "@daily"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            - name: borg-backup
+              image: ghcr.io/kiwix/borg-backup:latest
+              imagePullPolicy: Always
+              env:
+                # not secret, dedicated read-only user, only reachable on localhost (cyon) and whitelisted IP
+                - name: "DATABASES"
+                  value: "mysql://kiwixorg_backup:B9GRXwd8(kC+hV@s022.cyon.net:3306/kiwixorg_web2023"
+                - name: "BORGBASE_NAME"
+                  value: "website-wordpress-db"
+                - name: "BITWARDEN_EMAIL"
+                  value: "contact+bitwarden-slave@kiwix.org"
+              envFrom:
+              - secretRef:
+                  name: backup-credentials
+              command: ["single-backup"]
+              resources:
+                requests:
+                  cpu: 200m
+                  memory: 384Mi
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "services"
