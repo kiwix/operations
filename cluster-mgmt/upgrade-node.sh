@@ -32,8 +32,8 @@ function download_kube {
   fi
 
   # get kubelet and kubectl
-  curl -L "https://storage.googleapis.com/kubernetes-release/release/v${kubernetes_version}/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl-new
-  curl -L "https://storage.googleapis.com/kubernetes-release/release/v${kubernetes_version}/bin/linux/amd64/kubelet" -o /usr/local/bin/kubelet-new
+  curl -Lf "https://dl.k8s.io/release/v${kubernetes_version}/bin/linux/amd64/kubectl" -o /usr/local/bin/kubectl-new
+  curl -Lf "https://dl.k8s.io/release/v${kubernetes_version}/bin/linux/amd64/kubelet" -o /usr/local/bin/kubelet-new
   chmod +x /usr/local/bin/kubelet-new /usr/local/bin/kubectl-new
 }
 
