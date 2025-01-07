@@ -49,7 +49,7 @@ logs:
 kube-state-metrics:
   enabled: true
   image:
-    tag: v2.13.0
+    tag: v2.14.0
 
 prometheus-node-exporter:
   enabled: true
