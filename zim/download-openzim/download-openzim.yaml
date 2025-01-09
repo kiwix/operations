@@ -33,7 +33,7 @@ data:
       location / {
         if ($redirect_uri) {
           add_header Cache-Control "no-store, no-cache, must-revalidate";
-          rewrite ^ $redirect_uri permanent;
+          rewrite ^ https://$host$redirect_uri permanent;
         }
       }
     }

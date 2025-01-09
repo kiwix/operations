@@ -19,6 +19,7 @@ EXCLUDED_MIRRORS: list[str] = [
 PERMANENT_ZIM_URL: str = "https://download.kiwix.org/zim/wikipedia_he_all_maxi.zim"
 # all non-zim-only mirrors mirror all other files
 PERMANENT_APK_URL: str = "https://download.kiwix.org/release/kiwix-android/kiwix.apk"
+
 # we have no other way to know which mirrors are supposed to have APKs
 # taken from https://github.com/kiwix/container-images
 #            /blob/main/mirrorbrain/bin/update_mirrorbrain_db.sh
@@ -42,6 +43,18 @@ APK_MIRRORS: list[Mirror] = [
     mirror for mirror in ZIM_MIRRORS if mirror.hostname in EXPECTED_APK_MIRRORS
 ]
 APK_MIRRORS_IDS: list[str] = [mirror.hostname for mirror in APK_MIRRORS]
+PERMANENT_KIWIX_RELEASE_URL: str = (
+    "https://download.kiwix.org/release/kiwix-tools/kiwix-tools_linux-x86_64.tar.gz"
+)
+PERMANENT_KIWIX_NIGHTLY_URL: str = (
+    "https://download.kiwix.org/nightly/kiwix-tools_linux-x86_64.tar.gz"
+)
+PERMANENT_OPENZIM_RELEASE_URL: str = (
+    "https://download.openzim.org/release/libzim/libzim.tar.xz"
+)
+PERMANENT_OPENZIM_NIGHTLY_URL: str = (
+    "https://download.kiwix.org/nightly/libzim_linux-x86_64.tar.gz"
+)
 
 
 @pytest.fixture(scope="session")

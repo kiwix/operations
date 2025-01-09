@@ -1,5 +1,5 @@
 from http import HTTPStatus
-from urllib.parse import urljoin
+from urllib.parse import urljoin, urlparse
 
 import pytest
 import requests
@@ -7,10 +7,45 @@ from conftest import (
     APK_MIRRORS,
     APK_MIRRORS_IDS,
     EXPECTED_APK_MIRRORS,
+    PERMANENT_KIWIX_NIGHTLY_URL,
+    PERMANENT_KIWIX_RELEASE_URL,
+    PERMANENT_OPENZIM_NIGHTLY_URL,
+    PERMANENT_OPENZIM_RELEASE_URL,
+    PERMANENT_ZIM_URL,
     ZIM_MIRRORS,
     ZIM_MIRRORS_IDS,
 )
 from utils import TIMEOUT, Mirror
+
+
+def no_http_transit_for(url: str) -> bool:
+    resp = requests.head(url, allow_redirects=True, timeout=TIMEOUT)
+    if urlparse(resp.url).scheme != "https":
+        return False
+    for sub_resp in resp.history:
+        if urlparse(sub_resp.url).scheme != "https":
+            return False
+    return True
+
+
+def test_kiwix_release_map():
+    assert no_http_transit_for(PERMANENT_KIWIX_RELEASE_URL)
+
+
+def test_kiwix_nightly_map():
+    assert no_http_transit_for(PERMANENT_KIWIX_NIGHTLY_URL)
+
+
+def test_kiwix_zim_map():
+    assert no_http_transit_for(PERMANENT_ZIM_URL)
+
+
+def test_openzim_release_map():
+    assert no_http_transit_for(PERMANENT_OPENZIM_RELEASE_URL)
+
+
+def test_openzim_nightly_map():
+    assert no_http_transit_for(PERMANENT_OPENZIM_NIGHTLY_URL)
 
 
 def test_mirrors_list_reachable(mirrors_list_url):

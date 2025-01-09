@@ -737,15 +737,15 @@ data:
 
          RewriteMap releases-map "txt:/data/maps/kiwix-releases.map"
          RewriteCond ${releases-map:$1} !=""
-         RewriteRule ^(.*)$ ${releases-map:$1} [last,redirect=301,E=NOCACHE:1]
+         RewriteRule ^(.*)$ "https://%{HTTP_HOST}${releases-map:$1}" [last,redirect=301,E=NOCACHE:1]
 
          RewriteMap zim-map "txt:/data/maps/zim.map"
          RewriteCond ${zim-map:$1} !=""
-         RewriteRule ^(.*)$ ${zim-map:$1} [last,redirect=301,E=NOCACHE:1]
+         RewriteRule ^(.*)$ "https://%{HTTP_HOST}${zim-map:$1}" [last,redirect=301,E=NOCACHE:1]
 
          RewriteMap nightly-map "txt:/data/maps/kiwix-nightly.map"
          RewriteCond ${nightly-map:$1} !=""
-         RewriteRule ^(.*)$ ${nightly-map:$1} [last,redirect=301,E=NOCACHE:1]
+         RewriteRule ^(.*)$ "https://%{HTTP_HOST}${nightly-map:$1}" [last,redirect=301,E=NOCACHE:1]
 
          Header always set Cache-Control "no-store, no-cache, must-revalidate" env=NOCACHE
       </IfModule>
