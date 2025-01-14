@@ -190,6 +190,8 @@ data:
 
         print(f"Rewriting {redirects_map_fpath}...")
         content = "# releases redirects: no-version to latest\n"
+        if is_nginx:
+            content += "# this file is reloaded by nginx thanks to reload-nginx.sh, scheduled hourly at 10mins\n"
         for path, pattern in releases.items():
             content += f"/{release_dir}/{path} /{get_latest_release_path(pattern)}{eol}\n"
 
@@ -207,6 +209,8 @@ data:
             raise IOError(f"nightly folder {nightly_fpath} does not exist.")
 
         content = "# nightly redirects: path -> date/path\n"
+        if is_nginx:
+            content += "# this file is reloaded by nginx thanks to reload-nginx.sh, scheduled hourly at 10mins\n"
         ordered_folders = [
             nightly_fpath / d.strftime("%Y-%m-%d")
             for d in sorted(
@@ -355,6 +359,8 @@ data:
     fi
 
     cat /dev/null > $WP1_MAP
+    echo "# redirect from name without date to last name with date, e.g. enwiki => enwiki_2025-01" >> $WP1_MAP
+    echo "# this file is reloaded by nginx thanks to reload-nginx.sh, scheduled hourly at 10mins" >> $WP1_MAP
     cd $WP1_DIR
     for TARGET in $(find . -mindepth 1 -maxdepth 1 -type d | sed -e 's/.\///' | sort -r)
     do
