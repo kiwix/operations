@@ -11,3 +11,4 @@ spec:
   commonName: api.donation.kiwix.org
   dnsNames:
   - api.donation.kiwix.org
+  renewBefore: 744h # 31d, to escape Apple reminders
