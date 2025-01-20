@@ -100,10 +100,13 @@ spec:
         app: rsyncd-app
     spec:
       containers:
-      - image: docker.io/vimagick/rsyncd:latest
+      # this image is not tagged other than latest.
+      # at time of this SHA, it includes alpine 3.21.1
+      # with patched version 3.4.0 of rsync
+      - image: docker.io/alpinelinux/rsyncd@sha256:1f6d1953386bb0149a999c9b14fa171e6d340bb68fc61c82a955fabbfe102f77
         imagePullPolicy: IfNotPresent
         name: rsyncd
-        command: ["rsync", "--daemon", "--no-detach", "--log-file", "/dev/stdout"]
+        command: ["rsync", "--daemon", "--no-detach", "--log-file", "/dev/stdout", "--config", "/etc/rsyncd.conf"]
         securityContext:
           capabilities:
             add:
