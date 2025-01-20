@@ -17,19 +17,19 @@ demos: # Appear at demo.library.kiwix.org/home/name
   expired_on: 2025-01-01
 - name: libretexts
   zims:
-    - .hidden/dev/libretexts.org_en_bio
-    - .hidden/dev/libretexts.org_en_biz
-    - .hidden/dev/libretexts.org_en_chem
-    - .hidden/dev/libretexts.org_en_eng
-    - .hidden/dev/libretexts.org_en_geo
-    - .hidden/dev/libretexts.org_en_human
-    - .hidden/dev/libretexts.org_en_k12
-    - .hidden/dev/libretexts.org_en_math
-    - .hidden/dev/libretexts.org_en_med
-    - .hidden/dev/libretexts.org_en_phys
-    - .hidden/dev/libretexts.org_en_socialsci
-    - .hidden/dev/libretexts.org_en_stats
-    - .hidden/dev/libretexts.org_en_workforce
+    - libretexts/libretexts.org_en_bio
+    - libretexts/libretexts.org_en_biz
+    - libretexts/libretexts.org_en_chem
+    - libretexts/libretexts.org_en_eng
+    - libretexts/libretexts.org_en_geo
+    - libretexts/libretexts.org_en_human
+    - libretexts/libretexts.org_en_k12
+    - libretexts/libretexts.org_en_math
+    - libretexts/libretexts.org_en_med
+    - libretexts/libretexts.org_en_phys
+    - libretexts/libretexts.org_en_socialsci
+    - libretexts/libretexts.org_en_stats
+    - libretexts/libretexts.org_en_workforce
   expired_on: 2025-02-01
 # - name: asheville 
 #   zims:
