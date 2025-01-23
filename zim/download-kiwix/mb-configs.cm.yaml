@@ -679,15 +679,18 @@ data:
       Alias /static/ /var/www/static/
 
       MirrorBrainMetalinkPublisher "Kiwix project" https://kiwix.org
-      MirrorBrainTorrentTrackerURL "http://tracker.openzim.org:6969/announce"
+      MirrorBrainTorrentTrackerURL "https://tracker.openzim.org/announce"
       MirrorBrainTorrentTrackerURL "udp://tracker.openzim.org:6969/announce"
       # MirrorBrainTorrentTrackerURL "https://opentracker.xyz:443/announce"
       # MirrorBrainTorrentTrackerURL "http://torrent.nwps.ws:80/announce"
       # MirrorBrainTorrentTrackerURL "udp://tracker.open-internet.nl:6969/announce"
       # MirrorBrainTorrentTrackerURL "udp://tracker.coppersurfer.tk:6969/announce"
       # MirrorBrainTorrentTrackerURL "udp://tracker.openbittorrent.com:80/announce"
+      MirrorBrainDHTNode dht.libtorrent.org 25401
+      MirrorBrainDHTNode dht.transmissionbt.com 6881
       MirrorBrainDHTNode router.bittorrent.com 6881
       MirrorBrainDHTNode router.utorrent.com 6881
+      MirrorBrainDHTNode dht.aelitis.com 6881
 
       <IfModule mod_expires.c>
          ExpiresActive On
