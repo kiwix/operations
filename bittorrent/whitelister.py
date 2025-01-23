@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 """ forever-tunning script whitelisting Kiwix Catalog ZIM torrents in the Tracker
 
     - Connects to torrust-based Tracker API
