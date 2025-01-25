@@ -1,0 +1,146 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: index-configs
+  namespace: bittorrent
+data:
+  index.toml: |
+    # Configuration metadata.
+    [metadata]
+    app = "torrust-index"
+    purpose = "configuration"
+    schema_version = "2.0.0"
+
+    # The logging configuration.
+    [logging]
+    # Logging level. Possible values are: Off, Error, Warn, Info, Debug, Trace.
+    threshold = "info"
+
+    # The website customizable values.
+    [website]
+    # The name of the website.
+    name = "Kiwix Tracker"
+
+    # [website.demo]
+    # # The fixed message to show when the index is running in demo mode.
+    # warning = "this is running in demo mode"
+
+    # The legal information.
+    [website.terms.page]
+    # The terms page title.
+    title = "Terms & Conditions"
+    # The terms page content.
+    content = "## Terms"
+
+    # The upload agreement info.
+    [website.terms.upload]
+    # The terms page content.
+    content_upload_agreement = "# Upload Agreement"
+
+    # The tracker configuration.
+    [tracker]
+    # The url of the tracker API. For example: http://localhost:1212/.
+    api_url = "http://api-service"
+    # Whether the tracker is running in listed mode or not.
+    listed = true
+    # Whether the tracker is running in private mode or not.
+    private = false
+    # The token used to authenticate with the tracker API.
+    token = "admin-token"
+    # The amount of seconds the tracker API token is valid.
+    token_valid_seconds = 86400
+    # Connection string for the tracker. For example: udp://TRACKER_IP:6969.
+    url = "https://tracker.openzim.org/announce"
+
+    # The network configuration.
+    [net]
+    # The base URL for the API. For example: http://localhost. If not set, the base URL will be inferred from the request.
+    base_url = "https://torrents.kiwix.org"
+    # The address the tracker will bind to. The format is ip:port, for example 0.0.0.0:6969. If you want to listen to all interfaces, use 0.0.0.0. If you want the operating system to choose a random port, use port 0.
+    bind_address = "0.0.0.0:8080"
+
+    # # TSL configuration.
+    # [net.tsl]
+    # # Path to the SSL certificate file.
+    # ssl_cert_path = "/etc/ssl/certs/api.cert"
+    # # Path to the SSL key file.
+    # ssl_key_path = "/etc/ssl/certs/api.key"
+
+    # The authentication configuration.
+    [auth]
+    # The secret key used to sign JWT tokens.
+    user_claim_token_pepper = "DoesNotMatterWithoutAuth"
+
+    # The password constraints
+    [auth.password_constraints]
+    # The maximum password length.
+    max_password_length = 24
+    # The minimum password length.
+    min_password_length = 8
+
+    # The database configuration.
+    [database]
+    # The connection URL for the database. For example:
+    # Sqlite: sqlite://data.db?mode=rwc. Mysql: mysql://root:root_secret_password@mysql:3306/torrust_index_e2e_testing.
+    connect_url = "sqlite:///data/sqlite3.db?mode=rwc"
+
+    # The email address to send emails from.
+    [mail.from]
+    # The name associated with the address.
+    name = "Kiwix Torrents"
+    # The email address itself.
+    email = "contact+torrents@kiwix.org"
+
+    # The email address to reply to.
+    [mail.reply_to]
+    # The name associated with the address.
+    name = "Kiwix Torrents"
+    # The email address itself.
+    email = "contact+torrents@kiwix.org"
+
+    [mail.smtp]
+    # The SMTP port to use.
+    port = 25
+    # The SMTP server to use.
+    server = "localhost"
+
+    # The SMTP server credentials.
+    [mail.smtp.credentials]
+    # The password to use for SMTP authentication.
+    password = "password"
+    # The username to use for SMTP authentication.
+    username = "username"
+
+    # The image proxy cache configuration.
+    [image_cache]
+    # Cache size in bytes.
+    capacity = 1024
+    # Maximum size in bytes for a single image.
+    entry_size_limit = 1024
+    # Maximum time in seconds to wait for downloading the image form the original source.
+    max_request_timeout_ms = 30
+    # Users have a cache quota per period. For example: 100MB per day. This is the maximum size in bytes (100MB in bytes).
+    user_quota_bytes = 1024
+    # Users have a cache quota per period. For example: 100MB per day. This is the period in seconds (1 day in seconds).
+    user_quota_period_seconds = 600
+
+    # The API configuration.
+    [api]
+    # The default page size for torrent lists.
+    default_torrent_page_size = 50
+    # The maximum page size for torrent lists.
+    max_torrent_page_size = 50
+
+    # The registration configuration.
+    [registration.email]
+    # Whether or not email is required on signup.
+    required = false
+    # Whether or not email is verified.
+    verification_required = false
+
+    # The tracker statistics importer job configuration.
+    [tracker_statistics_importer]
+    # The port the Importer API is listening on. Default to 3002.
+    port = 3002
+    # The interval in seconds to get statistics from the tracker.
+    torrent_info_update_interval = 60

@@ -180,9 +180,7 @@ def contact_api() -> int:
     for _ in range(0, int(API_STARTUP_DURATION)):
         try:
             resp = session.get(
-                f"{API_URL}/stats",
-                params={"token": TOKEN, "offset": 0, "limit": 1},
-                timeout=TIMEOUT,
+                f"{API_URL}/stats", params={"token": TOKEN}, timeout=TIMEOUT
             )
             resp.raise_for_status()
             return resp.json()["torrents"]

@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: tracker-openzim-org
+  namespace: bittorrent
+spec:
+  secretName: tracker-openzim-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: tracker.openzim.org
+  dnsNames:
+  - tracker.openzim.org

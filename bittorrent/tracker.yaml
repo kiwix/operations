@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   namespace: bittorrent
   labels:
-    app: tracker-app
+    app: torrust-app
   name: tracker-deployment
 spec:
   strategy:
@@ -11,27 +11,144 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: tracker-app
+      app: torrust-app
   template:
     metadata:
       labels:
-        app: tracker-app
+        app: torrust-app
     spec:
+      initContainers:
+        - name: whitelister
+          restartPolicy: Always
+          image: ghcr.io/kiwix/maintenance:latest
+          imagePullPolicy: Always
+          args: ["sh", "-c", "pip install humanfriendly==10.0 requests==2.32.3 xmltodict==0.14.2 urllib3==2.3.0; whitelister"]
+          env:
+            - name: INSTALL_SCRIPTS
+              value: "whitelister#github://kiwix/operations/bittorrent/whitelister.py"
+            - name: TOKEN
+              value: admin-token
+            - name: API_URL
+              # localhost communicates with other container in same Pod (SVC does not)
+              value: http://localhost:5000/api/v1
+            - name: REFRESH_INTERVAL
+              value: 10m
+            - name: CACHE_DIR
+              value: /cache
+            - name: DEBUG
+              value: "1"
+          volumeMounts:
+            - name: cache
+              mountPath: /cache
       containers:
-      - image: ghcr.io/kiwix/bittorrent-tracker:latest
+      - image: docker.io/torrust/tracker:develop
         imagePullPolicy: Always
-        name: opentracker
+        name: torrust
+        livenessProbe:
+          failureThreshold: 5
+          httpGet:
+            path: /
+            port: 2000
+            scheme: HTTP
+          initialDelaySeconds: 1
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 1
+        volumeMounts:
+          - name: data-volume
+            mountPath: /data
+            readOnly: false
+          - name: configs
+            subPath: tracker.toml
+            mountPath: "/etc/tracker.toml"
+            readOnly: true
+        env:
+          - name: USER_ID
+            value: "1000"
+          - name: TORRUST_TRACKER_CONFIG_TOML_PATH
+            value: /etc/tracker.toml
         resources:
           requests:
-            memory: "5Mi"
-            cpu: "5m"
+            memory: "256Mi"
+            cpu: "100m"
         ports:
-          # we specifically want port 6969
-        - containerPort: 6969
-          hostPort: 6969
+        # HTTP API
+        - name: http-api
+          containerPort: 5000
           protocol: TCP
-        - containerPort: 6969
-          hostPort: 6969
+        # HTTP Tracker
+        - name: http-tracker
+          containerPort: 8080
+          protocol: TCP
+        # UDP Tracker
+        # we specifically want port 6969
+        - name: udp-tracker
+          containerPort: 6969
           protocol: UDP
+          hostPort: 6969
+      volumes:
+        - name: configs
+          configMap:
+            name: tracker-configs
+        - name: cache
+          emptyDir:
+            medium: Memory
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: bt-tracker-pvc
       nodeSelector:
         k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: bittorrent
+  name: http-service
+  labels:
+    app: torrust-app
+spec:
+  selector:
+    app: torrust-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: http-tracker
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: bittorrent
+  name: api-service
+  labels:
+    app: torrust-app
+spec:
+  selector:
+    app: torrust-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: http-api
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: tracker-ingress
+  namespace: bittorrent
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+      - tracker.openzim.org
+      secretName: tracker-openzim-org-tls
+  rules:
+  - host: tracker.openzim.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: http-service
+            port:
+              number: 80

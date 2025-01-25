@@ -1,0 +1,156 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: tracker-configs
+  namespace: bittorrent
+data:
+  tracker.toml: |
+    [metadata]
+    app = "torrust-tracker"
+    purpose = "configuration"
+    schema_version = "2.0.0"
+
+    # Logging configuration
+    [logging]
+    # Logging level. Possible values are: Off, Error, Warn, Info, Debug and Trace.
+    # Default is Info.
+    threshold = "info"
+
+    # Core configuration.
+    [core]
+    # Interval in seconds that the cleanup job will run
+    # to remove inactive peers from the torrent peer list.
+    inactive_peer_cleanup_interval = 600
+    # When true only approved torrents can be announced in the tracker.
+    listed = true
+    # When true clients require a key to connect and use the tracker.
+    private = false
+    # Weather the tracker should collect statistics about tracker usage.
+    # If enabled, the tracker will collect statistics
+    # like the number of connections handled, the number of announce requests handled, etc.
+    # Refer to the Tracker for more information about the collected metrics.
+    tracker_usage_statistics = true
+
+    # Announce policy configuration.
+    [core.announce_policy]
+    # Interval in seconds that the client should wait
+    # between sending regular announce requests to the tracker.
+    # It’s a recommended wait time between announcements.
+    # This is the standard amount of time that clients should wait
+    # between sending consecutive announcements to the tracker.
+    # This value is set by the tracker and is typically provided in the tracker’s response
+    # to a client’s initial request.
+    # It serves as a guideline for clients to know how often
+    # they should contact the tracker for updates on the peer list,
+    # while ensuring that the tracker is not overwhelmed with requests.
+    interval_min = 30
+    # Minimum announce interval. Clients must not reannounce more frequently than this.
+    # It establishes the shortest allowed wait time.
+    # This is an optional parameter in the protocol
+    # that the tracker may provide in its response.
+    # It sets a lower limit on the frequency at which clients are allowed
+    # to send announcements.
+    # Clients should respect this value to prevent sending too many requests
+    # in a short period, which could lead to excessive load on the tracker
+    # or even getting banned by the tracker for not adhering to the rules.
+    interval = 60
+
+    # Database configuration.
+    [core.database]
+    # Database driver. Possible values are: sqlite3, and mysql.
+    driver = "sqlite3"
+    # Database connection string. The format depends on the database driver.
+    # For sqlite3, the format is path/to/database.db,
+    # for example: ./storage/tracker/lib/database/sqlite3.db.
+    # For Mysql, the format is mysql://db_user:db_user_password:port/db_name,
+    # for example: mysql://root:password@localhost:3306/torrust.
+    path = "/data/sqlite3.db"
+
+    # Network configuration.
+    [core.net]
+    # The external IP address of the tracker.
+    # If the client is using a loopback IP address, this IP address will be used instead.
+    # If the peer is using a loopback IP address, the tracker assumes that the peer
+    # is in the same network as the tracker and will use the tracker’s IP address instead.
+    external_ip = "0.0.0.0"
+    # Weather the tracker is behind a reverse proxy or not.
+    # If the tracker is behind a reverse proxy, the X-Forwarded-For header
+    # sent from the proxy will be used to get the client’s IP address.
+    on_reverse_proxy = true
+
+    # # Configuration specific when the tracker is running in private mode.
+    # [core.private_mode]
+    # # When true, if the keys is not permanent the expiration date will be ignored.
+    # # The key will be accepted even if it has expired.
+    # check_keys_expiration = false
+
+    # Tracker policy configuration.
+    [core.tracker_policy]
+    # Maximum time in seconds that a peer can be inactive
+    # before being considered an inactive peer.
+    # If a peer is inactive for more than this time, it will be removed
+    # from the torrent peer list.
+    max_peer_timeout = 900
+    # If enabled the tracker will persist the number of completed downloads.
+    # That’s how many times a torrent has been downloaded completely.
+    persistent_torrent_completed_stat = true
+    # If enabled, the tracker will remove torrents that have no peers.
+    # The clean up torrent job runs every inactive_peer_cleanup_interval seconds and
+    # it removes inactive peers. Eventually, the peer list of a torrent could be empty
+    # and the torrent will be removed if this option is enabled.
+    remove_peerless_torrents = false
+
+    # The list of UDP trackers the tracker is running.
+    # Each UDP tracker represents a UDP server that the tracker is running
+    # and it has its own configuration.
+    [[udp_trackers]]
+    # The address the tracker will bind to.
+    # The format is ip:port, for example 0.0.0.0:6969.
+    # If you want to listen to all interfaces, use 0.0.0.0.
+    # If you want the operating system to choose a random port, use port 0.
+    bind_address = "0.0.0.0:6969"
+
+    # The list of HTTP trackers the tracker is running.
+    # Each HTTP tracker represents a HTTP server that the tracker is running
+    # and it has its own configuration.
+    [[http_trackers]]
+    # The address the tracker will bind to.
+    # The format is ip:port, for example 0.0.0.0:6969.
+    # If you want to listen to all interfaces, use 0.0.0.0.
+    # If you want the operating system to choose a random port, use port 0.
+    bind_address = "0.0.0.0:8080"
+    # [[http_trackers.tsl_config]]
+    # # Path to the SSL certificate file.
+    # ssl_cert_path = "/etc/ssl/certs/tracker.cert"
+    # # Path to the SSL key file.
+    # ssl_key_path = "/etc/ssl/certs/tracker.key"
+    #
+    # The HTTP API configuration.
+    [http_api]
+    # The address the tracker will bind to.
+    # The format is ip:port, for example 0.0.0.0:6969.
+    # If you want to listen to all interfaces, use 0.0.0.0.
+    # If you want the operating system to choose a random port, use port 0.
+    bind_address = "0.0.0.0:5000"
+
+    # [http_api.tsl_config]
+    # # Path to the SSL certificate file.
+    # ssl_cert_path = "/etc/ssl/certs/api.cert"
+    # # Path to the SSL key file.
+    # ssl_key_path = "/etc/ssl/certs/api.key"
+
+    # Access tokens for the HTTP API.
+    # The key is a label identifying the token and the value is the token itself.
+    # The token is used to authenticate the user.
+    # All tokens are valid for all endpoints and have all permissions.
+    [http_api.access_tokens]
+    # label: token
+    admin = "admin-token"
+
+    # The Health Check API configuration.
+    [health_check_api]
+    # The address the API will bind to.
+    # The format is ip:port, for example 127.0.0.1:1313.
+    # If you want to listen to all interfaces, use 0.0.0.0.
+    # If you want the operating system to choose a random port, use port 0.
+    bind_address = "0.0.0.0:2000"

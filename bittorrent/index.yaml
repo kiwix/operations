@@ -1,0 +1,162 @@
+# Tracker companion index and its WebGUI
+#
+# this is a website which goal is to help the tracker's community
+# by listing torrents with some metadata.
+# it connects to the tracker and fetches statistics about know torrents
+# to display the number of seeders and leechers.
+#
+# the problems with this UI:
+# - it goes not retrieve the list of torrents from Tracker API.
+# - every torrent must be added manually (via WebUI or API)
+# - for some reason it records the torrent's IH as Canonical Info Hash
+# but generates a new hash and displays that new hash prominently.
+# - UI offers torrent download and magnet links but both are using that new ID
+# - those generated torrents dont include our original meta like webseeds
+# - statistics are only for the new IDs and thus mostly useless
+#
+# this all show that the purpose of this tool is for users who create a torrent
+# upload it to that *community* and then seed of it.
+# it does not fit our need of listing torrents with seeders/leechers stats
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: bittorrent
+  labels:
+    app: index-app
+  name: index-deployment
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: index-app
+  template:
+    metadata:
+      labels:
+        app: index-app
+    spec:
+      containers:
+      - image: docker.io/torrust/index:develop
+        imagePullPolicy: Always
+        name: index
+        volumeMounts:
+          - name: data-volume
+            mountPath: /data
+            readOnly: false
+          - name: configs
+            subPath: index.toml
+            mountPath: "/etc/index.toml"
+            readOnly: true
+        env:
+          - name: USER_ID
+            value: "1000"
+          - name: TORRUST_INDEX_CONFIG_TOML_PATH
+            value: /etc/index.toml
+          - name: TORRUST_INDEX_API_CORS_PERMISSIVE
+            value: "true"
+        resources:
+          requests:
+            memory: "384Mi"
+            cpu: "100m"
+        ports:
+        - name: backend-http
+          containerPort: 8080
+          protocol: TCP
+      - image: docker.io/torrust/index-gui:develop
+        imagePullPolicy: Always
+        name: index-gui
+        env:
+        - name: NITRO_HOST
+          value: "0.0.0.0"
+        - name: NITRO_PORT
+          value: "8082"
+        - name: NUXT_PUBLIC_API_BASE
+          value: https://backend.torrents.kiwix.org/v1
+        resources:
+          requests:
+            memory: "384Mi"
+            cpu: "100m"
+        ports:
+        - name: frontend-http
+          containerPort: 8082
+          protocol: TCP
+      volumes:
+        - name: configs
+          configMap:
+            name: index-configs
+        - name: cache
+          emptyDir:
+            medium: Memory
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: bt-index-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: bittorrent
+  name: index-backend-service
+  labels:
+    app: index-app
+spec:
+  selector:
+    app: index-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: backend-http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: bittorrent
+  name: index-frontend-service
+  labels:
+    app: index-app
+spec:
+  selector:
+    app: index-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: frontend-http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: index-ingress
+  namespace: bittorrent
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+      - torrents.kiwix.org
+      secretName: torrents-kiwix-org-tls
+    - hosts:
+      - backend.torrents.kiwix.org
+      secretName: backend-torrents-kiwix-org-tls
+  rules:
+  - host: torrents.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: index-frontend-service
+            port:
+              number: 80
+  - host: backend.torrents.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: index-backend-service
+            port:
+              number: 80
