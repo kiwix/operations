@@ -19,3 +19,5 @@ kubeconfig-*.yaml
 
 # editor config not maintained
 .vscode
+
+junk/
