@@ -7,7 +7,7 @@ import requests
 from bs4 import BeautifulSoup, NavigableString
 from bs4.element import Tag
 
-TIMEOUT = int(os.getenv("TIMEOUT") or "5")
+TIMEOUT = int(os.getenv("TIMEOUT") or "20")
 SCHEMES = os.getenv("SCHEMES", "https").split(",")
 DEFAULT_SCHEME = SCHEMES[0]
 LIBRARY_HOST = os.getenv("LIBRARY_HOST", "library.kiwix.org")
