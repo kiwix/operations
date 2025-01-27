@@ -44,7 +44,7 @@ data:
     # mirrors.dotsrc.org (Anders Trier Olesen <staff@dotsrc.org>): mirrors.dotsrc.org 130.225.254.116 2001:878:346::116
     # www.mirrorservice.org (Tim Bishop <help@mirrorservice.org>): www.mirrorservice.org 212.219.56.128/26 2001:630:341:0012::/64
     # ftp.nluug.nl (Mike Hulsman  <ftpmirror-beheer@nluug.nl>): ftp.nluug.nl 145.220.21.40
-    # saimei.ftp.acc.umu.se (Niklas Edmundsson <ftp-adm@accum.se>): poincare.acc.umu.se 130.239.18.154 2001:6b0:e:2018::154
+    # mirror.accum.se (Niklas Edmundsson <ftp-adm@accum.se>): poincare.acc.umu.se 130.239.18.154 2001:6b0:e:2018::154
     # mirror.isoc.org.il: 192.115.2.70 192.115.2.0/24
     # ftpmirror.your.org (Ryan Steinmetz <noc@your.org>): ftpmirror.your.org.219.237.163.in-addr.arpa 163.237.219.7
     # md.mirrors.hacktegic.com (Artiom Mocrenco <amocrenco@protonmail.com>) md.mirrors.hacktegic.com 185.181.228.68 2a0a:d580:802:68::68

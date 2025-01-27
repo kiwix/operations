@@ -9,8 +9,6 @@ from utils import Mirror, get_current_mirrors, get_url
 MIRRORS_LIST_URL: str = "https://download.kiwix.org/mirrors.html"
 # list of mirrors (hostname) not to use in tests
 EXCLUDED_MIRRORS: list[str] = [
-    # samei is itself a load-balancer. all have same config. testing only laotzu
-    "saimei.ftp.acc.umu.se",
 ]
 # this is using the permalink pattern
 # from the permalink redirects (no warehouse path, no period in filename)

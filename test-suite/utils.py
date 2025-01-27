@@ -63,6 +63,10 @@ class Mirror(NamedTuple):
     base_url: str
     country_code: str
 
+    @property
+    def is_load_balancer(self) -> bool:
+        return self.hostname in ("mirror.accum.se")
+
 
 def get_current_mirrors(
     mirrors_list_url: str, excluded_mirrors: list[str]
