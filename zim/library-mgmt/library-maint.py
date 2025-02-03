@@ -16,6 +16,7 @@ import re
 import shutil
 import sys
 import tempfile
+import time
 import urllib.parse
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -633,6 +634,7 @@ class LibraryMaintainer:
 
         # purge library (once)
         logger.info(f"[PURGE] Requesting Library purge from {self.varnish_url}")
+        time.sleep(10)
         resp = requests.request(
             method="PURGE", url=self.varnish_url, headers={"X-Purge-Type": "library"}
         )
