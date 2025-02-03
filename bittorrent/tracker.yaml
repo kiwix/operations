@@ -69,8 +69,8 @@ spec:
             value: /etc/tracker.toml
         resources:
           requests:
-            memory: "256Mi"
-            cpu: "100m"
+            memory: "512Mi"
+            cpu: "700m"
         ports:
         # HTTP API
         - name: http-api

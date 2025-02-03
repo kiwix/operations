@@ -14,7 +14,7 @@ data:
     [logging]
     # Logging level. Possible values are: Off, Error, Warn, Info, Debug and Trace.
     # Default is Info.
-    threshold = "info"
+    threshold = "warn"
 
     # Core configuration.
     [core]
@@ -43,7 +43,7 @@ data:
     # It serves as a guideline for clients to know how often
     # they should contact the tracker for updates on the peer list,
     # while ensuring that the tracker is not overwhelmed with requests.
-    interval_min = 30
+    interval_min = 300
     # Minimum announce interval. Clients must not reannounce more frequently than this.
     # It establishes the shortest allowed wait time.
     # This is an optional parameter in the protocol
@@ -90,7 +90,7 @@ data:
     # before being considered an inactive peer.
     # If a peer is inactive for more than this time, it will be removed
     # from the torrent peer list.
-    max_peer_timeout = 900
+    max_peer_timeout = 1000
     # If enabled the tracker will persist the number of completed downloads.
     # That’s how many times a torrent has been downloaded completely.
     persistent_torrent_completed_stat = true
