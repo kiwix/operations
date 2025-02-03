@@ -59,7 +59,7 @@ spec:
         - containerPort: 5432
         resources:
           requests:
-            memory: "128Mi"
+            memory: "1Gi"
             cpu: "200m"
       volumes:
       - name: data-volume
