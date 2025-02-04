@@ -5,7 +5,7 @@ metadata:
   namespace: donation
 data:
   # should be 1 to enable
-  STRIPE_USE_LIVE: "0"
+  STRIPE_USE_LIVE: "1"
   STRIPE_WEBHOOK_TESTING_IPS: ""
   APPLEPAY_MERCHANT_IDENTIFIER: "merchant.org.kiwix.apple"
   APPLEPAY_DISPLAYNAME: "Kiwix"
