@@ -94,7 +94,7 @@ def pathlib_relpath(data: Any) -> Any:
 
 def get_tmp(fpath: pathlib.Path) -> pathlib.Path:
     """path to use to write fpath temporarily"""
-    return fpath.with_name(f"{fpath.name}.tmp")
+    return fpath.with_name(f"{fpath.name}.tmp_{datetime.datetime.utcnow().timetz()}")
 
 
 def swap(tmp: pathlib.Path, final: pathlib.Path):
