@@ -94,17 +94,12 @@ def pathlib_relpath(data: Any) -> Any:
 
 def get_tmp(fpath: pathlib.Path) -> pathlib.Path:
     """path to use to write fpath temporarily"""
-    return pathlib.Path(
-        tempfile.NamedTemporaryFile(
-            prefix=fpath.stem, suffix=fpath.suffix, delete=False
-        ).name
-    )
+    return fpath.with_name(f"{fpath.name}.tmp")
 
 
 def swap(tmp: pathlib.Path, final: pathlib.Path):
-    """moves* tmp to its final dest via copy + rm to prevent cross-fs errors"""
-    shutil.copy2(tmp, final)
-    tmp.unlink()
+    r"""rename tmp to final on fs. /!\ doesnt work cross-fs"""
+    tmp.rename(final)
 
 
 def without_period(text: str) -> str:
