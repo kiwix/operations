@@ -28,20 +28,15 @@ spec:
                 value: "1"
               volumeMounts:
               - name: kiwix-download
-                subPath: library/library_zim.xml
-                mountPath: "/data/download/library/library_zim.xml"
+                subPath: library
+                mountPath: "/data/download/library"
                 readOnly: false
               - name: kiwix-library
-                subPath: library_maint.log
-                mountPath: "/data/library/library_maint.log"
-                readOnly: false  # tmp
+                mountPath: "/data/library"
+                readOnly: false
               - name: kiwix-download
                 subPath: zim
                 mountPath: "/data/download/zim"
-                readOnly: false
-              - name: kiwix-library
-                subPath: internal_library.xml
-                mountPath: "/data/library/internal_library.xml"
                 readOnly: false
               - mountPath: "/data/maps/zim.map"
                 subPath: zim.map
