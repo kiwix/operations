@@ -41,8 +41,7 @@ spec:
           subPath: zim
           name: download-volume
           readOnly: true
-        - mountPath: "/data/library/internal_library.xml"
-          subPath: internal_library.xml
+        - mountPath: "/data/library"
           name: library-volume
           readOnly: true
         - mountPath: "/data/kiwix-serve-templates"
@@ -119,8 +118,7 @@ spec:
           subPath: zim
           name: download-volume
           readOnly: true
-        - mountPath: "/data/library/internal_library.xml"
-          subPath: internal_library.xml
+        - mountPath: "/data/library"
           name: library-volume
           readOnly: true
         resources:

@@ -26,8 +26,7 @@ spec:
         - name: hidden-volume
           mountPath: "/data"
           readOnly: true
-        - mountPath: "/library/dev_library.xml"
-          subPath: dev_library.xml
+        - mountPath: "/library"
           name: kiwix-library
           readOnly: true
         resources:
