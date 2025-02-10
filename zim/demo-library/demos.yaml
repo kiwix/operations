@@ -35,7 +35,7 @@ demos: # Appear at demo.library.kiwix.org/home/name
   zims:
     - .hidden/datacup/education.promet.sn_fr_examen_cm2
   expired_on: 2025-03-01
-# - name: asheville 
+# - name: Dissident voices 
 #   zims:
-#     - .hidden/dev/ashevillerelief.com_en_all
-#   expired_on: 2024-12-31
+#     - .hidden/dev/dissidentvoice_en_all
+#   expired_on: 2025-02-28
