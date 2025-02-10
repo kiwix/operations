@@ -35,7 +35,7 @@ demos: # Appear at demo.library.kiwix.org/home/name
   zims:
     - .hidden/datacup/education.promet.sn_fr_examen_cm2
   expired_on: 2025-03-01
-- name: Dissident voices 
+- name: dissidentvoices #Will appear at demo.library.kiwix.org/home/dissidentvoices
   zims:
     - .hidden/dev/dissidentvoice_en_all
   expired_on: 2025-02-28
