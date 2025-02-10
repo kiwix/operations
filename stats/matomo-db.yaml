@@ -25,6 +25,8 @@ data:
     innodb_page_cleaners=8
     innodb_io_capacity=100
 
+    binlog_expire_logs_seconds=432000
+
     [mysql]
     local-infile=1
 ---
