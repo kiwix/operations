@@ -1,0 +1,37 @@
+name: Kube Check
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+  push:
+    branches:
+      - main
+
+jobs:
+
+  mirrors:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+          architecture: x64
+      - name: Record KUBE_CONFIG
+        env:
+          KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
+        run: |
+          mkdir -p $HOME/.kube
+          echo "$KUBE_CONFIG" | base64 -d > $HOME/.kube/config
+      - name: Install kubectl
+        run: |
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+          curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl.sha256"
+          echo "$(cat kubectl.sha256)  kubectl" | sha256sum --check
+          install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+          kubectl version --client
+      - name: Install dependencies
+        run: pip install -r test-suite/requirements.txt
+      - name: Test kube
+        working-directory: test-suite
+        run: pytest -vvv test_kube.py
