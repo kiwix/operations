@@ -8,15 +8,17 @@ from utils import Mirror, get_current_mirrors, get_url
 # MB only provides the full list of mirrors through this.
 MIRRORS_LIST_URL: str = "https://download.kiwix.org/mirrors.html"
 # list of mirrors (hostname) not to use in tests
-EXCLUDED_MIRRORS: list[str] = [
-]
+EXCLUDED_MIRRORS: list[str] = []
 # this is using the permalink pattern
 # from the permalink redirects (no warehouse path, no period in filename)
 # using wikipedia_he_* as this is the only pattern mirrored by all mirrors
 # good enough for now
 PERMANENT_ZIM_URL: str = "https://download.kiwix.org/zim/wikipedia_he_all_maxi.zim"
 # all non-zim-only mirrors mirror all other files
-PERMANENT_APK_URL: str = "https://download.kiwix.org/release/kiwix-android/kiwix.apk"
+PERMANENT_APK_URL: str = (
+    "https://download.kiwix.org/release/kiwix-android/"
+    "org.kiwix.kiwixmobile.standalone.apk"
+)
 
 # we have no other way to know which mirrors are supposed to have APKs
 # taken from https://github.com/kiwix/container-images
