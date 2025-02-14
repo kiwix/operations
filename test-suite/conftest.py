@@ -28,7 +28,6 @@ EXPECTED_APK_MIRRORS: list[str] = [
     "ftp.fau.de",
     "md.mirrors.hacktegic.com",
     "mirror-sites-fr.mblibrary.info",
-    "mirror-sites-ca.mblibrary.info",
     "mirror-sites-in.mblibrary.info",
 ]
 ZIM_MIRRORS: list[Mirror] = get_current_mirrors(MIRRORS_LIST_URL, EXCLUDED_MIRRORS)
