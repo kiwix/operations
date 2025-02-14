@@ -9,7 +9,7 @@ on:
 
 jobs:
 
-  mirrors:
+  catalog:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v3
