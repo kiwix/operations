@@ -1,0 +1,25 @@
+name: Catalog Check
+
+on:
+  schedule:
+    - cron: "0 8 * * *"
+  push:
+    branches:
+      - main
+
+jobs:
+
+  mirrors:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.12
+          architecture: x64
+      - name: Install dependencies
+        run: pip install -r test-suite/requirements.txt
+      - name: Test Catalog
+        working-directory: test-suite
+        # not using: --run-flavours --run-flavour__maxi --run-all_flavour --run-title_len --run-description_len --run-name_pattern
+        run: pytest -vvv test_catalog.py --run-filename_pattern --run-publisher --run-author --run-flavour__mini --run-flavour__nopic

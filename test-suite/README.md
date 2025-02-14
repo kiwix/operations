@@ -49,6 +49,12 @@ pytest -v test_library.py
 
 # mirrors
 pytest -v test_mirrors.py
+
+# kube
+pytest -v test_kube.py
+
+# catalog
+pytest -v test_catalog.py
 ```
 
 ## Sample output

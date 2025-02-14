@@ -1,3 +1,5 @@
 requests==2.31.0
 pytest==7.4.0
 beautifulsoup4==4.12.3
+xmltodict==0.14.2
+regex==2024.11.6

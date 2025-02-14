@@ -54,6 +54,54 @@ PERMANENT_OPENZIM_RELEASE_URL: str = (
 PERMANENT_OPENZIM_NIGHTLY_URL: str = (
     "https://download.kiwix.org/nightly/libzim_linux-x86_64.tar.gz"
 )
+CATALOG_URL: str = "https://library.kiwix.org/catalog/v2"
+# list of book ident from the Catalog that should be excluded from tests
+# because those are known to be broken
+# should be temporary obviously
+EXCLUDED_BOOKS: list[str] = [":wikizimmer.pokepedia-pw_:"]
+
+
+markers = (
+    "flavours",
+    "flavour__maxi",
+    "flavour__nopic",
+    "flavour__mini",
+    "all_flavour",
+    "title_len",
+    "description_len",
+    "author",
+    "publisher",
+    "name_pattern",
+    "filename_pattern",
+)
+
+
+def pytest_addoption(parser: pytest.Parser):
+    for marker in markers:
+        parser.addoption(
+            f"--run-{marker}",
+            action="store_true",
+            default=False,
+            help=f"run {marker} tests",
+        )
+
+
+def pytest_configure(config: pytest.Config):
+    for marker in markers:
+        config.addinivalue_line(
+            "markers", f"{marker}: mark test as related to {marker}"
+        )
+
+
+def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item]):
+    skips = {}
+    for marker in markers:
+        skips[marker] = pytest.mark.skip(reason=f"need --run-{marker} option to run")
+
+    for item in items:
+        for marker in markers:
+            if marker in item.keywords and not config.getoption(f"--run-{marker}"):
+                item.add_marker(skips[marker])
 
 
 @pytest.fixture(scope="session")
