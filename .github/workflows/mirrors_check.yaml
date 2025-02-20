@@ -13,12 +13,10 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.11
-          architecture: x64
+      - name: Setup venv
+        run: python3 -m venv .venv
       - name: Install dependencies
-        run: pip install -r test-suite/requirements.txt
+        run: .venv/bin/pip install -r test-suite/requirements.txt
       - name: Test mirrors
         working-directory: test-suite
-        run: pytest -vvv test_mirrors.py
+        run: .venv/bin/pytest -vvv test_mirrors.py
