@@ -17,11 +17,11 @@ data:
   MAILGUN_API_URL: "https://api.mailgun.net/v3/mg.zimit.kiwix.org"
   MAILGUN_FROM: "Zimit <contact+zimit@kiwix.org>"
   # task configuration
-  ZIMIT_SIZE_LIMIT: "4294967296"
+  ZIMIT_SIZE_LIMIT: "4294967296" # update TASK_DISK if you change this
   ZIMIT_TIME_LIMIT: "7200"
   ZIMIT_IMAGE: "openzim/zimit:3.0.1"
   TASK_MEMORY: "3840MiB"
-  TASK_DISK: "4GiB"
+  TASK_DISK: "12GiB" # three times ZIMIT_SIZE_LIMIT is recommended because we need at least two times (warc + ZIM) and some rome 
   TASK_CPU: "1"
   TASK_WORKER: "sisyphus"
   PUBLIC_URL: "https://zimit.kiwix.org"
