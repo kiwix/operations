@@ -25,3 +25,5 @@ data:
   CACHE_TIMEOUT: "3600"
   DATA_DIR: "/data"
   CSRF_TRUSTED_ORIGINS: "https://imager.kiwix.org"
+  # | separated
+  BRANDING_ORGS: "orange|cordial.dust1431@fastmail.com"
