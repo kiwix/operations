@@ -1,4 +1,4 @@
-demos: # Appear at demo.library.kiwix.org/home/name
+demos: # Appear at demo.library.kiwix.org/home/name Refresh is at the hour, every hour
 # - name: benoit
 #   zims:
 #     - ted/ted_mul_all
