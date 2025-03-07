@@ -38,4 +38,4 @@ demos: # Appear at demo.library.kiwix.org/home/name
 - name: ascension
   zims:
     - .hidden/dev/ascensionglossary_en_all_maxi
-    expired_on: 2026-03-06
+  expired_on: 2026-03-06
