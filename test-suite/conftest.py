@@ -7,6 +7,7 @@ from utils import Mirror, get_current_mirrors, get_url
 
 # MB only provides the full list of mirrors through this.
 MIRRORS_LIST_URL: str = "https://download.kiwix.org/mirrors.html"
+CANONICAL_MIRRORS_LIST_URL: str = "https://mirror.download.kiwix.org/mirrors.html"
 # list of mirrors (hostname) not to use in tests
 EXCLUDED_MIRRORS: list[str] = []
 # this is using the permalink pattern
@@ -32,7 +33,9 @@ EXPECTED_APK_MIRRORS: list[str] = [
     "mirror-sites-fr.mblibrary.info",
     "mirror-sites-in.mblibrary.info",
 ]
-ZIM_MIRRORS: list[Mirror] = get_current_mirrors(MIRRORS_LIST_URL, EXCLUDED_MIRRORS)
+ZIM_MIRRORS: list[Mirror] = get_current_mirrors(
+    CANONICAL_MIRRORS_LIST_URL, EXCLUDED_MIRRORS
+)
 # IDs are used for pytest output
 ZIM_MIRRORS_IDS: list[str] = [mirror.hostname for mirror in ZIM_MIRRORS]
 # we could have discovered mirrors via testing an actual APK online which would
