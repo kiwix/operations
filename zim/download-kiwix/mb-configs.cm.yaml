@@ -691,6 +691,7 @@ data:
       MirrorBrainDHTNode router.bittorrent.com 6881
       MirrorBrainDHTNode router.utorrent.com 6881
       MirrorBrainDHTNode dht.aelitis.com 6881
+      # MirrorBrainMetalinkMagnetLinks On
 
       <IfModule mod_expires.c>
          ExpiresActive On
