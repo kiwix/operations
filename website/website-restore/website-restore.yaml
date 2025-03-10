@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: website
+  labels:
+    app: website-restore-app
+  name: website-restore-deployment
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: website-restore-app
+  template:
+    metadata:
+      labels:
+        app: website-restore-app
+    spec:
+      containers:
+      - image: php:8.3-apache
+        imagePullPolicy: Always
+        name: ui
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "100m"
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/var/www/html/"
+          readOnly: false
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: website-restore-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
