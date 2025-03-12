@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: support-kiwix-org
+  namespace: website
+spec:
+  secretName: support-kiwix-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: support.kiwix.org
+  dnsNames:
+  - support.kiwix.org

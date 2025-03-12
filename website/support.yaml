@@ -1,0 +1,19 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: support-ingress
+  namespace: website
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "1m"
+    nginx.ingress.kubernetes.io/server-snippet: |
+      rewrite (?i)^/qr/H1/([A-Z0-9]*)$ "https://kiwix.org/en/hotspot-support/?sn=$1" permanent;
+      return 301 "https://kiwix.org/en/get-involved/#donate";
+spec:
+  tls:
+    - hosts:
+      - support.kiwix.org
+      secretName: support-kiwix-org-tls
+  rules:
+  - host: support.kiwix.org
+    http:
+

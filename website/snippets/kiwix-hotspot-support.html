@@ -1,0 +1,18 @@
+<div id="sn-placeholder" style="background-color: white; color: black; font-size: 4em; border-radius: .5em; margin-bottom: 1em;"></div>
+
+<p style="text-align: center;">All inquiries regarding Kiwix Hotspot are to be sent to <a id="mailto" href="mailto:hotspot@kiwix.org?subject=Hotspot+Support&body=S/N: xxx%0A">hotspot@kiwix.org</a>, with your serial number as reference.</p>
+
+<script type="text/javascript">
+    function getSearchParams(k){
+      var p={};
+      location.search.replace(/[?&]+([^=&]+)=([^&]*)/gi,function(s,k,v){p[k]=v})
+      return k?p[k]:p;
+    }
+    var sn = getSearchParams("sn");
+    if (sn && sn.length) {
+        var ph = document.getElementById("sn-placeholder");
+        ph.innerHTML = `S/N: <code>${sn.toUpperCase()}</code>`;
+        var mailto = document.getElementById("mailto");
+        mailto.setAttribute("href", mailto.getAttribute("href").replace("xxx", sn));
+    }
+</script>
