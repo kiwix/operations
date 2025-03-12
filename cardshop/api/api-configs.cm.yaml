@@ -13,7 +13,7 @@ data:
   MANAGER_API_URL: "https://imager.kiwix.org/api"
   # public url to display link to
   PUBLIC_URL: "https://imager.kiwix.org"
-  SHOP_PUBLIC_URL: "https://www.kiwix.org/en/cardshop-access/"
+  SHOP_PUBLIC_URL: "https://kiwix.org/en/kiwix-hotspot/"
   # URLS for download/upload warehouses
   DEFAULT_WAREHOUSE_DOWNLOAD_URI: "s3://s3.us-west-1.wasabisys.com/?bucketName=org-kiwix-hotspot-cardshop-warehouse"
   DEFAULT_WAREHOUSE_UPLOAD_URI: "s3://s3.us-west-1.wasabisys.com/?bucketName=org-kiwix-hotspot-cardshop-warehouse"
@@ -21,7 +21,7 @@ data:
   DOWNLOAD_WAREHOUSE_UPLOAD_URI: "s3://s3.us-west-1.wasabisys.com/?bucketName=org-kiwix-hotspot-cardshop-download"
   # mail sending via mailgun
   MAILGUN_API_URL: "https://api.mailgun.net/v3/cardshop.hotspot.kiwix.org"
-  MAIL_FROM: "Kiwix Imager <imager@kiwix.org>"
+  MAIL_FROM: "Kiwix <hotspot@kiwix.org>"
   # Stripe shop configuration
   STRIPE_PUBLIC_API_KEY: "pk_live_GEcXcJPSS1WkxsOtEQceoIWo"
   STRIPE_METHOD_ACCESS1M: "payment"
@@ -31,18 +31,34 @@ data:
   STRIPE_METHOD_MD: "payment"
   STRIPE_METHOD_TED: "payment"
   STRIPE_METHOD_CS: "payment"
+  STRIPE_METHOD_WPH1: "payment"
+  STRIPE_METHOD_PPH1: "payment"
+  STRIPE_METHOD_MDH1: "payment"
+  STRIPE_METHOD_TEDH1: "payment"
+  STRIPE_METHOD_CSH1: "payment"
   STRIPE_PRICE_ACCESS1M: "price_1PCkyAFwbeEkT850KEbafpWT"
   STRIPE_PRICE_ACCESS1Y: "price_1Ho6CLFwbeEkT850egikS1sr"
   STRIPE_PRICE_WPDE: "price_1Ho6C4FwbeEkT850hC2koYgD"
-  STRIPE_PRICE_WPEN: "price_1IktiCFwbeEkT850dKcdIH3n"
   STRIPE_PRICE_WPES: "price_1Ho6CAFwbeEkT8503UK7o4TS"
   STRIPE_PRICE_WPFR: "price_1Ho6BwFwbeEkT850tNTrQi2c"
+  STRIPE_PRICE_WPEN: "price_1IktiCFwbeEkT850dKcdIH3n"
   STRIPE_PRICE_PP: "price_1Ojl2nFwbeEkT850LXg6Qxaf"
   STRIPE_PRICE_MD: "price_1QGLrcFwbeEkT850Vw6yPkZp"
   STRIPE_PRICE_TED: "price_1Po0ZHFwbeEkT850XkZLrTgm"
   STRIPE_PRICE_CS: "price_1PNAHWFwbeEkT850aL3uk5sb"
+  STRIPE_PRICE_WPENH1: "price_1R1Ng5FwbeEkT850kWXW6ank"
+  STRIPE_PRICE_PPH1: "price_1R1NeMFwbeEkT85045qBeqCC"
+  STRIPE_PRICE_MDH1: "price_1R1NhDFwbeEkT850Xc6JGjCR"
+  STRIPE_PRICE_TEDH1: "price_1R1NhjFwbeEkT850J6n0IV0s"
+  STRIPE_PRICE_CSH1: "price_1R1NidFwbeEkT8503DSs6R3N"
+  SHIPPING_RATE_TRACKING: "shr_1R13JMFwbeEkT8509JaWjmpx"
+  SHIPPING_RATE_NOTRACKING: ""
+  TAXES_ENABLED: "y"
   # debugging emails
   TEST_EMAIL: "reg@kiwix.org"
+  ASSEMBLY_EMAIL: "assembly@kiwix.org"
   FAILED_ORDER_EMAIL: "reg+cardshop-errors@kiwix.org"
+  # tracking URL template. Use {number} as placeholder
+  TRACKING_URL_TMPL: "https://service.post.ch/ekp-web/ui/entry/search/{number}?lang=en"
   # should not be used
   # RESET_DB: "1"
