@@ -72,3 +72,31 @@ spec:
             name: api-service
             port:
               number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: api-ingress-protected
+  namespace: cardshop
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /shop/stripe/shipment
+    nginx.ingress.kubernetes.io/proxy-body-size: "20m"
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: api-basic-auth
+    nginx.ingress.kubernetes.io/auth-realm: "Kiwix Assembly Team only"
+spec:
+  tls:
+    - hosts:
+      - api.imager.kiwix.org
+      secretName: api-imager-kiwix-org-tls
+  rules:
+  - host: api.imager.kiwix.org
+    http:
+      paths:
+      - path: /shop/stripe/shipment
+        pathType: Prefix
+        backend:
+          service:
+            name: api-service
+            port:
+              number: 80
