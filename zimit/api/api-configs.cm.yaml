@@ -11,7 +11,7 @@ data:
   ZIMIT_USE_RELAXED_SCHEMA: "y"
   NAUTILUS_USE_RELAXED_SCHEMA: "y"
   # Timeout for requests to other services
-  REQ_TIMEOUT_NOTIFICATIONS: "5"
+  REQ_TIMEOUT_NOTIFICATIONS: "10"
   REQ_TIMEOUT_CMS: "50"
   REQ_TIMEOUT_GHCR: "10"
   # Default publisher to set in ZIMs
