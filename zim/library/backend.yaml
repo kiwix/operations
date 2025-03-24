@@ -36,7 +36,7 @@ spec:
                 value: localhost
           initialDelaySeconds: 20
           periodSeconds: 5
-          timeoutSeconds: 3
+          timeoutSeconds: 10
         volumeMounts:
         - mountPath: "/data/download/zim"
           subPath: zim
