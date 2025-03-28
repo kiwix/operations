@@ -1,69 +1,80 @@
 cluster:
-  name: "kiwix-prod"
+  name: kiwix-prod
 
-externalServices:
-  prometheus:
-    host: "https://prometheus-prod-24-prod-eu-west-2.grafana.net"
-    basicAuth:
-      username: "1172000"
+destinations: # nota: this is in fact overriden in grafana.values.secret.yaml
+  - name: metricsService
+    type: prometheus
+    url: https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom/push
+    auth:
+      type: basic
+      username: '1172000'
+  - name: logsService
+    type: loki
+    url: https://logs-prod-012.grafana.net/loki/api/v1/push
+    auth:
+      type: basic
+      username: '685075'
 
-  loki:
-    host: "https://logs-prod-012.grafana.net"
-    basicAuth:
-      username: "685075"
-
-metrics:
+clusterMetrics:
+  enabled: true
   kube-state-metrics:
+    image:
+      tag: v2.15.0
+    deploy: true
     enabled: true
-
   node-exporter:
+    extraArgs:
+      - '--collector.mdadm'
+    deploy: true
     enabled: true
     metricsTuning:
       includeMetrics:
         - node_md_.*
-
+  opencost:
+    enabled: true
+    opencost:
+      exporter:
+        defaultClusterId: kiwix-prod
+      prometheus:
+        external:
+          url: https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom
+        existingSecretName: metricsservice-grafana-k8s-monitoring
+    metricsSource: metricsService
   kubelet:
     enabled: true
-
   cadvisor:
     enabled: true
-
-  cost:
-    enabled: true
-
+alloy-metrics:
+  enabled: true
+clusterEvents:
+  enabled: true
+alloy-singleton:
+  enabled: true
+podLogs:
+  enabled: true
+alloy-logs:
+  enabled: true
+annotationAutodiscovery:
+  enabled: true
+prometheusOperatorObjects:
+  enabled: true
+  crds:
+    deploy: true
   podMonitors:
     enabled: true
-
   serviceMonitors:
     enabled: true
-
-logs:
-  enabled: true
-
-  pod_logs:
-    enabled: true
-
-  cluster_events:
-    enabled: true
-
-kube-state-metrics:
-  enabled: true
-  image:
-    tag: v2.14.0
-
-prometheus-node-exporter:
-  enabled: true
-  extraArgs:
-    - --collector.mdadm
-
-prometheus-operator-crds:
-  enabled: true
-
-opencost:
-  enabled: true
-  opencost:
-    exporter:
-      defaultClusterId: "kiwix-prod"
-    prometheus:
-      external:
-        url: "https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom"
+integrations:
+  alloy:
+    instances:
+      - name: alloy
+        labelSelectors:
+          app.kubernetes.io/name:
+            - alloy-metrics
+            - alloy-singleton
+            - alloy-logs
+        metrics:
+          tuning:
+            useDefaultAllowList: false
+            includeMetrics:
+              - alloy_build_info
