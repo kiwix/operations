@@ -26,6 +26,8 @@ spec:
                 value: "http://mirrorbrain-web-service"
               - name: ZIM_DIRENTLOOKUPCACHE
                 value: "1"
+              - name: MIRRORBRAIN_DB_DSN
+                value: "postgresql://mirrorbrain:@mirrorbrain-db-service:5432/mirrorbrain"
               volumeMounts:
               - name: kiwix-download
                 subPath: library

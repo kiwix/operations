@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 """
-    apt install -y libmagic1
-    pip install unidecode requests lxml zimscraperlib
+apt install -y libmagic1
+pip install unidecode requests lxml zimscraperlib psycopg2-binary
 """
 
 import argparse
@@ -20,8 +20,10 @@ import time
 import urllib.parse
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Any, Dict, Generator, List, Tuple
+from typing import Any, Dict, Generator, Iterable, List, Tuple
 
+import psycopg2
+import psycopg2._psycopg
 import requests
 import unidecode
 from humanfriendly import format_size as human_size
@@ -29,7 +31,9 @@ from lxml import etree
 from zimscraperlib.i18n import get_language_details
 from zimscraperlib.zim import Archive
 
-logger = logging.getLogger("gen-lib")
+MIRRORBRAIN_DB_DSN = os.getenv("MIRRORBRAIN_DB_DSN") or "notset"
+MIRRORBRAIN_BATCH_SIZE = int(os.getenv("MIRRORBRAIN_BATCH_SIZE") or "100")
+
 
 # in-ZIM metadata to in-library XML attributes
 NAMES_MAP: Dict[str, str] = {
@@ -61,6 +65,103 @@ PROJECTS_PRIO = {
     "ted": 10,
     "phet": 11,
 }
+
+logger = logging.getLogger("gen-lib")
+
+
+class Mirrorbrain:
+
+    @classmethod
+    def get_connection(cls) -> psycopg2._psycopg.connection:
+        return psycopg2.connect(dsn=MIRRORBRAIN_DB_DSN)
+
+    @classmethod
+    def ensure_connected(cls):
+        with cls.get_connection() as connection:
+            if not connection.server_version:
+                raise OSError("Not connected to mirrorbrain DB")
+
+    @classmethod
+    def has_hashes_for(cls, relpath: str) -> bool:
+        """whether a single path has hashes on mirrorbrain"""
+        with cls.get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    r"SELECT COUNT(f.id) FROM filearr f, hash h "
+                    r"WHERE f.id=h.file_id and f.path = %s;",
+                    (relpath,),
+                )
+                row = cursor.fetchone()
+                if row:
+                    return bool(row[0])
+            return False
+
+    @classmethod
+    def get_not_ready_from(
+        cls, all_zims: list[pathlib.Path], relative_to: pathlib.Path
+    ) -> list[pathlib.Path]:
+        """list of path from supplied list that dont have hashes on mirrorbrain
+
+        list of path is resolved to relative_to but returned as supplied
+        ---
+
+        We cant query MB for all the existing ones without specifying
+        because the DB has like 130K entries (and counting).
+
+        We cant make an enormous query with an IN/ANY parameter containing
+        4,000 items neither.
+
+        We're left with two choices:
+        - make 4K individual requests
+          - quick requests as those match on equality of path
+          - output is only a boolean for each
+        - make batch requests with ANY operator
+          - way less requests (40 for batches of 100)
+          - output is a lot more verbose as we then need the path for each
+        """
+
+        if not all_zims:
+            return []
+
+        nb_zims = len(all_zims)
+        batch_size = MIRRORBRAIN_BATCH_SIZE
+        nb_batches = nb_zims // batch_size
+        remaining = nb_zims % batch_size
+        missing = list(all_zims)
+
+        def get_prefix(zim_path: pathlib.Path) -> pathlib.Path:
+            relpath = zim_path.relative_to(relative_to)
+            return pathlib.Path(*zim_path.parts[: -len(relpath.parts)])
+
+        # record the source values prefix so we can apply that back when we receive
+        # the results from MB DB as those are relative to MB root (so no prefix)
+        prefix = get_prefix(all_zims[0])
+
+        def query_for(zim_paths: list[pathlib.Path]):
+            if not zim_paths:
+                return
+            stmt = (
+                r"SELECT f.path FROM filearr f, hash h "
+                r"WHERE f.id=h.file_id and f.path = ANY(%s);"
+            )
+            values = [str(zim_path.relative_to(relative_to)) for zim_path in zim_paths]
+            cursor.execute(stmt, (values,))
+            for row in cursor.fetchall():
+                zim_path = prefix.joinpath(pathlib.Path(row[0]))
+                missing.remove(zim_path)
+
+        with cls.get_connection() as connection:
+            with connection.cursor() as cursor:
+                for batch_index in range(nb_batches):
+                    query_for(
+                        all_zims[
+                            (batch_index * batch_size) : (batch_index * batch_size)
+                            + batch_size
+                        ]
+                    )
+                if remaining:
+                    query_for(all_zims[-remaining:])
+        return missing
 
 
 @dataclass
@@ -148,7 +249,7 @@ def human_sort(entry: Dict) -> str:
     )
 
 
-def sort_filenames_for_recent(filenames: List[pathlib.Path]) -> List[pathlib.Path]:
+def sort_filenames_for_recent(filenames: Iterable[pathlib.Path]) -> List[pathlib.Path]:
     """Sorted copy of a list of ZIM filenames with ASC names but DESC periods"""
 
     def split_filename(filename):
@@ -468,7 +569,7 @@ class LibraryMaintainer:
         if self.load_fs:
             logger.info(f"[READ] Attempting reload from {self.load_fs}")
             try:
-                with open(self.load_fs, "r") as fh:
+                with open(self.load_fs) as fh:
                     self.all_zims = json.load(fh, object_hook=pathlib_relpath)
                     return
             except Exception as exc:
@@ -478,6 +579,7 @@ class LibraryMaintainer:
                 )
 
         all_zim_files = get_zim_files(self.zim_root, with_hidden=self.with_hidden)
+
         for index, zim_path in enumerate(sort_filenames_for_recent(all_zim_files)):
             relpath = zim_path.relative_to(self.zim_root)
             alias = to_human_alias(relpath)
@@ -661,9 +763,37 @@ class LibraryMaintainer:
         #     headers={"X-Purge-Type": "kiwix-serve"},
         # )
 
+    def filter_zims_to_mirrorbrain_ready_only(self):
+        not_ready = Mirrorbrain.get_not_ready_from(
+            # all_zims is a sorted list with first being latest for an alias
+            [
+                self.zim_root.joinpath(entries[0]["relpath"])
+                for entries in self.all_zims.values()
+            ],
+            # mirrorbrain works off a non-zim root (as for the redirects)
+            relative_to=self.redirects_root,
+        )
+        for zim_path in not_ready:
+            relpath = zim_path.relative_to(self.zim_root)
+            alias = to_human_alias(relpath)
+            logger.debug(f"[MB] Excluding {relpath} (not in Mirrorbrain)")
+            # we only need to keep the alias if there are 2 or more ZIMs for it
+            if len(self.all_zims.get(alias, [])) < 2:
+                try:
+                    del self.all_zims[alias]
+                except KeyError:
+                    ...
+            else:
+                for entry in list(self.all_zims[alias]):
+                    if entry["relpath"] == relpath:
+                        self.all_zims[alias].remove(entry)
+
     def run(self):
+        restrict_to_mirrorbrain = False
+
         if "all" in self.actions:
             self.actions = self.ACTIONS
+            restrict_to_mirrorbrain = True
         else:
             for action in self.actions:
                 if action not in self.ACTIONS:
@@ -672,12 +802,18 @@ class LibraryMaintainer:
 
         logger.info(f"Starting library-maint for {', '.join(self.actions)}")
 
+        if restrict_to_mirrorbrain:
+            Mirrorbrain.ensure_connected()
+
         self.load_previous_library()
 
         # always read source data
         self.readfs()
         if not len(self.all_zims):
             return 1
+
+        if restrict_to_mirrorbrain:
+            self.filter_zims_to_mirrorbrain_ready_only()
 
         if "delete-zim" in self.actions:
             self.delete_outdated()
