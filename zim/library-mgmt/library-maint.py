@@ -202,7 +202,7 @@ def pathlib_relpath(data: Any) -> Any:
 def get_tmp(fpath: pathlib.Path) -> pathlib.Path:
     """path to use to write fpath temporarily"""
     return fpath.with_name(
-        f"{fpath.name}.tmp_{datetime.datetime.utcnow().timetz()}"  # noqa: DTZ003
+        f"{fpath.name}.tmp_{datetime.datetime.now(datetime.UTC).timetz()}"
     )
 
 
@@ -399,8 +399,8 @@ class PreviousLib:
         self.read = False
 
         try:
-            self.date = datetime.datetime.fromtimestamp(  # noqa: DTZ006
-                fpath.stat().st_mtime
+            self.date = datetime.datetime.fromtimestamp(
+                fpath.stat().st_mtime, datetime.UTC
             )
             tree = etree.parse(str(fpath))  # noqa: S320
         except Exception:
