@@ -13,30 +13,30 @@ import logging
 import os
 import pathlib
 import re
-import shutil
 import sys
-import tempfile
 import time
 import urllib.parse
+from collections.abc import Generator, Iterable
 from contextlib import contextmanager
 from dataclasses import dataclass
-from typing import Any, Dict, Generator, Iterable, List, Tuple
+from typing import Any
 
-import psycopg2
-import psycopg2._psycopg
+import psycopg2  # pyright: ignore [reportMissingModuleSource]
+import psycopg2._psycopg  # pyright: ignore [reportMissingModuleSource]
 import requests
 import unidecode
 from humanfriendly import format_size as human_size
-from lxml import etree
-from zimscraperlib.i18n import get_language_details
+from lxml import etree  # pyright: ignore [reportAttributeAccessIssue]
 from zimscraperlib.zim import Archive
 
 MIRRORBRAIN_DB_DSN = os.getenv("MIRRORBRAIN_DB_DSN") or "notset"
 MIRRORBRAIN_BATCH_SIZE = int(os.getenv("MIRRORBRAIN_BATCH_SIZE") or "100")
 
+VARNISH_PURGE_HTTP_TIMEOUT = 50
+
 
 # in-ZIM metadata to in-library XML attributes
-NAMES_MAP: Dict[str, str] = {
+NAMES_MAP: dict[str, str] = {
     "Title": "title",
     "Description": "description",
     "Language": "language",
@@ -48,9 +48,15 @@ NAMES_MAP: Dict[str, str] = {
     "Date": "date",
 }
 
-COPIED_KEYS = ["id", "size", "url", "mediaCount", "articleCount", "favicon"] + list(
-    NAMES_MAP.values()
-)
+COPIED_KEYS = [
+    "id",
+    "size",
+    "url",
+    "mediaCount",
+    "articleCount",
+    "favicon",
+    *list(NAMES_MAP.values()),
+]
 
 PROJECTS_PRIO = {
     "wikipedia": 1,
@@ -195,7 +201,9 @@ def pathlib_relpath(data: Any) -> Any:
 
 def get_tmp(fpath: pathlib.Path) -> pathlib.Path:
     """path to use to write fpath temporarily"""
-    return fpath.with_name(f"{fpath.name}.tmp_{datetime.datetime.utcnow().timetz()}")
+    return fpath.with_name(
+        f"{fpath.name}.tmp_{datetime.datetime.utcnow().timetz()}"  # noqa: DTZ003
+    )
 
 
 def swap(tmp: pathlib.Path, final: pathlib.Path):
@@ -212,7 +220,9 @@ def period_from(text: str) -> str:
     """extracted period from a ZIM filename or stem"""
     return re.search(
         r"_(?P<period>\d{4}-\d{2})$", re.sub(r"\.zim$", "", text)
-    ).groupdict()["period"]
+    ).groupdict()[  # pyright: ignore [reportOptionalMemberAccess]
+        "period"
+    ]
 
 
 def fname_from_url(url: str) -> pathlib.Path:
@@ -234,12 +244,12 @@ def to_core(fpath: pathlib.Path) -> str:
     return fpath.stem
 
 
-def to_std_dict(obj: Any) -> Dict:
+def to_std_dict(obj: Any) -> dict:
     """Specific values we use to compare previous/current libraries"""
     return {key: obj.get(key, "") for key in COPIED_KEYS}
 
 
-def human_sort(entry: Dict) -> str:
+def human_sort(entry: dict) -> str:
     """human-sort-frienldy string to compare ZIM entries"""
     return (
         str(PROJECTS_PRIO.get(entry["project"], len(PROJECTS_PRIO) + 1)).zfill(2)
@@ -249,7 +259,7 @@ def human_sort(entry: Dict) -> str:
     )
 
 
-def sort_filenames_for_recent(filenames: Iterable[pathlib.Path]) -> List[pathlib.Path]:
+def sort_filenames_for_recent(filenames: Iterable[pathlib.Path]) -> list[pathlib.Path]:
     """Sorted copy of a list of ZIM filenames with ASC names but DESC periods"""
 
     def split_filename(filename):
@@ -259,14 +269,14 @@ def sort_filenames_for_recent(filenames: Iterable[pathlib.Path]) -> List[pathlib
         try:
             return split_filename(filename)[0]
         except IndexError:
-            print(f"FAILED on {filename}")
+            print(f"FAILED on {filename}")  # noqa: T201
             raise
 
     def get_period(filename):
         try:
             return split_filename(filename)[1]
         except IndexError:
-            print(f"FAILED on {filename}")
+            print(f"FAILED on {filename}")  # noqa: T201
             raise
 
     filenames_ = list(filenames)
@@ -338,7 +348,7 @@ def convert_pub_library_to_internal(
     logger.info(f"[LIBS] Preparing internal Library for {internal_library_dest}")
 
     int_library_tmp = get_tmp(internal_library_dest)
-    tree = etree.parse(str(pub_library_dest))
+    tree = etree.parse(str(pub_library_dest))  # noqa: S320
 
     with open_chmod(int_library_tmp, "wb", chmod=0o644) as fh:
         fh.write(
@@ -367,30 +377,32 @@ def convert_pub_library_to_internal(
         fh.write(f"</{tree.docinfo.root_name}>\n".encode(tree.docinfo.encoding))
 
     logger.info("[LIBS] Internal Library successfuly generated. Verifying XML…")
-    etree.parse(str(int_library_tmp))
+    etree.parse(str(int_library_tmp))  # noqa: S320
     logger.info("[LIBS] XML is well formed. Swaping files…")
     swap(int_library_tmp, internal_library_dest)
     logger.info("[LIBS] > done.")
 
 
 class JSONEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, pathlib.Path):
-            return str(obj)
-        if isinstance(obj, datetime.datetime):
-            return obj.isoformat()
-        return json.JSONEncoder.default(self, obj)
+    def default(self, o):
+        if isinstance(o, pathlib.Path):
+            return str(o)
+        if isinstance(o, datetime.datetime):
+            return o.isoformat()
+        return json.JSONEncoder.default(self, o)
 
 
 class PreviousLib:
     def __init__(self, fpath: pathlib.Path):
-        self.books: Dict[str, Dict] = {}  # core: entry
-        self.aliases: Dict[str, str] = {}  # human: id
+        self.books: dict[str, dict] = {}  # core: entry
+        self.aliases: dict[str, str] = {}  # human: id
         self.read = False
 
         try:
-            self.date = datetime.datetime.fromtimestamp(fpath.stat().st_mtime)
-            tree = etree.parse(str(fpath))
+            self.date = datetime.datetime.fromtimestamp(  # noqa: DTZ006
+                fpath.stat().st_mtime
+            )
+            tree = etree.parse(str(fpath))  # noqa: S320
         except Exception:
             logger.warning("[READ] Unbale to read previous library. Purging disabled.")
             return
@@ -415,13 +427,13 @@ class PreviousLib:
 class LibraryMaintainer:
 
     # allowed actions for the script
-    ACTIONS = [
+    ACTIONS = (
         "read",
         "delete-zim",
         "write-redirects",
         "write-libraries",
         "purge-varnish",
-    ]
+    )
 
     # former (old) filename format for ZIMs (period was MM_YYYY)
     old_filename_fmt = re.compile(
@@ -438,6 +450,7 @@ class LibraryMaintainer:
 
     def __init__(
         self,
+        *,
         actions: str,
         zim_root: str,
         with_hidden: bool,
@@ -451,8 +464,8 @@ class LibraryMaintainer:
         nb_zim_versions_exposed: int,
         varnish_url: str,
         log_to: str,
-        dump_fs: bool,
-        load_fs: bool,
+        dump_fs: str,
+        load_fs: str,
     ):
         self.actions = [action.strip() for action in actions]
 
@@ -473,18 +486,18 @@ class LibraryMaintainer:
 
         self.varnish_url = varnish_url
 
-        self.log_to = pathlib.Path(log_to) if log_to else False
-        self.dump_fs = pathlib.Path(dump_fs) if dump_fs else False
-        self.load_fs = pathlib.Path(load_fs) if load_fs else False
+        self.log_to = pathlib.Path(log_to) if log_to else None
+        self.dump_fs = pathlib.Path(dump_fs) if dump_fs else None
+        self.load_fs = pathlib.Path(load_fs) if load_fs else None
 
-        # mapping of <core>: [<entry>, ] for ZIMs (entry is Dict)
+        # mapping of <core>: [<entry>, ] for ZIMs (entry is dict)
         self.all_zims = {}
 
-        self.previous_lib: PreviousLib = None
-        self.updated_zims: Dict[str, Tuple(str, str)] = {}  # alias: (uuid, core)
+        self.previous_lib: PreviousLib
+        self.updated_zims: dict[str, tuple[str, str]] = {}  # alias: (uuid, core)
 
     @property
-    def exposed_zims(self) -> Dict[str, Dict]:
+    def exposed_zims(self) -> dict[str, dict]:
         """alias: Entry of just the last entries for an alias"""
         return {alias: entries[0] for alias, entries in self.all_zims.items()}
 
@@ -498,21 +511,27 @@ class LibraryMaintainer:
                 f"{len(self.previous_lib.aliases)} aliases"
             )
 
-    def read_zimfile_info(self, fpath: pathlib.Path, read_zim: bool) -> Dict[str, Any]:
+    def read_zimfile_info(
+        self, fpath: pathlib.Path, *, read_zim: bool
+    ) -> dict[str, Any]:
         """All infor read from ZIM file/name"""
         entry = {}
         relpath = fpath.relative_to(self.zim_root)
 
         try:
-            values = self.filename_fmt.match(fpath.stem).groupdict()
+            values = self.filename_fmt.match(
+                fpath.stem
+            ).groupdict()  # pyright: ignore[reportOptionalMemberAccess]
         except AttributeError:
             try:
-                values = self.old_filename_fmt.match(fpath.stem).groupdict()
-            except Exception:
+                values = self.old_filename_fmt.match(
+                    fpath.stem
+                ).groupdict()  # pyright: ignore[reportOptionalMemberAccess]
+            except Exception as exc:
                 logger.error(
                     f"[READ] Non-standard ZIM filename: {fpath.name}. Skipping"
                 )
-                raise ValueError("Non-standard ZIM filename")
+                raise ValueError("Non-standard ZIM filename") from exc
 
         entry.update(
             {
@@ -543,7 +562,7 @@ class LibraryMaintainer:
             }
         )
 
-        for meta_name in NAMES_MAP.keys():
+        for meta_name in NAMES_MAP.keys():  # noqa: PLC0206
             try:
                 if meta_name == "Tags":
                     entry[NAMES_MAP[meta_name]] = ";".join(zim.get_tags(libkiwix=True))
@@ -709,7 +728,7 @@ class LibraryMaintainer:
             fh.write(b"</library>\n")
 
         logger.info("[LIBS] Public Library successfuly generated. Verifying XML…")
-        etree.parse(str(pub_library_tmp))
+        etree.parse(str(pub_library_tmp))  # noqa: S320
         logger.info("[LIBS] Public XML is well formed. Swaping files…")
         swap(pub_library_tmp, self.pub_library_dest)
         logger.info("[LIBS] > done.")
@@ -733,7 +752,10 @@ class LibraryMaintainer:
         logger.info(f"[PURGE] Requesting Library purge from {self.varnish_url}")
         time.sleep(10)
         resp = requests.request(
-            method="PURGE", url=self.varnish_url, headers={"X-Purge-Type": "library"}
+            method="PURGE",
+            url=self.varnish_url,
+            headers={"X-Purge-Type": "library"},
+            timeout=VARNISH_PURGE_HTTP_TIMEOUT,
         )
         if not resp.ok:
             logger.error(f"[PURGE] > HTTP {resp.status_code}/{resp.reason}")
@@ -752,6 +774,7 @@ class LibraryMaintainer:
                     # only account for new-style book name fmt (yolo)
                     "X-Book-Name-Nodate": book_alias,
                 },
+                timeout=VARNISH_PURGE_HTTP_TIMEOUT,
             )
             if not resp.ok:
                 logger.error(f"[PURGE] >> HTTP {resp.status_code}/{resp.reason}")
@@ -778,7 +801,7 @@ class LibraryMaintainer:
             alias = to_human_alias(relpath)
             logger.debug(f"[MB] Excluding {relpath} (not in Mirrorbrain)")
             # we only need to keep the alias if there are 2 or more ZIMs for it
-            if len(self.all_zims.get(alias, [])) < 2:
+            if len(self.all_zims.get(alias, [])) < 2:  # noqa: PLR2004
                 try:
                     del self.all_zims[alias]
                 except KeyError:
@@ -955,7 +978,9 @@ def entrypoint():
     if args.log_to:
         log_fpath = pathlib.Path(args.log_to)
         os.truncate(log_fpath, 0)
-        handlers.append(logging.FileHandler(log_fpath))
+        handlers.append(
+            logging.FileHandler(log_fpath)  # pyright: ignore [reportArgumentType]
+        )
     logging.basicConfig(
         level=logging.DEBUG,
         format="%(asctime)s %(levelname)s %(message)s",
@@ -968,7 +993,7 @@ def entrypoint():
     except Exception as exc:
         logger.error(f"FAILED. An error occurred: {exc}")
         logger.exception(exc)
-        raise SystemExit(1)
+        raise SystemExit(1) from exc
 
 
 if __name__ == "__main__":
