@@ -579,7 +579,7 @@ class LibraryMaintainer:
 
         return entry
 
-    def readfs(self):
+    def readfs(self, *, restrict_to_mirrorbrain: bool = False):
         """walk filesystem for ZIM files to build self.all_zims
 
         Optionnaly reads from load_fs JSON file.
@@ -598,8 +598,20 @@ class LibraryMaintainer:
                 )
 
         all_zim_files = get_zim_files(self.zim_root, with_hidden=self.with_hidden)
+        all_zim_files = sort_filenames_for_recent(all_zim_files)  # consumes generator
 
-        for index, zim_path in enumerate(sort_filenames_for_recent(all_zim_files)):
+        if restrict_to_mirrorbrain:
+            not_mb_ready = Mirrorbrain.get_not_ready_from(
+                all_zim_files,
+                # mirrorbrain works off a non-zim root (as for the redirects)
+                relative_to=self.redirects_root,
+            )
+            # reduce list to matching ones
+            for path in not_mb_ready:
+                logger.warning(f"[MB] Excluding {path} (not in Mirrorbrain)")
+                all_zim_files.remove(path)
+
+        for index, zim_path in enumerate(all_zim_files):
             relpath = zim_path.relative_to(self.zim_root)
             alias = to_human_alias(relpath)
             logger.debug(f"[READ] {str(index).zfill(4)} {relpath}")
@@ -722,7 +734,8 @@ class LibraryMaintainer:
                 for attr in COPIED_KEYS:
                     if entry.get(attr):
                         elem.set(attr, entry.get(attr))
-                elem.set("faviconMimeType", "image/png")
+                    elem.set("faviconMimeType", "image/png")
+                assert elem.get("id")  # safeguard that we dont write entry without data
                 fh.write(etree.tostring(elem, encoding="UTF-8"))
                 fh.write(b"\n")
             fh.write(b"</library>\n")
@@ -831,12 +844,9 @@ class LibraryMaintainer:
         self.load_previous_library()
 
         # always read source data
-        self.readfs()
+        self.readfs(restrict_to_mirrorbrain=restrict_to_mirrorbrain)
         if not len(self.all_zims):
             return 1
-
-        if restrict_to_mirrorbrain:
-            self.filter_zims_to_mirrorbrain_ready_only()
 
         if "delete-zim" in self.actions:
             self.delete_outdated()
