@@ -339,6 +339,19 @@ def is_latest(fpath: pathlib.Path) -> bool:
     return True
 
 
+def parseable_xml_file(fpath: pathlib.Path) -> bool:
+    """whether Catalog XML file can be parsed as XML"""
+    try:
+        for _, elem in etree.iterparse(str(fpath)):
+            if elem.tag == "book":
+                assert elem.attrib["id"]
+    except Exception as exc:
+        logger.error(exc)
+        logger.exception(exc)
+        return False
+    return True
+
+
 def convert_pub_library_to_internal(
     pub_library_dest: pathlib.Path,
     internal_library_dest: pathlib.Path,
@@ -348,20 +361,22 @@ def convert_pub_library_to_internal(
     logger.info(f"[LIBS] Preparing internal Library for {internal_library_dest}")
 
     int_library_tmp = get_tmp(internal_library_dest)
-    tree = etree.parse(str(pub_library_dest))  # noqa: S320
-
+    tree = None
+    encoding = "UTF-8"
     with open_chmod(int_library_tmp, "wb", chmod=0o644) as fh:
-        fh.write(
-            (
-                f'<?xml version="{tree.docinfo.xml_version}" '
-                f'encoding="{tree.docinfo.encoding}" ?>\n'
-                f"<{tree.docinfo.root_name} "
-                f'version="{tree.getroot().attrib.get("version")}">\n'
-            ).encode(tree.docinfo.encoding)
-        )
-        for elem in tree.iter():
-            if elem.tag == tree.docinfo.root_name:
-                continue
+
+        for _, elem in etree.iterparse(str(pub_library_dest), tag="book"):
+            if not tree:
+                tree = elem.getroottree()
+                encoding = tree.docinfo.encoding or encoding
+                fh.write(
+                    (
+                        f'<?xml version="{tree.docinfo.xml_version}" '
+                        f'encoding="{encoding}" ?>\n'
+                        f"<{tree.docinfo.root_name} "
+                        f'version="{tree.getroot().attrib.get("version")}">\n'
+                    ).encode(encoding)
+                )
 
             # internal library path is constructed from relative download path
             # in URL and prefix with internal_zim_root
@@ -374,10 +389,10 @@ def convert_pub_library_to_internal(
                 ),
             )
             fh.write(etree.tostring(elem, encoding=tree.docinfo.encoding))
-        fh.write(f"</{tree.docinfo.root_name}>\n".encode(tree.docinfo.encoding))
+        fh.write(f"</{tree.docinfo.root_name}>\n".encode(encoding))
 
     logger.info("[LIBS] Internal Library successfuly generated. Verifying XML…")
-    etree.parse(str(int_library_tmp))  # noqa: S320
+    assert parseable_xml_file(int_library_tmp)
     logger.info("[LIBS] XML is well formed. Swaping files…")
     swap(int_library_tmp, internal_library_dest)
     logger.info("[LIBS] > done.")
@@ -741,7 +756,7 @@ class LibraryMaintainer:
             fh.write(b"</library>\n")
 
         logger.info("[LIBS] Public Library successfuly generated. Verifying XML…")
-        etree.parse(str(pub_library_tmp))  # noqa: S320
+        assert parseable_xml_file(pub_library_tmp)
         logger.info("[LIBS] Public XML is well formed. Swaping files…")
         swap(pub_library_tmp, self.pub_library_dest)
         logger.info("[LIBS] > done.")
