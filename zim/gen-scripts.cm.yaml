@@ -36,6 +36,12 @@ data:
         KIWIX_NIGHTLY_REDIRECTS_MAP = "/data/maps/kiwix-nightly.map"
 
 
+    # using special, custom syntax: the content within the two pipes
+    # is considered a single regex match expression for the version.
+    # this allows finer-matching when a simple * glob matching would
+    # match a different file because there are files with specifiers on same level
+    # as version.
+    # see https://github.com/kiwix/operations/issues/406
     openzim_releases = {
         "javascript-libzim/libzim_wasm.zip": "libzim_wasm_*.zip",
         # obsolete
@@ -46,12 +52,12 @@ data:
         "libzim/libzim_android-arm64.tar.gz": "libzim_android-arm64-*.tar.gz",
         "libzim/libzim_android-x86.tar.gz": "libzim_android-x86-*.tar.gz",
         "libzim/libzim_android-x86_64.tar.gz": "libzim_android-x86_64-*.tar.gz",
-        "libzim/libzim_linux-aarch64.tar.gz": "libzim_linux-aarch64-*.tar.gz",
+        "libzim/libzim_linux-aarch64.tar.gz": r"libzim_linux-aarch64-|[\d\.]+|.tar.gz",
         "libzim/libzim_linux-aarch64-bionic.tar.gz": "libzim_linux-aarch64-bionic-*.tar.gz",
         "libzim/libzim_linux-aarch64-musl.tar.gz": "libzim_linux-aarch64-musl-*.tar.gz",
         "libzim/libzim_linux-armv6.tar.gz": "libzim_linux-armv6-*.tar.gz",
         "libzim/libzim_linux-armv8.tar.gz": "libzim_linux-armv8-*.tar.gz",
-        "libzim/libzim_linux-x86_64.tar.gz": "libzim_linux-x86_64-*.tar.gz",
+        "libzim/libzim_linux-x86_64.tar.gz": r"libzim_linux-x86_64-|[\d\.]+|.tar.gz",
         "libzim/libzim_linux-x86_64-bionic.tar.gz": "libzim_linux-x86_64-bionic-*.tar.gz",
         "libzim/libzim_linux-x86_64-musl.tar.gz": "libzim_linux-x86_64-musl-*.tar.gz",
         "libzim/libzim_macos-arm64.tar.gz": "libzim_macos-arm64-*.tar.gz",
@@ -59,14 +65,13 @@ data:
         "libzim/libzim_wasm-emscripten.tar.gz": "libzim_wasm-emscripten-*.tar.gz",
         # obsolete
         "libzim/libzim_linux-armhf.tar.gz": "libzim_linux-armv6-*.tar.gz",
-
         "zim-tools/zim-tools.tar.xz": "zim-tools-*.tar.xz",
-        "zim-tools/zim-tools_linux-aarch64.tar.gz": "zim-tools_linux-aarch64-*.tar.gz",
+        "zim-tools/zim-tools_linux-aarch64.tar.gz": r"zim-tools_linux-aarch64-|[\d\.]+|.tar.gz",
         "zim-tools/zim-tools_linux-aarch64-musl.tar.gz": "zim-tools_linux-aarch64-musl-*.tar.gz",
         "zim-tools/zim-tools_linux-armv6.tar.gz": "zim-tools_linux-armv6-*.tar.gz",
         "zim-tools/zim-tools_linux-armv8.tar.gz": "zim-tools_linux-armv8-*.tar.gz",
         "zim-tools/zim-tools_linux-i586.tar.gz": "zim-tools_linux-i586-*.tar.gz",
-        "zim-tools/zim-tools_linux-x86_64.tar.gz": "zim-tools_linux-x86_64-*.tar.gz",
+        "zim-tools/zim-tools_linux-x86_64.tar.gz": r"zim-tools_linux-x86_64-|[\d\.]+|.tar.gz",
         "zim-tools/zim-tools_linux-x86_64-musl.tar.gz": "zim-tools_linux-x86_64-musl-*.tar.gz",
         "zim-tools/zim-tools_macos-arm64.tar.gz": "zim-tools_macos-arm64-*.tar.gz",
         "zim-tools/zim-tools_macos-x86_64.tar.gz": "zim-tools_macos-x86_64-*.tar.gz",
@@ -122,12 +127,12 @@ data:
         "kiwix-tools/kiwix-tools_macos-x86_64.tar.gz": "kiwix-tools_macos-x86_64-*.tar.gz",
         "kiwix-tools/kiwix-tools_macos-arm64.tar.gz": "kiwix-tools_macos-arm64-*.tar.gz",
         "kiwix-tools/kiwix-tools.tar.xz": "kiwix-tools-*.tar.xz",
-        "kiwix-tools/kiwix-tools_linux-x86_64.tar.gz": "kiwix-tools_linux-x86_64-*.tar.gz",
+        "kiwix-tools/kiwix-tools_linux-x86_64.tar.gz": r"kiwix-tools_linux-x86_64-|[\d\.]+|.tar.gz",
         "kiwix-tools/kiwix-tools_linux-aarch64-musl.tar.gz": "kiwix-tools_linux-aarch64-musl-*.tar.gz",
         "kiwix-tools/kiwix-tools_linux-armv6.tar.gz": "kiwix-tools_linux-armv6-*.tar.gz",
         "kiwix-tools/kiwix-tools_linux-armv8.tar.gz": "kiwix-tools_linux-armv8-*.tar.gz",
         "kiwix-tools/kiwix-tools_linux-x86_64-musl.tar.gz": "kiwix-tools_linux-x86_64-musl-*.tar.gz",
-        "kiwix-tools/kiwix-tools_linux-aarch64.tar.gz": "kiwix-tools_linux-aarch64-*.tar.gz",
+        "kiwix-tools/kiwix-tools_linux-aarch64.tar.gz": r"kiwix-tools_linux-aarch64-|[\d\.]+|.tar.gz",
         "kiwix-tools/kiwix-tools_win-i686.zip": "kiwix-tools_win-i686-*.zip",
         "kiwix-tools/kiwix-tools_linux-i586.tar.gz": "kiwix-tools_linux-i586-*.tar.gz",
         # obsolete
@@ -174,17 +179,33 @@ data:
         def get_latest_release_path(pattern):
             """content_fpath-relative path of latest matching file"""
 
+            glob_pattern = pattern
+            re_pattern = pattern.replace("*", "(?P<version>.+)")
+
+            # using special regex syntax
+            if pattern.count("|") == 2:
+                prefix, regexp, suffix = pattern.split("|", 2)
+                glob_pattern = f"{prefix}*{suffix}"  # we filter files with *, always
+                re_pattern = f"{prefix}(?P<version>{regexp}){suffix}"  # for actual matching
+
             # retrieve list of files using glob
-            files = list(release_fpath.rglob(pattern))
+            files = list(release_fpath.rglob(glob_pattern))
 
             # create regex from simple “glob” pattern
-            version_reg = re.compile(pattern.replace("*", "(?P<version>.+)"))
+            version_reg = re.compile(re_pattern)
 
             # get latest version and related file by sorting all matching files
             # on their version number ; keeping last of list
             latest_version, lastest_fpath = sorted(
-                [(version_reg.match(p.name).groupdict()["version"], p) for p in files],
-                key=version_key,
+                [
+                    (
+                        version_reg.match(p.name).groupdict()["version"],  # pyright: ignore
+                        p,
+                    )
+                    for p in files
+                    if version_reg.match(p.name)
+                ],
+                key=lambda v: v[0],
             )[-1]
 
             return lastest_fpath.relative_to(content_fpath)
