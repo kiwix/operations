@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: demo-generator
+  name: clients-demo-generator
   namespace: zim
 spec:
   schedule: "0 * * * *"
@@ -19,7 +19,7 @@ spec:
               imagePullPolicy: Always
               env:
               - name: INSTALL_SCRIPTS
-                value: "demo-generator#github://kiwix/operations/zim/demo-library/demo-generator.py\n"
+                value: "demo-generator#github://kiwix/operations/zim/clients-library/clients-demo-generator.py\n"
               volumeMounts:
               - mountPath: "/data/demo"
                 subPath: demo

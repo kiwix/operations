@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: clients-library-kiwix-org
+  namespace: zim
+spec:
+  secretName: clients-library-kiwix-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: clients.library.kiwix.org
+  dnsNames:
+  - clients.library.kiwix.org

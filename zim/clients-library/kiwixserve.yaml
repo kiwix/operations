@@ -3,21 +3,21 @@ kind: Deployment
 metadata:
   namespace: zim
   labels:
-    app: demo-library-kiwixserve-app
-  name: demo-library-kiwixserve-deployment
+    app: clients-library-kiwixserve-app
+  name: clients-library-kiwixserve-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: demo-library-kiwixserve-app
+      app: clients-library-kiwixserve-app
   template:
     metadata:
       labels:
-        app: demo-library-kiwixserve-app
+        app: clients-library-kiwixserve-app
     spec:
       containers:
       # /!\ manually purge kiwix-serve cache on kiwix-serve version upgrade
-      # curl -X PURGE -H "X-Purge-Type: kiwix-serve" http://demo-library-webcache-service
+      # curl -X PURGE -H "X-Purge-Type: kiwix-serve" http://clients-library-webcache-service
       - image: ghcr.io/kiwix/kiwix-tools:3.7.0-2
         imagePullPolicy: IfNotPresent
         name: kiwix-tools
@@ -66,12 +66,12 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: zim
-  name: demo-library-kiwixserve-service
+  name: clients-library-kiwixserve-service
   labels:
-    app: demo-library-kiwixserve-app
+    app: clients-library-kiwixserve-app
 spec:
   selector:
-    app: demo-library-kiwixserve-app
+    app: clients-library-kiwixserve-app
   ports:
   - protocol: TCP
     port: 80

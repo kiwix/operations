@@ -88,10 +88,10 @@ favicons_path = demos_path / "favicons"
 favicons_path.mkdir(exist_ok=True)
 logger = getLogger("demo-generator")
 assets_base_url = (
-    "https://raw.githubusercontent.com/kiwix/operations/main/zim/demo-library/"
+    "https://raw.githubusercontent.com/kiwix/operations/main/zim/clients-library/"
 )
 logger.info(f"Assets will be downloaded from {assets_base_url}")
-varnish_cache_url = "http://demo-library-webcache-service"
+varnish_cache_url = "http://clients-library-webcache-service"
 
 
 def zim_date_key(zim_filename: str) -> tuple[str, int, str, str]:

@@ -10,4 +10,4 @@ This repo contain:
 
 ## Demo library
 
-Demos served at https://demo.library.kiwix.org are configured in this repo, see https://wiki.openzim.org/wiki/Content_team#Demo_a_ZIM for details about how to setup a new demo.
+Demos served at https://clients.library.kiwix.org are configured in this repo, see https://wiki.openzim.org/wiki/Content_team#Demo_a_ZIM for details about how to setup a new demo.
