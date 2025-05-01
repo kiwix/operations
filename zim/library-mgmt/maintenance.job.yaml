@@ -12,8 +12,8 @@ spec:
           image: ghcr.io/kiwix/maintenance:latest
           imagePullPolicy: Always
           env:
-          - name: VARNISH_URL
-            value: "http://library-frontend-service"
+          - name: VARNISH_URLS
+            value: "http://library-frontend-service|http://demo-library-frontend-service"
           - name: MIRRORBRAIN_URL
             value: "http://mirrorbrain-web-service"
           volumeMounts:

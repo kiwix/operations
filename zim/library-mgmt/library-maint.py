@@ -187,7 +187,7 @@ class Defaults:
     NB_ZIM_VERSIONS_TO_KEEP = 2
     NB_ZIM_VERSIONS_EXPOSED = 1
 
-    VARNISH_URL = "http://localhost"
+    VARNISH_URLS = ["http://localhost"]
 
 
 def pathlib_relpath(data: Any) -> Any:
@@ -477,7 +477,7 @@ class LibraryMaintainer:
         zim_redirects_map: str,
         nb_zim_versions_to_keep: int,
         nb_zim_versions_exposed: int,
-        varnish_url: str,
+        varnish_urls: str,
         log_to: str,
         dump_fs: str,
         load_fs: str,
@@ -499,7 +499,7 @@ class LibraryMaintainer:
         self.nb_zim_versions_to_keep = nb_zim_versions_to_keep
         self.nb_zim_versions_exposed = nb_zim_versions_exposed
 
-        self.varnish_url = varnish_url
+        self.varnish_urls = varnish_urls
 
         self.log_to = pathlib.Path(log_to) if log_to else None
         self.dump_fs = pathlib.Path(dump_fs) if dump_fs else None
@@ -776,43 +776,44 @@ class LibraryMaintainer:
             logger.info("[PURGE] No updated ZIM in Library, not purging.")
             return
 
-        # purge library (once)
-        logger.info(f"[PURGE] Requesting Library purge from {self.varnish_url}")
-        time.sleep(10)
-        resp = requests.request(
-            method="PURGE",
-            url=self.varnish_url,
-            headers={"X-Purge-Type": "library"},
-            timeout=VARNISH_PURGE_HTTP_TIMEOUT,
-        )
-        if not resp.ok:
-            logger.error(f"[PURGE] > HTTP {resp.status_code}/{resp.reason}")
-
-        logger.info("[PURGE] Requesting Books purge for")
-        for book_alias in self.updated_zims.keys():
-            book_id, book_core = self.updated_zims[book_alias]
-            logger.debug(f"[PURGE] > {book_alias} / {book_core} / {book_id}")
+        for varnish_url in self.varnish_urls:
+            # purge library (once)
+            logger.info(f"[PURGE] Requesting Library purge from {varnish_url}")
+            time.sleep(10)
             resp = requests.request(
                 method="PURGE",
-                url=self.varnish_url,
-                headers={
-                    "X-Purge-Type": "book",
-                    "X-Book-Id": book_id,
-                    "X-Book-Name": book_core,
-                    # only account for new-style book name fmt (yolo)
-                    "X-Book-Name-Nodate": book_alias,
-                },
+                url=varnish_url,
+                headers={"X-Purge-Type": "library"},
                 timeout=VARNISH_PURGE_HTTP_TIMEOUT,
             )
             if not resp.ok:
-                logger.error(f"[PURGE] >> HTTP {resp.status_code}/{resp.reason}")
+                logger.error(f"[PURGE] > HTTP {resp.status_code}/{resp.reason}")
 
-        # no mandate to purge kiwix-serve
-        # resp = requests.request(
-        #     method="PURGE",
-        #     url=self.varnish_url,
-        #     headers={"X-Purge-Type": "kiwix-serve"},
-        # )
+            logger.info("[PURGE] Requesting Books purge for")
+            for book_alias in self.updated_zims.keys():
+                book_id, book_core = self.updated_zims[book_alias]
+                logger.debug(f"[PURGE] > {book_alias} / {book_core} / {book_id}")
+                resp = requests.request(
+                    method="PURGE",
+                    url=varnish_url,
+                    headers={
+                        "X-Purge-Type": "book",
+                        "X-Book-Id": book_id,
+                        "X-Book-Name": book_core,
+                        # only account for new-style book name fmt (yolo)
+                        "X-Book-Name-Nodate": book_alias,
+                    },
+                    timeout=VARNISH_PURGE_HTTP_TIMEOUT,
+                )
+                if not resp.ok:
+                    logger.error(f"[PURGE] >> HTTP {resp.status_code}/{resp.reason}")
+
+            # no mandate to purge kiwix-serve
+            # resp = requests.request(
+            #     method="PURGE",
+            #     url=varnish_url,
+            #     headers={"X-Purge-Type": "kiwix-serve"},
+            # )
 
     def filter_zims_to_mirrorbrain_ready_only(self):
         not_ready = Mirrorbrain.get_not_ready_from(
@@ -967,12 +968,17 @@ def entrypoint():
         type=int,
         dest="nb_zim_versions_exposed",
     )
+
+    def pipesplit(text_with_pipes: str) -> list[str]:
+        return [text.strip() for text in text_with_pipes.split("|")]
+
     parser.add_argument(
-        "--varnish-url",
-        default=os.getenv("VARNISH_URL", Defaults.VARNISH_URL),
-        help="URL of the varnish cache to query for purge. Defaults to "
-        f"`VARNISH_URL` environ or {Defaults.VARNISH_URL}",
-        dest="varnish_url",
+        "--varnish-urls",
+        default=os.getenv("VARNISH_URLS", "|".join(Defaults.VARNISH_URLS)),
+        help="URLs of the varnish cache to query for purge. Separated by |. "
+        f"Defaults to `VARNISH_URLS` environ or {Defaults.VARNISH_URLS}",
+        type=pipesplit,
+        dest="varnish_urls",
     )
 
     parser.add_argument(

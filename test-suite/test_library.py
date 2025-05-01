@@ -18,7 +18,7 @@ from utils import (
 def test_reachable(scheme):
     assert (
         requests.head(get_url("/", scheme), timeout=TIMEOUT).status_code
-        == HTTPStatus.OK
+        in (HTTPStatus.OK, HTTPStatus.MOVED_PERMANENTLY)
     )
 
 

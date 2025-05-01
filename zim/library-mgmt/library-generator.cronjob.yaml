@@ -20,8 +20,8 @@ spec:
               env:
               - name: INSTALL_SCRIPTS
                 value: "library-maint#github://kiwix/operations/zim/library-mgmt/library-maint.py"
-              - name: VARNISH_URL
-                value: "http://library-frontend-service"
+              - name: VARNISH_URLS
+                value: "http://library-frontend-service|http://demo-library-frontend-service"
               - name: MIRRORBRAIN_URL
                 value: "http://mirrorbrain-web-service"
               - name: ZIM_DIRENTLOOKUPCACHE
