@@ -477,7 +477,7 @@ class LibraryMaintainer:
         zim_redirects_map: str,
         nb_zim_versions_to_keep: int,
         nb_zim_versions_exposed: int,
-        varnish_urls: str,
+        varnish_urls: list[str],
         log_to: str,
         dump_fs: str,
         load_fs: str,
