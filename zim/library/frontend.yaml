@@ -306,15 +306,13 @@ metadata:
         # serve / (will be handled here, and last)
         if ($uri = "/") {
           set $demoFlag 0;
+          return 200 '<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml">\n<head>\n<meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><title>Kiwix Library</title>\n<link rel="apple-touch-icon" sizes="180x180" href="https://browse.library.kiwix.org/skin/favicon/apple-touch-icon.png?14.0.0">\n<link rel="icon" type="image/png" sizes="32x32" href="https://browse.library.kiwix.org/skin/favicon/favicon-32x32.png?14.0.0">\n<link rel="icon" type="image/png" sizes="16x16" href="https://browse.library.kiwix.org/skin/favicon/favicon-16x16.png?14.0.0">\n<link rel="manifest" href="https://browse.library.kiwix.org/skin/favicon/site.webmanifest?14.0.0">\n<link rel="mask-icon" href="https://browse.library.kiwix.org/skin/favicon/safari-pinned-tab.svg?14.0.0" color="#5bbad5">\n<link rel="shortcut icon" href="https://browse.library.kiwix.org/skin/favicon/favicon.ico?14.0.0">\n<meta name="msapplication-TileColor" content="#da532c">\n<meta name="msapplication-config" content="/skin/favicon/browserconfig.xml?14.0.0">\n<meta name="theme-color" content="#ffffff">\n<style type="text/css">* { margin: 0; padding:0; } body { width: 100vw; height: 100vh; } iframe { border: 0; width: 100vw; height: 100vh; }</style>\n</head>\n<body><iframe src="https://browse.library.kiwix.org/"/></body>\n</html>';
         }
 
         if ( $demoFlag = 1 ) {
           rewrite ^/(.*) https://browse.library.kiwix.org/$1 permanent;
           return 301 "https://browse.library.kiwix.org/";
         }
-
-        default_type text/html;
-        return 200 '<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml">\n<head>\n<meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><title>Kiwix Library</title>\n<link rel="apple-touch-icon" sizes="180x180" href="https://browse.library.kiwix.org/skin/favicon/apple-touch-icon.png?14.0.0">\n<link rel="icon" type="image/png" sizes="32x32" href="https://browse.library.kiwix.org/skin/favicon/favicon-32x32.png?14.0.0">\n<link rel="icon" type="image/png" sizes="16x16" href="https://browse.library.kiwix.org/skin/favicon/favicon-16x16.png?14.0.0">\n<link rel="manifest" href="https://browse.library.kiwix.org/skin/favicon/site.webmanifest?14.0.0">\n<link rel="mask-icon" href="https://browse.library.kiwix.org/skin/favicon/safari-pinned-tab.svg?14.0.0" color="#5bbad5">\n<link rel="shortcut icon" href="https://browse.library.kiwix.org/skin/favicon/favicon.ico?14.0.0">\n<meta name="msapplication-TileColor" content="#da532c">\n<meta name="msapplication-config" content="/skin/favicon/browserconfig.xml?14.0.0">\n<meta name="theme-color" content="#ffffff">\n<style type="text/css">* { margin: 0; padding:0; } body { width: 100vw; height: 100vh; } iframe { border: 0; width: 100vw; height: 100vh; }</style>\n</head>\n<body><iframe src="https://browse.library.kiwix.org/"/></body>\n</html>';
 spec:
   ingressClassName: nginx
   tls:
