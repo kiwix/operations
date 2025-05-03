@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: opds-redirect-ingress
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+      rewrite ^/(.*) https://library.kiwix.org/catalog/$1 permanent;
+      return 301 "https://library.kiwix.org/catalog/";
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - opds.library.kiwix.org
+      secretName: opds-library-kiwix-org-tls
+  rules:
+  - host: opds.library.kiwix.org
