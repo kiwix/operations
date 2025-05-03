@@ -21,7 +21,7 @@ KIWIX_PATCH=$(cat <<EOF
       <meta charset="UTF-8" />
       <meta name="viewport" content="width=device-width,initial-scale=1" />
       <link type="root" href="{{root}}">
-!     <title>Kiwix Library</title>
+!     <title>Kiwix Library</title><base target="_top" />
       <link
         type="text/css"
         href="{{root}}/skin/kiwix.css?KIWIXCACHEID"
