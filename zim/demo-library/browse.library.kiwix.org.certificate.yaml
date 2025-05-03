@@ -1,13 +1,13 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: demo-library-kiwix-org
+  name: browse-library-kiwix-org
   namespace: zim
 spec:
-  secretName: demo-library-kiwix-org-tls
+  secretName: browse-library-kiwix-org-tls
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt-prod
-  commonName: demo.library.kiwix.org
+  commonName: browse.library.kiwix.org
   dnsNames:
-  - demo.library.kiwix.org
+  - browse.library.kiwix.org

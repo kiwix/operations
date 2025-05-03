@@ -28,7 +28,7 @@ spec:
                 - name: USE_SUFFIXED_LOG
                   value: "y"
                 - name: HOST
-                  value: "demo.library.kiwix.org"
+                  value: "browse.library.kiwix.org"
                 - name: MATOMO_TOKEN
                   valueFrom:
                     secretKeyRef:

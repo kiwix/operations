@@ -298,14 +298,19 @@ metadata:
           return 200 "User-agent: *\nDisallow: /";
         }
 
-        # redirect all requests not for the catalog to demo.library
+        # redirect all requests not for the catalog to browse.library
         set $demoFlag 0;
         if ($uri !~* "^/catalog/" ){
           set $demoFlag 1;
         }
+        # serve / (will be reversed to demo)
+        if ($uri = "/") {
+          set $demoFlag 0;
+        }
+
         if ( $demoFlag = 1 ) {
-          rewrite ^/(.*) https://demo.library.kiwix.org/$1 permanent;
-          return 301 "https://demo.library.kiwix.org/";
+          rewrite ^/(.*) https://browse.library.kiwix.org/$1 permanent;
+          return 301 "https://browse.library.kiwix.org/";
         }
 spec:
   ingressClassName: nginx
@@ -317,6 +322,14 @@ spec:
   - host: library.kiwix.org
     http:
       paths:
+      - path: /
+        pathType: Exact
+        backend:
+          service:
+            name: demo-library-frontend-service
+            port:
+              name: http
+
       - path: /
         pathType: Prefix
         backend:

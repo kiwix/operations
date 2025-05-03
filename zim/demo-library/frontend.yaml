@@ -302,10 +302,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - demo.library.kiwix.org
-      secretName: demo-library-kiwix-org-tls
+      - browse.library.kiwix.org
+      secretName: browse-library-kiwix-org-tls
   rules:
-  - host: demo.library.kiwix.org
+  - host: browse.library.kiwix.org
     http:
       paths:
       - path: /
