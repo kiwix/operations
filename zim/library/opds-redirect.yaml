@@ -5,6 +5,9 @@ metadata:
   namespace: zim
   annotations:
     nginx.ingress.kubernetes.io/server-snippet: |
+      if ($uri ~* "^/catalog/" ){
+        return 404 "Not Found";
+      }
       rewrite ^/(.*) https://library.kiwix.org/catalog/$1 permanent;
       return 301 "https://library.kiwix.org/catalog/";
 spec:
