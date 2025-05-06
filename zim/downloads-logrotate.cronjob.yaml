@@ -24,6 +24,9 @@ data:
     /data/nginx-logs/library-kiwix/*.log {
       olddir /data/nginx-logs/archives/library-kiwix
     }
+    /data/nginx-logs/demo-library-kiwix/*.log {
+      olddir /data/nginx-logs/archives/demo-library-kiwix
+    }
 ---
 apiVersion: batch/v1
 kind: CronJob
