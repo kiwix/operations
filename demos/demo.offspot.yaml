@@ -20,4 +20,6 @@ demos:
   - ident: wikipedia-en
     alias: wikipedia
     name: Wikipedia Package
+  - ident: homeschooling
+    name: Homeschooling
 
