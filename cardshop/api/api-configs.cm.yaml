@@ -4,6 +4,8 @@ metadata:
   name: api-configs
   namespace: cardshop
 data:
+  # set to y to close the shop temporarily
+  SHOP_IS_DISABLED: ""
   # set to `y` to disable periodic-tasks (autoimages, etc)
   DISABLE_PERIODIC_TASKS: "n"
   # previous hosting (sloppy) required different internal-usage URL
