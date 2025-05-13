@@ -192,7 +192,157 @@ data:
       return (deliver);
 
     }
+  index.html: |
+    <!DOCTYPE html>
+    <html xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width,initial-scale=1" />
+      <title>Kiwix Library</title>
+      <link rel="apple-touch-icon" sizes="180x180" href="https://browse.library.kiwix.org/skin/favicon/apple-touch-icon.png?14.0.0">
+      <link rel="icon" type="image/png" sizes="32x32" href="https://browse.library.kiwix.org/skin/favicon/favicon-32x32.png?14.0.0">
+      <link rel="icon" type="image/png" sizes="16x16" href="https://browse.library.kiwix.org/skin/favicon/favicon-16x16.png?14.0.0">
+      <link rel="manifest" href="https://browse.library.kiwix.org/skin/favicon/site.webmanifest?14.0.0">
+      <link rel="mask-icon" href="https://browse.library.kiwix.org/skin/favicon/safari-pinned-tab.svg?14.0.0" color="#5bbad5">
+      <link rel="shortcut icon" href="https://browse.library.kiwix.org/skin/favicon/favicon.ico?14.0.0">
+      <meta name="msapplication-TileColor" content="#da532c">
+      <meta name="msapplication-config" content="/skin/favicon/browserconfig.xml?14.0.0">
+      <meta name="theme-color" content="#ffffff">
+      <style type="text/css">* { margin: 0; padding:0; } body { width: 100vw; height: 100vh; } iframe { border: 0; width: 100vw; height: 100vh; }</style>
+    </head>
+    <body>
+      <script type="text/javascript">
+        // mandatory. also set on browse.library's kiwix-serve templates.
+        // allows communication between those two origins on same upper-level domain
+        // required to read changes to URL
+        document.domain = "library.kiwix.org";
+        const topRoot = `${window.location.origin}/`;
+        const targetRoot = "https://browse.library.kiwix.org/";
+        var iframe;
+        var isSetup = false;
 
+        /* called when URL changes inside the iframe
+           for instance whenever a filter is used, the URL's fragments are updated
+           we thus replicate such fragment changes to _top URL.
+           supports paths changes but we should not have those in home.
+        */
+        function onIframeUrlChanged(url) {
+          if (url.pathname == window.location.pathname && url.hash == window.location.hash) {
+            console.log('onIframeUrlChanged() same URL');
+            return;
+          }
+
+          console.debug('iframe URL changed', url);
+          if (url.pathname != window.location.pathname) {
+            let target = url.href.replace(targetRoot, "/");
+            console.debug(".. different paths, changing whole URL:", target);
+            window.location.replace(target);
+            return;
+          }
+          window.location.hash = url.hash;
+        }
+
+        /* called when URL changes in _top URL (main window)
+           for instance whenever user manually updates the URL, to change filters.
+           we thus replicate such fragment changes to iframe URL.
+           supports paths changes but we should not have those in home since
+           the server already redirects everything not /
+        */
+        function onTopUrlChanged(url) {
+          if (isSetup && url.pathname == iframe.contentWindow.pathname && url.hash == iframe.contentWindow.hash) {
+            console.log('onTopUrlChanged() same URL');
+            return;
+          }
+
+          console.debug('___top URL changed', url);
+
+          if (url.pathname != iframe.contentWindow.location.pathname) {
+            let target = url.href.replace(topRoot, targetRoot);
+            console.debug("changing whole path to:", target);
+            iframe.contentWindow.location.replace(target);
+            return;
+          }
+          iframe.contentWindow.location.hash = url.hash;
+        }
+
+        /* reliably registers a `toplocationchange` Event when URL changes in window
+           registers a handler for this event
+        */
+        function setupTopURLChangeWatcher() {
+          console.debug("setupTopURLChangeWatcher()");
+          var pushState = window.history.pushState;
+          var replaceState = window.history.replaceState;
+          window.history.pushState = function() {
+              pushState.apply(window.history, arguments);
+              window.dispatchEvent(new Event('pushstate'));
+              window.dispatchEvent(new Event('toplocationchange'));
+          };
+          window.history.replaceState = function() {
+              replaceState.apply(window.history, arguments);
+              window.dispatchEvent(new Event('replacestate'));
+              window.dispatchEvent(new Event('toplocationchange'));
+          };
+          window.addEventListener('popstate', function() {
+              window.dispatchEvent(new Event('toplocationchange'))
+          });
+
+          window.addEventListener('toplocationchange', function(){
+            onTopUrlChanged(window.location);
+          });
+        }
+
+        /* reliably registers an `iframelocationchange` Event when URL changes in iframe
+           registers a handler for this event
+           but first removes handler should it exist given every `load` requires
+           re-registering event and would otherwise pollutes the stack with handlers
+        */
+        function setupIframeURLChangeWatcher() {
+          console.debug("setupIframeURLChangeWatcher()");
+          var pushState = iframe.contentWindow.history.pushState;
+          var replaceState = iframe.contentWindow.history.replaceState;
+          iframe.contentWindow.history.pushState = function() {
+              pushState.apply(iframe.contentWindow.history, arguments);
+              window.dispatchEvent(new Event('pushstate'));
+              window.dispatchEvent(new Event('iframelocationchange'));
+          };
+          iframe.contentWindow.history.replaceState = function() {
+              replaceState.apply(iframe.contentWindow.history, arguments);
+              window.dispatchEvent(new Event('replacestate'));
+              window.dispatchEvent(new Event('iframelocationchange'));
+          };
+          window.addEventListener('popstate', function() {
+              window.dispatchEvent(new Event('iframelocationchange'))
+          });
+
+          function onIframeUrlChangedEvent(){
+            onIframeUrlChanged(iframe.contentWindow.location);
+          }
+
+          // clear up previously registered event
+          window.removeEventListener('iframelocationchange', onIframeUrlChangedEvent);
+          window.addEventListener('iframelocationchange', onIframeUrlChangedEvent);
+        }
+
+        document.addEventListener('DOMContentLoaded', function(){
+          // register once to top URL changes
+          setupTopURLChangeWatcher();
+
+          // get a hold of iframe and register URL change events
+          iframe = document.getElementById("browse_iframe");
+          // register URL change events on every `load`
+          iframe.addEventListener('load', function(ev) {
+            console.debug('iframe load event', iframe.contentWindow.location, ev)
+            // register iframe URL events
+            setupIframeURLChangeWatcher();
+          });
+          // call URL change event once to trigger iframe load
+          onTopUrlChanged(window.location);
+          isSetup = true;
+        });
+      </script>
+      <iframe id="browse_iframe"></iframe>
+      </body>
+    </html>
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -286,6 +436,61 @@ spec:
     port: 6082
     targetPort: 6082
 ---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: library-frontend-root-app
+  name: library-frontend-root-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: library-frontend-root-app
+  template:
+    metadata:
+      labels:
+        app: library-frontend-root-app
+    spec:
+      containers:
+      - image: docker.io/nginx:1.21
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: "/usr/share/nginx/html/index.html"
+          name: files-volume
+          subPath: index.html
+          readOnly: true
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+      volumes:
+      - name: files-volume
+        configMap:
+          name: library-frontend-configs
+      nodeSelector:
+        k8s.kiwix.org/role: "storage"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: library-frontend-root-service
+  labels:
+    app: library-frontend-root-app
+spec:
+  selector:
+    app: library-frontend-root-app
+  ports:
+  - protocol: TCP
+    port: 80
+    name: http
+    targetPort: 80
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -303,10 +508,9 @@ metadata:
         if ($uri !~* "^/catalog/" ){
           set $demoFlag 1;
         }
-        # serve / (will be handled here, and last)
+        # prevent redirect on / (will be handled by location from ingress path)
         if ($uri = "/") {
           set $demoFlag 0;
-          return 200 '<!DOCTYPE html><html xmlns="http://www.w3.org/1999/xhtml">\n<head>\n<meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" /><title>Kiwix Library</title>\n<link rel="apple-touch-icon" sizes="180x180" href="https://browse.library.kiwix.org/skin/favicon/apple-touch-icon.png?14.0.0">\n<link rel="icon" type="image/png" sizes="32x32" href="https://browse.library.kiwix.org/skin/favicon/favicon-32x32.png?14.0.0">\n<link rel="icon" type="image/png" sizes="16x16" href="https://browse.library.kiwix.org/skin/favicon/favicon-16x16.png?14.0.0">\n<link rel="manifest" href="https://browse.library.kiwix.org/skin/favicon/site.webmanifest?14.0.0">\n<link rel="mask-icon" href="https://browse.library.kiwix.org/skin/favicon/safari-pinned-tab.svg?14.0.0" color="#5bbad5">\n<link rel="shortcut icon" href="https://browse.library.kiwix.org/skin/favicon/favicon.ico?14.0.0">\n<meta name="msapplication-TileColor" content="#da532c">\n<meta name="msapplication-config" content="/skin/favicon/browserconfig.xml?14.0.0">\n<meta name="theme-color" content="#ffffff">\n<style type="text/css">* { margin: 0; padding:0; } body { width: 100vw; height: 100vh; } iframe { border: 0; width: 100vw; height: 100vh; }</style>\n</head>\n<body><iframe src="https://browse.library.kiwix.org/"/></body>\n</html>';
         }
 
         if ( $demoFlag = 1 ) {
@@ -323,7 +527,13 @@ spec:
   - host: library.kiwix.org
     http:
       paths:
-
+      - path: /
+        pathType: Exact
+        backend:
+          service:
+            name: library-frontend-root-service
+            port:
+              name: http
       - path: /
         pathType: Prefix
         backend:
