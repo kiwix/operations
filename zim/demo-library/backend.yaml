@@ -51,7 +51,7 @@ spec:
           readOnly: true
         resources:
           requests:
-            memory: "2Gi"
+            memory: "4Gi"
             cpu: "50m"
       volumes:
       - name: download-volume
