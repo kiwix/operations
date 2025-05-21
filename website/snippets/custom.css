@@ -1,0 +1,378 @@
+.single-post header .wpml-ls-item {
+  display: none;
+}
+
+.cky-btn {
+  font-family:"Quicksand" !important;
+}
+
+footer .footer-menu-containter,
+footer .footer-right,
+footer .footer-bottom {
+  z-index: 1 !important;
+}
+/* Ensure popup background is white */
+.pum-popup {
+    background-color: #ffffff !important;
+}
+/* Ensure the image keeps its aspect ratio and fits within the container */
+.fluentcrm_un_logo_wrapper img {
+    width: auto; /* Keeps the original aspect ratio */
+    max-width: 100%; /* Ensures the image doesn’t overflow */
+    height: auto; /* Maintains proportional dimensions */
+    margin: 0 auto; /* Centers the image horizontally */
+}
+
+/* Center the image wrapper content vertically and horizontally */
+.fluentcrm_un_logo_wrapper {
+    display: flex; /* Enables flexbox for alignment */
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically */
+    margin-bottom: 20px; /* Adds space between the image and the next element */
+}
+
+/* hotspot page related CSS (specs table) */
+.specs-container {
+    margin: auto;
+    margin-top: 3em;
+    display: table;
+}
+.specs-column {
+    display: block;
+    width: 100%;
+    padding: 1em;
+    box-sizing: border-box;
+}
+.specs-intro {
+    text-align: center;
+}
+.specs-entry {
+    margin-bottom: 2em;
+}
+.specs-entry h4, .specs-entry p {
+    margin: 0;
+    padding: 0;
+}
+.specs-entry h4 {
+    color: #111827;
+    font-size: 1.2em;
+    line-height: 1.5em;
+}
+.specs-entry p {
+    color: #4b5563;
+}
+.specs-entry .specs-icon, .specs-entry .specs-content {
+    display: block;
+}
+.specs-entry .specs-icon {
+    color: #f87216;
+    vertical-align: top;
+    padding: .3em;
+}
+@media(min-width:481px) {
+    .specs-entry .specs-icon, .specs-entry .specs-content {
+        display: inline-block;
+    }
+}
+@media(min-width:1000px) {
+    .specs-container {
+        display: table;
+    }
+    .specs-column {
+        display: table-cell;
+        width: 50%;
+    }
+}
+
+
+body.home main>section.banner div.banner-video {
+  display: none;
+}
+
+body.home main>section.banner {
+  background: #0f151d url(/wp-content/uploads/2025/05/Header-space-optim.jpeg);
+}
+
+body.home main>section.banner .wrapper .banner-content h1 {
+  text-transform: none;
+  margin-top: 3em;
+  margin-bottom: 2em;
+}
+
+@media only screen and (max-width: 995px) {
+  body.home main>section.banner {
+    background: #0f151d url(/wp-content/uploads/2025/05/Header-space-mobile-1.jpeg);
+  }
+}
+
+@media only screen and (max-width: 995px) {
+  body.home main>section.banner .wrapper .banner-content .download-cta {
+    margin-top: 2em;
+  }
+}
+
+body.home .mission-cta .cta {
+  color: #f93;
+}
+body.home .mission-cta .cta:hover {
+  color: white;
+}
+
+body.home .our-mission {
+  margin-bottom: 0;
+}
+
+body.home .our-mission .wrapper {
+  padding-top: 2em;
+}
+
+body.home .our-mission .wrapper .mission-image {
+  display: none;
+}
+
+body.home .our-mission .wrapper .mission-content {
+  text-align: center;
+}
+
+@media only screen and (max-width: 640px) {
+  body.home .our-mission .wrapper h2 {
+    display: block;
+    font-size: 1.5em;
+  }
+}
+
+body.home .our-mission .wrapper .mission-content .description {
+  margin: auto;
+  max-width: 90%;
+}
+
+body.home .counter h2 {
+  display: none;
+}
+
+
+/********
+ * comparison page */
+.comparison-page, .comparison-page * {
+  box-sizing: border-box;
+}
+
+.comparison-page > h3 {
+  margin-bottom: 1em !important;
+}
+
+.comparison-page table {
+  border-radius: .35rem;
+  border: 2px solid #f4f6fa;
+
+  padding: 1em;
+  margin-bottom: 2em;
+}
+
+.comparison-page table thead th {
+  padding-bottom: 1em;
+  border-bottom: 1px solid #f4f6fa;
+}
+
+.comparison-page table tbody th:first-child {
+  text-align: left;
+}
+
+.comparison-page table tbody tr > * {
+  border-bottom: 1px solid #f2f3f7;
+  padding: 1em;
+  position: relative;
+}
+
+.comparison-page table tbody tr:last-child > * {
+  border-bottom: 0;
+}
+
+.comparison-page table th {
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.comparison-page table tbody tr th img {
+  display: none;
+}
+
+.comparison-page table tbody tr td {
+  padding-left: 2em;
+}
+
+.comparison-page table tbody tr td label {
+  font-weight: bold;
+  color: #0f0f0f;
+  margin-bottom: 1em;
+  display: none;
+}
+
+.comparison-page table tbody tr td.check,
+.comparison-page table tbody tr td.cross {
+  color: #a7a7a7;
+}
+
+.comparison-page table tbody tr td.check:before,
+.comparison-page table tbody tr td.cross:before {
+  position: absolute;
+  left: 0;
+}
+
+.comparison-page table tbody tr td.check:before {
+  content: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMzZGM2NjUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgNiA5IDE3bC01LTUiLz48L3N2Zz4K);
+}
+
+.comparison-page table tbody tr td.cross:before {
+  content: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiNlYjQwNDgiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMTggNiA2IDE4Ii8+PHBhdGggZD0ibTYgNiAxMiAxMiIvPjwvc3ZnPgo=);
+}
+
+.comparison-page .summary {
+  display: flex;
+  flex-direction: row;
+}
+
+.comparison-page .summary .column {
+  background-color: #fafbfc;
+  border-radius: .35rem;
+  border: 1px solid #f2f3f7;
+  padding: 1em;
+}
+.comparison-page .summary .column:last-child {
+  margin-left: 2em;
+}
+
+.comparison-page .summary h4 {
+  font-size: 1.2em;
+}
+
+.comparison-page .summary ul {
+  list-style-type: none;
+  margin-top: 1em;
+}
+
+.comparison-page .summary ul li {
+  display: block;
+  position:relative;
+  margin-bottom: 1em;
+}
+
+.comparison-page .summary ul li::before {
+  content: url(data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNCIgaGVpZ2h0PSIyNCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMzZGM2NjUiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48cGF0aCBkPSJNMjAgNiA5IDE3bC01LTUiLz48L3N2Zz4K);
+  position: absolute;
+  left: -1.8em;
+}
+
+.comparison-page .return-link {
+  margin-top: 3rem;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 5em;
+}
+
+.comparison-page .return-link a {
+  color: #ff9926;
+  border-radius: .35rem;
+  border: 2px solid #ff9926;
+  padding: .5em 3em;
+  font-weight: 600;
+}
+
+.comparison-page .return-link a, .comparison-page .return-link a:hover {
+  text-decoration: none;
+}
+
+@media(max-width: 750px) {
+  .comparison-page {
+    width: 100%;
+    padding: .5em;
+  }
+  .comparison-page table {
+    padding: 0 1em 0 1em;
+  }
+
+  .comparison-page table thead {
+    display: none;
+  }
+  .comparison-page table tbody tr {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+
+  .comparison-page table tbody tr > th {
+    display: block;
+    width: 100%;
+    flex-grow: 5;
+    padding-left: 0;
+    cursor: pointer;
+
+    border-top: 1px solid #f2f3f7;
+    border-bottom: 0;
+  }
+
+  .comparison-page table tbody tr:first-child > th {
+    border-top: 0;
+  }
+
+  .comparison-page table tbody tr > th img {
+    display: block;
+    float: right;
+  }
+
+  .comparison-page table tbody tr > td {
+    display: none;
+    flex-grow: 1;
+    width: 40%;
+    box-sizing: border-box;
+  }
+
+  .comparison-page table tbody tr td.check:before,
+  .comparison-page table tbody tr td.cross:before {
+    left: .3rem;
+  }
+
+  .comparison-page table tbody tr.showing {
+    margin-bottom: 2em;
+  }
+
+  .comparison-page table tbody tr.showing > * {
+    border-bottom: 0;
+  }
+
+  .comparison-page table tbody tr.showing > th img {
+    -webkit-transform: rotate(180deg);
+    transform: rotate(180deg);
+  }
+
+  .comparison-page table tbody tr.showing > td {
+    display: inline-block;
+    background-color: #fafbfc;
+    border: 1px solid #f3f4f8;
+    border-radius: .5rem;
+  }
+
+  .comparison-page table tbody tr.showing > td:first-of-type {
+    border-right: 0;
+    border-radius: .5rem 0 0 .5rem;
+  }
+
+  .comparison-page table tbody tr.showing > td:last-of-type {
+    border-left: 0;
+    border-radius: 0 .5rem .5rem 0;
+  }
+
+  .comparison-page table tbody tr.showing td label {
+    display: block;
+  }
+
+  .comparison-page .summary {
+    flex-direction: column;
+  }
+
+  .comparison-page .summary .column:last-child {
+    margin-left: 0;
+    margin-top: 2em;
+  }
+}

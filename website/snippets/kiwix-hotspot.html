@@ -1,31 +1,29 @@
 <script type="text/javascript" defer>
-function resizeFrame(height) {
-    document.getElementById('cardshop-frame').style.height = height.toString() + 'px';
-}
-var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
-var eventer = window[eventMethod];
-var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
-eventer(messageEvent, function(e) {
-  try {
-    var message = JSON.parse(e.data);
-    console.debug("received message", message);
-    if (message.height) {
-      setTimeout(resizeFrame, 50, message.height);
+    function resizeFrame(height) {
+        document.getElementById('cardshop-frame').style.height = height.toString() + 'px';
     }
-  } catch (e) {
-    console.error("can't parse received message as JSON");
-    return;
-  }
-}, false);
+    var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
+    var eventer = window[eventMethod];
+    var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+    eventer(messageEvent, function(e) {
+        try {
+            var message = JSON.parse(e.data);
+            console.debug("received message", message);
+            if (message.height) {
+                setTimeout(resizeFrame, 50, message.height);
+            }
+        } catch (e) {
+            console.error("can't parse received message as JSON");
+            return;
+        }
+    }, false);
 </script>
-
 <iframe id="cardshop-frame" style="height: 745px;" title="card shop" src="https://api.imager.kiwix.org/shop/stripe/widget/" name="cardshop" width="100%" frameborder="0" scrolling="no" seamless="seamless"></iframe>
 
 <script type="text/javascript" defer>
-    var elem = document.querySelectorAll('#our-story')[0];
-    elem.style.backgroundColor = '#f9f9f9';
-    elem.style.marginTop = '5em';
-    elem.style.paddingTop = '4em';
-    elem.style.marginBottom = '5em';
-    elem.style.paddingBottom = '4em';
+    const style = document.createElement("style");
+    document.head.appendChild(style);
+    const styleSheet = style.sheet;
+    styleSheet.insertRule("#our-story { background-color: #f9f9f9; margin-top: 5em; padding-top: 4em; margin-bottom: 5em; padding-bottom: 4em; }");
+    styleSheet.insertRule("@media (max-width:573px) { #our-story .wrapper { width: 100%; } }");
 </script>

@@ -1,0 +1,114 @@
+<div class="comparison-page">
+<p>We have drawn up a comparative table to help you decide which Hotspot solution best suits your needs. <a href="/en/contact-us">Contact us</a> if your questions aren't answered below.</p>
+<h3>Feature comparison</h3>
+<table>
+<thead>
+  <tr>
+    <th></th>
+    <th>Hotspot OS-only</th>
+    <th>Kiwix Hotspot</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <th>Package (content) selection<img width="14" height="14" src="/wp-content/themes/kiwix/assets/images/Down-Arrow-Black.svg"></th>
+    <td class="check"><label>Hotspot OS only</label>Choice of package can be chosen upon purchase.</td>
+    <td class="check"><label>Kiwix Hotspot</label>Choice of package can be chosen upon purchase.</td>
+   </tr>
+   <tr>
+    <th>SD card easily accessible to enable a different package to be loaded<img width="14" height="14" src="/wp-content/themes/kiwix/assets/images/Down-Arrow-Black.svg"></th>
+    <td class="check"><label>Hotspot OS only</label>If the user's hardware allows for easy SD extraction, yes.</td>
+    <td class="cross"><label>Kiwix Hotspot</label>The content is loaded onto the SSD, so requires tools for extraction and a compatible reader.</td>
+  </tr>
+  <tr>
+    <th>Works Out of the Box<img width="14" height="14" src="/wp-content/themes/kiwix/assets/images/Down-Arrow-Black.svg"></th>
+    <td class="cross"><label>Hotspot OS only</label>Needs assembly, flashing, and configuration before use. A compatible Raspberry Pi, power plug, case, SDHC card and card reader are required.</td>
+    <td class="check"><label>Kiwix Hotspot</label>Just power on and connect; everything is pre-configured.</td>
+  </tr>
+  <tr>
+    <th>Software & Image Setup<img width="14" height="14" src="/wp-content/themes/kiwix/assets/images/Down-Arrow-Black.svg"></th>
+    <td class="cross"><label>Hotspot OS only</label>Requires downloading rpi-imager software and large image file (~200GB), plus 5 hours to flash SDHC card.</td>
+    <td class="check"><label>Kiwix Hotspot</label>No downloads or setup needed; device comes pre-flashed, content pre-loaded, tested and ready to use.</td>
+  </tr>
+  <tr>
+    <th>Clock & Timekeeping<img width="14" height="14" src="/wp-content/themes/kiwix/assets/images/Down-Arrow-Black.svg"></th>
+    <td class="cross"><label>Hotspot OS only</label>Clock won't retain time unless connected to the Internet.</td>
+    <td class="check"><label>Kiwix Hotspot</label>Battery-backed clock keeps time accurate even offline.</td>
+  </tr>
+  <tr>
+    <th>Testing & Quality Control<img width="14" height="14" src="/wp-content/themes/kiwix/assets/images/Down-Arrow-Black.svg"></th>
+    <td class="cross"><label>Hotspot OS only</label>Non applicable</td>
+    <td class="check"><label>Kiwix Hotspot</label>Each device is human-tested before shipping to ensure quality and reliability.</td>
+  </tr>
+  <tr>
+    <th>Supoport & Warranty<img width="14" height="14" src="/wp-content/themes/kiwix/assets/images/Down-Arrow-Black.svg"></th>
+    <td class="cross"><label>Hotspot OS only</label>Product FAQ, online community or self-support; no official warranty.</td>
+    <td class="check"><label>Kiwix Hotspot</label>Includes warranty and priority support from Kiwix.</td>
+  </tr>
+  <tr>
+    <th>Cost<img width="14" height="14" src="/wp-content/themes/kiwix/assets/images/Down-Arrow-Black.svg"></th>
+    <td><label>Hotspot OS only</label>Low, but user's own hardware costs and installation time may add up.</td>
+    <td><label>Kiwix Hotspot</label>Higher. Includes high-quality durable hardware, full setup, testing, technical support and shipping.</td>
+  </tr>
+  <tr>
+    <th>User Profile<img width="14" height="14" src="/wp-content/themes/kiwix/assets/images/Down-Arrow-Black.svg"></th>
+    <td><label>Hotspot OS only</label>Ideal for hobbyists or tech-savvy users willing to put in the effort for a successful installation.</td>
+    <td><label>Kiwix Hotspot</label>Ideal for organisations, educators, NGOs, oe=r anyone needing a turnkey, reliable offline knowledge solution.</td>
+  </tr>
+</tbody>
+</table>
+<h3>In short…</h3>
+<div class="summary">
+  <div class="column">
+    <h4>Choose Hotspot OS-only if you…</h4>
+    <ul>
+      <li><strong>Have technical skills</strong>, enjoy DIY projects and can troubleshoot if required.</li>
+      <li>Are budget-conscious and <strong>willing to invest time and effort</strong> to set up and run your own hardware.</li>
+      <li>Want <strong>full control over the installation</strong> process.</li>
+    </ul>
+  </div>
+
+  <div class="column">
+    <h4>Choose Kiwix Hotspot if you…</h4>
+    <ul>
+      <li>Want a <strong>high-performance device without any setup hassle</strong>.</li>
+      <li>Have <strong>no technical skills</strong> or simply wish to have an “<strong>out-of-the-box</strong>” offline solution.</li>
+      <li>Value <strong>high-quality, pre-installed and tested hardware</strong> for ease of use and professional support.</li>
+    </ul>
+  </div>
+</div>
+<p class="return-link"><a href="/en/kiwix-hotspot/">View the Hotspots</a></p>
+</div>
+<script type="text/javascript">
+  function ComparisonAddEvent(el, type, handler) {
+      if (el.attachEvent) el.attachEvent('on'+type, handler); else el.addEventListener(type, handler);
+  }
+  function comparisonHasClass(el, className) {
+      return el.classList ? el.classList.contains(className) : new RegExp('\\b'+ className+'\\b').test(el.className);
+  }
+  function comparisonAddClass(el, className) {
+      if (el.classList) el.classList.add(className);
+      else if (!comparisonHasClass(el, className)) el.className += ' ' + className;
+  }
+  function comparisonRemoveClass(el, className) {
+      if (el.classList) el.classList.remove(className);
+      else el.className = el.className.replace(new RegExp('\\b'+ className+'\\b', 'g'), '');
+  }
+  function comparisonToggleClass(el, className) {
+    if (!comparisonHasClass(el, className))
+      comparisonAddClass(el, className);
+    else
+      comparisonRemoveClass(el, className);
+  }
+  function comparisonToggleRowDisplay(ev) {
+    let row = ev.target.parentNode;
+    comparisonToggleClass(row, 'showing')
+  }
+  function ComparisonMain() {
+    var ths = document.querySelectorAll('.comparison-page table tbody tr th');
+    ths.forEach(function(item) {
+      ComparisonAddEvent(item, 'click', comparisonToggleRowDisplay);
+    });
+  }
+  document.addEventListener('DOMContentLoaded', ComparisonMain);
+</script>
