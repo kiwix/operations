@@ -517,6 +517,25 @@ metadata:
           rewrite ^/(.*) https://browse.library.kiwix.org/$1 permanent;
           return 301 "https://browse.library.kiwix.org/";
         }
+
+        # CORS headers for browser-extension.kiwix.org
+        add_header Access-Control-Allow-Origin "https://browser-extension.kiwix.org" always;
+
+        # CORS headers for pwa.kiwix.org
+        add_header Access-Control-Allow-Origin "https://pwa.kiwix.org" always;
+
+        # Other CORS headers
+        add_header Access-Control-Allow-Methods "GET, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Content-Type, Authorization" always;
+        add_header Access-Control-Allow-Credentials "true" always;
+
+        # Frame ancestors for both sites
+        add_header Content-Security-Policy "frame-ancestors 'self' https://browser-extension.kiwix.org https://pwa.kiwix.org" always;
+
+        # Handle preflight requests
+        if ($request_method = 'OPTIONS') {
+            return 204;
+        }
 spec:
   ingressClassName: nginx
   tls:
