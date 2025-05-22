@@ -95,7 +95,6 @@ body.home main>section.banner {
 
 body.home main>section.banner .wrapper .banner-content h1 {
   text-transform: none;
-  margin-top: 3em;
   margin-bottom: 2em;
 }
 
@@ -103,9 +102,9 @@ body.home main>section.banner .wrapper .banner-content h1 {
   body.home main>section.banner {
     background: #0f151d url(/wp-content/uploads/2025/05/Header-space-mobile-1.jpeg);
   }
-}
-
-@media only screen and (max-width: 995px) {
+  body.home main>section.banner .wrapper .banner-content h1 {
+    margin-top: 3em;
+  }
   body.home main>section.banner .wrapper .banner-content .download-cta {
     margin-top: 2em;
   }
