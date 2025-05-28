@@ -185,7 +185,9 @@ for instance_key, instance_data in data.items():
         disk_id += 1
 
     instance_id += 1
-    consumed_y += 8 * math.floor((len(instance_data.items()) - 1) / 2)
+    consumed_y += 8 * (
+        1 + math.floor((len(instance_data.get("disks").items()) - 1) / 2)
+    )
 
 dashboard = {
     "annotations": {
