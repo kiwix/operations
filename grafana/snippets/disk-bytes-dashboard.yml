@@ -1,0 +1,53 @@
+storage:
+  label: storage
+  instance: scw-kiwix-prod-foreign-2a079b8a58c44e8e942093d
+  disks:
+    md0:
+      device: /dev/md0
+      mounted: /boot
+    md1:
+      device: /dev/md1
+      mounted: /
+stats:
+  label: stats
+  instance: scw-kiwix-prod-foreign-7aaa98d57ede4cf0ba95d14
+  disks:
+    md0:
+      device: /dev/md0
+      mounted: /boot
+    md1:
+      device: /dev/md1
+      mounted: /
+services:
+  label: services
+  instance: scw-kiwix-prod-foreign-8dd780078597459d8d396a8
+  disks:
+    md0:
+      device: /dev/md0
+      mounted: /boot
+    md1:
+      device: /dev/md1
+      mounted: /
+services:
+  label: system (bastion)
+  instance: scw-kiwix-prod-foreign-fd47028c64314d1d98b4cbd
+  disks:
+    sda1:
+      device: /dev/sda1
+      mounted: /
+    sda15:
+      device: /dev/sda15
+      mounted: /boot/efi
+demo:
+  label: demo.hotspot.kiwix.org
+  instance: demo.hotspot.kiwix.org
+  disks:
+    md0:
+      device: /dev/md0
+      mounted: /boot
+    md1:
+      device: /dev/md1
+      mounted: /
+    md2:
+      device: /dev/md2
+      mounted: /data
