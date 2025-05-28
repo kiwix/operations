@@ -518,11 +518,7 @@ metadata:
           return 301 "https://browse.library.kiwix.org/";
         }
 
-        # CORS headers for browser-extension.kiwix.org
-        add_header Access-Control-Allow-Origin "https://browser-extension.kiwix.org" always;
-
-        # CORS headers for pwa.kiwix.org
-        add_header Access-Control-Allow-Origin "https://pwa.kiwix.org" always;
+        add_header Access-Control-Allow-Origin "*" always;
 
         # Other CORS headers
         add_header Access-Control-Allow-Methods "GET, OPTIONS" always;
