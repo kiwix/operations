@@ -375,3 +375,64 @@ body.home .counter h2 {
     margin-top: 2em;
   }
 }
+
+/* shop page */
+.survey-box {
+    display: block;
+    width: 100%;
+    background-color: white;
+    text-align: center;
+    padding: 2em;
+    box-sizing: border-box;
+    margin-top: 3em;
+    margin-bottom: 3em;
+}
+
+.survey-icon {
+    box-sizing: border-box;
+    border-radius: 50%;
+    background-color: #ffecd5;
+    width: 4.5rem;
+    padding: .7rem 0rem 0rem .2rem;
+    margin: auto;
+    height: 4.5rem;
+    margin-bottom: 1.5rem;
+}
+.survey-icon svg {
+    color: #f86b0a;
+    width: 3rem;
+    height: 3rem;
+}
+
+.survey-box p {
+    max-width: 35rem;
+    margin: auto;
+    margin-bottom: 2rem;
+}
+.survey-box p:last-child {
+    margin-bottom: 0;
+}
+.survey-box button {
+    background-color: #f87216;
+    border: 1px solid #f76500;
+    color: white;
+    padding: 1em 2em;
+    border-radius: .3rem;
+    font-weight: 600;
+}
+.survey-box button:hover {
+    background-color: white;
+    color: #f76500;
+}
+@media (min-width: 545px) {
+    .survey-box {
+        border: .1rem solid #e3e8ef;
+        border-radius: .5rem;
+    }
+}
+@media (min-width: 680px) {
+    .survey-box {
+        border: 0;
+        box-shadow: 1px 2px 8px #ccc;
+    }
+}
