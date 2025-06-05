@@ -58,6 +58,9 @@ clusterMetrics:
   node-exporter:
     extraArgs:
       - '--collector.mdadm'
+      - '--no-collector.netdev'
+      - '--no-collector.netclass'
+      - '--no-collector.softnet'
     deploy: true
     enabled: true
     metricsTuning:
