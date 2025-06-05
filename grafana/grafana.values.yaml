@@ -22,6 +22,39 @@ clusterMetrics:
       tag: v2.15.0
     deploy: true
     enabled: true
+    collectors:
+      # - certificatesigningrequests
+      # - configmaps
+      # - cronjobs
+      # - daemonsets
+      # - deployments
+      # - endpoints
+      # - horizontalpodautoscalers
+      # - ingresses
+      # - jobs
+      # - leases
+      # - limitranges
+      # - mutatingwebhookconfigurations
+      # - namespaces
+      # - networkpolicies
+      - nodes
+      # - persistentvolumeclaims
+      # - persistentvolumes
+      # - poddisruptionbudgets
+      - pods
+      # - replicasets
+      # - replicationcontrollers
+      # - resourcequotas
+      # - secrets
+      # - services
+      # - statefulsets
+      # - storageclasses
+      # - validatingwebhookconfigurations
+      # - volumeattachments
+      # - ingressclasses
+      # - clusterrolebindings
+      # - clusterroles
+      # - roles
   node-exporter:
     extraArgs:
       - '--collector.mdadm'
