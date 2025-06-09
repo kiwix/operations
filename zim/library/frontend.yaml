@@ -513,6 +513,10 @@ metadata:
           set $demoFlag 0;
         }
 
+        if ($uri ~* "/.well-known/acme-challenge/(.+)") {
+          set $demoFlag 0;
+        }
+
         if ( $demoFlag = 1 ) {
           rewrite ^/(.*) https://browse.library.kiwix.org/$1 permanent;
           return 301 "https://browse.library.kiwix.org/";
