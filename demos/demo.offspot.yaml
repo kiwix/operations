@@ -10,8 +10,8 @@
 demos:
   - ident: preppers
     name: Preppers Package
-  - ident: ted
-    name: TED Talks Package
+  - ident: premium-preppers
+    name: Preppers Premium Package
   - ident: computers
     alias: compsci
     name: Computer Science Package
