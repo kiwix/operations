@@ -50,14 +50,6 @@ jobs:
         ASSIGNEES: rgaudin,benoit74
         ISSUE_BODY: |
 
-          ## Check nodes free space
-
-          ```sh
-          df -h / && df -h /data
-          ```
-
-          - [ ] create a report in issue comment
-
           ## Nodes system upgrades
 
           ```sh
@@ -98,7 +90,8 @@ jobs:
           - [ ] Check whether matomo should be upgraded
 
           ## Grafana
-
+          
+          - [ ] [Disk usage](https://kiwixorg.grafana.net/d/8ee7e349-af68-4aac-8eba-23c561cedbc0/disk-bytes-usage) is normal, no unexpected usage
           - [ ] Alert list is [normal](https://kiwixorg.grafana.net/alerting/list)
           - [ ] Zimfarm dashboard is [normal](https://kiwixorg.grafana.net/d/d2803d94-7c40-4338-bf80-f3cd7cd796bf/zimfarms?from=now-7d&to=now)
           - [ ] Jobs durations dashboard is [normal](https://kiwixorg.grafana.net/d/bb0f0990-04c5-4314-8afc-6185ac49c668/jobs?orgId=1)
