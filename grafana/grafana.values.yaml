@@ -31,7 +31,7 @@ clusterMetrics:
       # - endpoints
       # - horizontalpodautoscalers
       # - ingresses
-      # - jobs
+      - jobs
       # - leases
       # - limitranges
       # - mutatingwebhookconfigurations
