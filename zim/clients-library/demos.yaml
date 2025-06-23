@@ -31,10 +31,10 @@ demos: # Appear at clients.library.kiwix.org/home/name Refresh is at the hour, e
     - libretexts/libretexts.org_en_stats
     - libretexts/libretexts.org_en_workforce
   expired_on: 2025-02-01
-- name: dissidentvoices #Will appear at clients.library.kiwix.org/home/dissidentvoices
+- name: cyberhymnal #Will appear at clients.library.kiwix.org/home/cyberhymnal
   zims:
-    - .hidden/dev/dissidentvoice_en_all
-  expired_on: 2025-02-15
+    - .hidden/dev/cyberhymnal_en_all
+  expired_on: 2026-06-31
 - name: ascension
   zims:
     - .hidden/dev/ascensionglossary_en_all_maxi
