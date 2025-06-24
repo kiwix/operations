@@ -34,7 +34,7 @@ demos: # Appear at clients.library.kiwix.org/home/name Refresh is at the hour, e
 - name: cyberhymnal #Will appear at clients.library.kiwix.org/home/cyberhymnal
   zims:
     - .hidden/dev/cyberhymnal_en_all
-  expired_on: 2026-06-31
+  expired_on: 2026-06-30
 - name: ascension
   zims:
     - .hidden/dev/ascensionglossary_en_all_maxi
