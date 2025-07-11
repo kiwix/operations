@@ -9,12 +9,10 @@ demos: # Appear at clients.library.kiwix.org/home/name Refresh is at the hour, e
 #     - .hidden/dev/hansard-botswana_en #Removing the _date.zim allows automatic update. Removing .zim only does not work
 #     - .hidden/dev/Bundesministerium_fuer_Inneres_2024-07.zim 
 #   expired_on: 2025-01-01  # Always set a date, even if far in the future. Expires at 00:01 on d day 
-- name: opennet
+- name: jim
   zims:
-    - zimit/radiozamaneh-com_far_all
-    - zimit/hra-news.org_far_all
-    - zimit/iranwire-com_far_all
-  expired_on: 2025-01-01
+    - .hidden/dev//trueprepper.com_en
+  expired_on: 2026-08-01
 - name: libretexts
   zims:
     - libretexts/libretexts.org_en_bio
