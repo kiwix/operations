@@ -11,7 +11,7 @@ demos: # Appear at clients.library.kiwix.org/home/name Refresh is at the hour, e
 #   expired_on: 2025-01-01  # Always set a date, even if far in the future. Expires at 00:01 on d day 
 - name: jim
   zims:
-    - .hidden/dev/trueprepper.com_en
+    - .hidden/dev/true_prepper.com_en_all
   expired_on: 2026-08-01
 - name: libretexts
   zims:
