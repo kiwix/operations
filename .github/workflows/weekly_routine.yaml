@@ -102,7 +102,7 @@ jobs:
 
           - [ ] UptimeRobot [has no alert](https://dashboard.uptimerobot.com/monitors)
           - [ ] [zimit backlog](https://farm.zimit.kiwix.org/pipeline/filter-todo) is reasonable
-          - [ ] [Cloud Code Signing Certificate](https://secure.ssl.com/certificate_orders/co-291j8smt34b) usage is *OK* (look for *Unused Signings* under *END ENTITY CERTIFICATES*): we have 1,200 per year (August to August)
+          - [ ] [Cloud Code Signing Certificate](https://secure.ssl.com/certificate_orders/co-5c1k4jahu91) usage is *OK* (look for *Unused Signings* under *END ENTITY CERTIFICATES*): we have 1,200 per year (August to August)
           - [ ] [PRs awaiting your review](https://github.com/notifications?query=reason%3Areview-requested)
 
           ## Security
