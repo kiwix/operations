@@ -5,11 +5,17 @@ metadata:
   namespace: zim
   annotations:
     nginx.ingress.kubernetes.io/server-snippet: |
+      set $shouldRedirect 1;
+      if ($uri ~* "/.well-known/acme-challenge/(.+)") {
+        set $shouldRedirect 0;
+      }
       if ($uri ~* "^/catalog/" ){
         return 404 "Not Found";
       }
-      rewrite ^/(.*) https://library.kiwix.org/catalog/$1 permanent;
-      return 301 "https://library.kiwix.org/catalog/";
+      if ( $shouldRedirect = 1 ) {
+        rewrite ^/(.*) https://library.kiwix.org/catalog/$1 permanent;
+        return 301 "https://library.kiwix.org/catalog/";
+      }
 spec:
   ingressClassName: nginx
   tls:
