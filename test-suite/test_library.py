@@ -2,9 +2,11 @@ from http import HTTPStatus
 
 import pytest
 import requests
+
 from utils import (
     COMPRESSABLE_OPDS_ENDPOINTS,
     KIWIX_MIN_CONTENT_SIZE_TO_COMPRESS,
+    LIBRARY_HOST,
     OPDS_ENDPOINTS,
     SCHEMES,
     TIMEOUT,
@@ -14,11 +16,20 @@ from utils import (
 )
 
 
+def test_opds_redirect():
+    if LIBRARY_HOST != "library.kiwix.org":
+        pytest.skip("not testing prod URL")
+        return
+    resp = requests.head("https://opds.library.kiwix.org/v2/entries", timeout=TIMEOUT)
+    assert resp.status_code == HTTPStatus.MOVED_PERMANENTLY
+    assert resp.headers.get("location") == f"https://{LIBRARY_HOST}/catalog/v2/entries"
+
+
 @pytest.mark.parametrize("scheme", SCHEMES)
 def test_reachable(scheme):
-    assert (
-        requests.head(get_url("/", scheme), timeout=TIMEOUT).status_code
-        in (HTTPStatus.OK, HTTPStatus.MOVED_PERMANENTLY)
+    assert requests.head(get_url("/", scheme), timeout=TIMEOUT).status_code in (
+        HTTPStatus.OK,
+        HTTPStatus.MOVED_PERMANENTLY,
     )
 
 
