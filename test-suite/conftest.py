@@ -32,6 +32,7 @@ EXPECTED_APK_MIRRORS: list[str] = [
     "md.mirrors.hacktegic.com",
     "mirror-sites-fr.mblibrary.info",
     "mirror-sites-in.mblibrary.info",
+    "mirror-sites-ca.mblibrary.info",
     "mirror.triplebit.org",
 ]
 ZIM_MIRRORS: list[Mirror] = get_current_mirrors(
