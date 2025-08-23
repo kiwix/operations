@@ -215,6 +215,46 @@ spec:
         runAsUser: 0
         runAsGroup: 0
       containers:
+      - name: anubis
+        image: ghcr.io/techarohq/anubis:latest
+        imagePullPolicy: Always
+        env:
+          - name: "BIND"
+            value: ":8080"
+          - name: "DIFFICULTY"
+            value: "4"
+          - name: ED25519_PRIVATE_KEY_HEX
+            valueFrom:
+              secretKeyRef:
+                name: browse-anubis-key
+                key: ED25519_PRIVATE_KEY_HEX
+          - name: "SERVE_ROBOTS_TXT"
+            value: "true"
+          - name: "TARGET"
+            value: "http://localhost:80"
+          - name: "OG_PASSTHROUGH"
+            value: "true"
+          - name: "OG_EXPIRY_TIME"
+            value: "24h"
+          - name: "WEBMASTER_EMAIL"
+            value: "abuse@kiwix.org"
+        resources:
+          limits:
+            cpu: 750m
+            memory: 256Mi
+          requests:
+            cpu: 250m
+            memory: 256Mi
+        securityContext:
+          runAsUser: 1000
+          runAsGroup: 1000
+          runAsNonRoot: true
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop:
+              - ALL
+          seccompProfile:
+            type: RuntimeDefault
       - image: docker.io/library/varnish:7.3-alpine
         # command: ["varnishd", "-F", "-a", "http=:80,HTTP", "-p", "feature=+http2", "-f", "/etc/varnish/default.vcl", "-s", "malloc,384M"]
         command: ["entrypoint"]
@@ -285,6 +325,10 @@ spec:
     protocol: TCP
     port: 6082
     targetPort: 6082
+  - protocol: TCP
+    port: 8080
+    targetPort: 8080
+    name: anubis
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -314,4 +358,4 @@ spec:
           service:
             name: demo-library-frontend-service
             port:
-              name: http
+              name: anubis
