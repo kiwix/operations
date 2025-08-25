@@ -106,7 +106,7 @@ data:
 
               # should never change; but can if we redo same ZIM or was 404 before or became 404
               std.ban("req.url ~ ^/raw/" + req.http.X-Book-Name + "/(meta|content)/") &&
-              std.ban("req.url ~ ^/content/" + req.http.X-Book-Name + "/") &&
+              std.ban("req.url ~ ^/content/" + req.http.X-Book-Name) &&
 
               # may change if kiwix-serve updates search algo/template
               # purging in case ZIM has been updated (should not)
@@ -117,11 +117,11 @@ data:
               std.ban("req.url ~ ^/suggest?content=" + req.http.X-Book-Name + "&") &&
 
               # redirects to /content/ (not purging)
-              # std.ban("req.url ~ ^/" + req.http.X-Book-Name + "/") &&
+              # std.ban("req.url ~ ^/" + req.http.X-Book-Name + "/?$") &&
 
               # no-date must be purged as redirect may point to a new location
-              std.ban("req.url ~ ^/" + req.http.X-Book-Name-Nodate + "/") &&
-              std.ban("req.url ~ ^/content/" + req.http.X-Book-Name-Nodate + "/")) {
+              std.ban("req.url ~ ^/" + req.http.X-Book-Name-Nodate + "/?$") &&
+              std.ban("req.url ~ ^/content/" + req.http.X-Book-Name-Nodate + "/?$")) {
             return(synth(200, "Purged Book endpoints"));
           } else {
             # return ban error in 400 response
