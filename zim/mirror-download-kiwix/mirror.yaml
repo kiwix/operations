@@ -18,10 +18,6 @@ data:
       location = /50x.html {
           root   /usr/share/nginx/html;
       }
-      # temporary kill HTTP downloads to WPEN
-      location = /zim/wikipedia/wikipedia_en_all_maxi_2025-08.zim {
-        return 502 "Server overloaded";
-      }
       location = /README {
         types { } default_type "text/plain; charset=utf-8";
       }
