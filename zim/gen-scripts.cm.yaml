@@ -176,7 +176,7 @@ data:
                         ...
             return Version(re.sub(r"[^\d\.]", "", version))
 
-        def get_latest_release_path(pattern):
+        def get_latest_release_path(pattern, *, use_sem: bool = True):
             """content_fpath-relative path of latest matching file"""
 
             glob_pattern = pattern
@@ -189,14 +189,13 @@ data:
                 re_pattern = f"{prefix}(?P<version>{regexp}){suffix}"  # for actual matching
 
             # retrieve list of files using glob
-            files = list(release_fpath.rglob(glob_pattern))
+            files: list[pathlib.Path] = list(release_fpath.rglob(glob_pattern))
 
             # create regex from simple “glob” pattern
             version_reg = re.compile(re_pattern)
 
-            # get latest version and related file by sorting all matching files
-            # on their version number ; keeping last of list
-            latest_version, lastest_fpath = sorted(
+            # tuple of extracted version and filepath
+            files_with_version: list[tuple[str, Path]] = sorted(
                 [
                     (
                         version_reg.match(p.name).groupdict()["version"],  # pyright: ignore
@@ -206,7 +205,17 @@ data:
                     if version_reg.match(p.name)
                 ],
                 key=lambda v: v[0],
-            )[-1]
+            )
+
+            # last version and file based on str comparison
+            latest_version, lastest_fpath = files_with_version[-1]
+
+            # sorted list of version and files but sorted using version semantics
+            files_with_semver = sorted(files_with_version, key=version_key)
+            latest_sem_version, lastest_sem_fpath = files_with_semver[-1]
+
+            if use_sem:
+                return lastest_sem_fpath.relative_to(content_fpath)
 
             return lastest_fpath.relative_to(content_fpath)
 
