@@ -27,7 +27,7 @@ data:
     [download.kiwix.org]
     path = /var/www/download.kiwix.org
     comment = Kiwix download repository
-    max connections = 3
+    max connections = 1
     lock file = /var/lock/public.lock
 
     # private module for official mirrors
