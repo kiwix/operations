@@ -240,11 +240,11 @@ spec:
             value: "abuse@kiwix.org"
         resources:
           limits:
-            cpu: 750m
-            memory: 256Mi
+            cpu: 1000m
+            memory: 10Gi
           requests:
             cpu: 250m
-            memory: 256Mi
+            memory: 10Gi
         securityContext:
           runAsUser: 1000
           runAsGroup: 1000
