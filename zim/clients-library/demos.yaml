@@ -37,3 +37,7 @@ demos: # Appear at clients.library.kiwix.org/home/name Refresh is at the hour, e
   zims:
     - .hidden/dev/ascensionglossary_en_all_maxi
   expired_on: 2026-03-06
+- name: mdwiki
+  zims:
+    - .hidden/custom_apps/mdwiki_en_all-app_maxi
+  expired_on: 2025-10-01
