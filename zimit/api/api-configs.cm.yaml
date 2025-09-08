@@ -16,3 +16,4 @@ data:
   REQ_TIMEOUT_GHCR: "10"
   # Default publisher to set in ZIMs
   DEFAULT_PUBLISHER: "openZIM"
+  ALLOWED_ORIGINS: https://farm.zimit.kiwix.org,https://zimit.kiwix.org
