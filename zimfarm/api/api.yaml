@@ -16,7 +16,7 @@ spec:
         app: api-app
     spec:
       containers:
-      - image: ghcr.io/openzim/zimfarm-dispatcher:latest
+      - image: ghcr.io/openzim/zimfarm-backend:latest
         imagePullPolicy: Always
         name: api
         envFrom:
