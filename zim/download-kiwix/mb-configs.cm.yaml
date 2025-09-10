@@ -673,7 +673,7 @@ data:
     </IfModule>
   httpd-vhosts.conf: |
     <VirtualHost *:80>
-      ServerName download.kiwix.org
+      ServerName https://download.kiwix.org
       ServerAdmin contact+download@kiwix.org
       DocumentRoot /var/www/download.kiwix.org
       Alias /static/ /var/www/static/

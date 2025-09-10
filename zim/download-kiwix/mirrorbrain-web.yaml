@@ -114,7 +114,7 @@ metadata:
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
     nginx.ingress.kubernetes.io/proxy-redirect-from: "http://download.kiwix.org/"
     nginx.ingress.kubernetes.io/proxy-redirect-to: "$scheme://download.kiwix.org/"
-    # anddroid deep-linking validator (#190)
+    # android deep-linking validator (#190)
     nginx.ingress.kubernetes.io/server-snippet: |
         location /.well-known/assetlinks.json {
           add_header Content-Type "application/json";
