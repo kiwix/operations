@@ -76,11 +76,13 @@ jobs:
           k get pods -A -o wide | pyp -i 'print("\n".join([line for line in l if re.split(r"\s+", line)[4] != "0"]))'
           ```
           - [ ] Check if k8s should/could be upgraded
+          
           ```sh
           curl -s -H "X-Auth-Token: $SCW_SECRET_KEY" https://api.scaleway.com/k8s/v1/regions/fr-par/clusters/$KIWIX_PROD_CLUSTER | jq ".version,.upgrade_available"
           curl -s -H "X-Auth-Token: $SCW_SECRET_KEY" https://api.scaleway.com/k8s/v1/regions/fr-par/versions | jq ".versions[].name"
           ```
-          - [ ] [Upgrade k8s](https://github.com/kiwix/operations/wiki/Cluster-Setup#upgrading-kubernetes) if applicable/possible
+
+          If yes, open a dedicated issue in [kiwix/operations](https://github.com/kiwix/operations/issues/new) with [upgrade procedure](https://github.com/kiwix/operations/wiki/Cluster-Setup#upgrading-kubernetes) 
 
           ## Stats
 
