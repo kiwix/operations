@@ -19,7 +19,7 @@ clusterMetrics:
   enabled: true
   kube-state-metrics:
     image:
-      tag: v2.15.0
+      tag: v2.17.0
     deploy: true
     enabled: true
     collectors:
