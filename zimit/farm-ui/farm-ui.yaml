@@ -19,15 +19,24 @@ spec:
       - image: ghcr.io/openzim/zimfarm-ui:latest
         imagePullPolicy: Always
         name: farm-ui
-        envFrom:
-        - configMapRef:
-            name: farm-ui-configs
+        volumeMounts:
+          - name: configs
+            subPath: config.json
+            mountPath: "/usr/share/nginx/html/config.json"
+            readOnly: true
+        env:
+          - name: ENVIRON_PATH
+            value: "/usr/share/nginx/html/config_old.json"
         ports:
         - containerPort: 80
         resources:
           requests:
             memory: "16Mi"
             cpu: "1m"
+      volumes:
+        - name: configs
+          configMap:
+            name: farm-ui-configs
       nodeSelector:
         k8s.kiwix.org/role: "services"
 ---
