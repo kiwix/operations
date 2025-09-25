@@ -12,6 +12,9 @@ spec:
     spec:
       backoffLimit: 2
       template:
+        metadata:
+          annotations:
+            resource.opentelemetry.io/service.name: db-backup
         spec:
           containers:
             - name: borg-backup
