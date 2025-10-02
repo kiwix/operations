@@ -15,7 +15,7 @@ spec:
         spec:
           restartPolicy: Never
           containers:
-            - image: ghcr.io/openzim/zimfarm-dispatcher:latest
+            - image: ghcr.io/openzim/zimfarm-backend:latest
               imagePullPolicy: IfNotPresent
               name: zimfarm
               envFrom:
@@ -32,6 +32,8 @@ spec:
                 value: task
               - name: CREATE_ISSUE
                 value: "true"
+              - name: JWT_SECRET
+                value: "notused"
               volumeMounts:
               - name: report-youtube-api-keys-config
                 mountPath: /app/maint-scripts/report_youtube_api_keys.conf.json
