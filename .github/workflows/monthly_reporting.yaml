@@ -19,7 +19,7 @@ jobs:
       - name: Download script
         run: curl -O https://raw.githubusercontent.com/openzim/zimfarm/refs/heads/main/dispatcher/backend/maint-scripts/monthly_report_tasks.py
       - name: Create report
-        run: ZF_URI="https://api.farm.zimit.kiwix.org/v1" FILE_PREFIX="farm.zimit.kiwix.org_tasks_" python monthly_report_tasks.py --
+        run: ZF_URI="https://api.farm.zimit.kiwix.org/v2" FILE_PREFIX="farm.zimit.kiwix.org_tasks_" python monthly_report_tasks.py --
       - name: List files
         run: ls -lah *.csv
       - name: Upload report
