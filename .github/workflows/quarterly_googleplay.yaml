@@ -50,7 +50,7 @@ jobs:
         ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         REPO: kiwix/kiwix-android
         LABELS: store
-        ASSIGNEES: kelson42,MohitMaliDeveloper
+        ASSIGNEES: kelson42,MohitMaliFtechiz
         ISSUE_BODY: |
 
           Check that the [Kiwix Team profile](https://play.google.com/store/apps/dev?id=9116215767541857492) and [Kiwix App](https://play.google.com/store/apps/details?id=org.kiwix.kiwixmobile) are up-to-date.
