@@ -29,7 +29,7 @@ EXPECTED_APK_MIRRORS: list[str] = [
     "mirror.download.kiwix.org",
     "ftp.nluug.nl",
     "ftp.fau.de",
-    "md.mirrors.hacktegic.com",
+    # "md.mirrors.hacktegic.com",
     "mirror-sites-fr.mblibrary.info",
     "mirror-sites-in.mblibrary.info",
     "mirror-sites-ca.mblibrary.info",
