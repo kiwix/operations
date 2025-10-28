@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: status-farm-zimit-kiwix-org
+  namespace: zimit
+spec:
+  secretName: status-farm-zimit-kiwix-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: status.farm.zimit.kiwix.org
+  dnsNames:
+  - status.farm.zimit.kiwix.org

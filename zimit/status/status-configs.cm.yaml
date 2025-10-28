@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: status-configs
+  namespace: zimit
+data:
+  DEBUG: "Y"
+  REQUESTS_TIMEOUT: 30s
+  ZIMFARM_API_URL: https://api.farm.zimit.kiwix.org
+  ZIMFARM_USERNAME: healthcheck
+
+

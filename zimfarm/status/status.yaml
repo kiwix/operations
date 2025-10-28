@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zimfarm
+  labels:
+    app: status-app
+  name: status-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: status-app
+  template:
+    metadata:
+      labels:
+        app: status-app
+    spec:
+      containers:
+      - image: ghcr.io/openzim/zimfarm-healthcheck:latest
+        imagePullPolicy: Always
+        name: healthcheck
+        envFrom:
+        - configMapRef:
+            name: status-configs
+        - secretRef:
+            name: status-secrets
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "20m"
+      nodeSelector:
+        k8s.kiwix.org/role: "system"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zimfarm
+  name: status-service
+  labels:
+    app: status-app
+spec:
+  selector:
+    app: status-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: status-ingress
+  namespace: zimfarm
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+      - status.farm.openzim.org
+      secretName: status-farm-openzim-org-tls
+  rules:
+  - host: status.farm.openzim.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: status-service
+            port:
+              number: 80

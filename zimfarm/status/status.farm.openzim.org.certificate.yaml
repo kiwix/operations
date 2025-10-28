@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: status-farm-openzim-org
+  namespace: zimfarm
+spec:
+  secretName: status-farm-openzim-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: status.farm.openzim.org
+  dnsNames:
+  - status.farm.openzim.org
