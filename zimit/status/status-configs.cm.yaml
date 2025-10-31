@@ -4,9 +4,10 @@ metadata:
   name: status-configs
   namespace: zimit
 data:
-  DEBUG: "Y"
+  DEBUG: "F"
   REQUESTS_TIMEOUT: 30s
-  ZIMFARM_API_URL: https://api.farm.zimit.kiwix.org
+  ZIMFARM_API_URL: https://api.farm.zimit.kiwix.org/v2
+  ZIMFARM_FRONTEND_URL: https://farm.zimit.kiwix.org
   ZIMFARM_USERNAME: healthcheck
 
 

@@ -4,9 +4,10 @@ metadata:
   name: status-configs
   namespace: zimfarm
 data:
-  DEBUG: "Y"
+  DEBUG: "F"
   REQUESTS_TIMEOUT: 30s
-  ZIMFARM_API_URL: https://api.farm.openzim.org
+  ZIMFARM_API_URL: https://api.farm.openzim.org/v2
+  ZIMFARM_FRONTEND_URL: https://farm.openzim.org
   ZIMFARM_USERNAME: healthcheck
 
 
