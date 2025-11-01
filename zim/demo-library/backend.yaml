@@ -21,7 +21,7 @@ spec:
       # also check that varnish hack still necessary (gzip, endpoints)
       # /!\ manually trigger update-kiwixserve-template Job on kiwix-serve upgrade
       # after having updated the LIBKIWIX_VERSION field in env (and tested!)
-      - image: ghcr.io/kiwix/kiwix-tools:3.7.0-1
+      - image: ghcr.io/kiwix/kiwix-tools:3.8.0
         imagePullPolicy: IfNotPresent
         name: kiwix-tools
         args: ["kiwix-serve", "-b", "--library", "--monitorLibrary", "--threads", "16", "--searchLimit", "5", "--nodatealias", "--customIndex", "/data/kiwix-serve-templates/index-template.html", "/data/library/internal_library.xml"]
