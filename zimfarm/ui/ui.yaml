@@ -62,6 +62,10 @@ metadata:
   namespace: zimfarm
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/server-snippet: |
+      if ($uri = "/contrib/zimfarm.sh") {
+        return 302 "https://raw.githubusercontent.com/openzim/zimfarm/refs/heads/main/worker/contrib/zimfarm.sh";
+      }
 spec:
   tls:
     - hosts:
