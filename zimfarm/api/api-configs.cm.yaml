@@ -47,7 +47,7 @@ data:
   WASABI_WHITELIST_POLICY_ARN: "arn:aws:iam::100000050990:policy/ZimfarmWorker"
   WASABI_WHITELIST_STATEMENT_ID: "ZimfarmWorkersIPsWhiteList"
   # CMS connection
-  INFORM_CMS: "1"
+  INFORM_CMS: "0"
   CMS_ENDPOINT: "https://api.cms.openzim.org/v1/books/add"
   # obsolete keys
   # SOCKET_URI: "tcp://relay.backend.zimfarm.kiwixoffline.node.intern:5000"
