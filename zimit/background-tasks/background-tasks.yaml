@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zimit
+  labels:
+    app: background-tasks-app
+  name: background-tasks-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: background-tasks-app
+  template:
+    metadata:
+      labels:
+        app: background-tasks-app
+    spec:
+      containers:
+      - image: ghcr.io/openzim/zimfarm-background-tasks:latest
+        imagePullPolicy: Always
+        name: background-tasks
+        envFrom:
+        - configMapRef:
+            name: background-tasks-configs
+        - secretRef:
+            name: background-tasks-secrets
+        resources:
+          requests:
+            memory: "100M"
+            cpu: "20m"
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
