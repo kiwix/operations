@@ -21,6 +21,8 @@ spec:
         name: background-tasks
         envFrom:
         - configMapRef:
+            name: api-configs
+        - configMapRef:
             name: background-tasks-configs
         - secretRef:
             name: background-tasks-secrets
