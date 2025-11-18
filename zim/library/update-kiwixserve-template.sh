@@ -55,6 +55,10 @@ echo "Applying Kiwix Patch…"
 
 echo "$KIWIX_PATCH" | patch --input=- --output=$TEMPLATE_TMP_PATH -p1 $TEMPLATE_SRC_PATH
 
+echo "Replacing KIWIXCACHEID with ${LIBKIWIX_VERSION}"
+
+sed "s/KIWIXCACHEID/$LIBKIWIX_VERSION/g" $TEMPLATE_TMP_PATH > $TEMPLATE_TMP_PATH
+
 echo "Replacing final file…"
 
 mv $TEMPLATE_TMP_PATH $TEMPLATE_PATH
