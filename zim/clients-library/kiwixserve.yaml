@@ -17,8 +17,8 @@ spec:
     spec:
       containers:
       # /!\ manually purge kiwix-serve cache on kiwix-serve version upgrade
-      # curl -X PURGE -H "X-Purge-Type: kiwix-serve" http://clients-library-webcache-service
-      - image: ghcr.io/kiwix/kiwix-tools:3.8.0
+      # curl -X PURGE -H "X-Purge-Type: all" http://clients-library-webcache-service
+      - image: ghcr.io/kiwix/kiwix-tools:3.8.1
         imagePullPolicy: IfNotPresent
         name: kiwix-tools
         args: ["kiwix-serve", "-b", "--library", "--monitorLibrary", "--threads", "16", "--searchLimit", "5", "--nodatealias", "/data/demo/demo_library.xml"]

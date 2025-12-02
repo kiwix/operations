@@ -16,7 +16,7 @@ spec:
           # kiwix-serve version we use in library-data-backend-deployment
           # can be obtain with `kiwix-serve --version`
           - name: LIBKIWIX_VERSION
-            value: "14.1.0"
+            value: "14.1.1"
           - name: INSTALL_SCRIPTS
             value: "update-template#github://kiwix/operations/zim/library/update-kiwixserve-template.sh\n"
           volumeMounts:
