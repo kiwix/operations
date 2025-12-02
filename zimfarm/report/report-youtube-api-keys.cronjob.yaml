@@ -15,7 +15,7 @@ spec:
         spec:
           restartPolicy: Never
           containers:
-            - image: ghcr.io/openzim/zimfarm-backend:latest
+            - image: ghcr.io/openzim/zimfarm-background-tasks:latest
               imagePullPolicy: IfNotPresent
               name: zimfarm
               envFrom:
