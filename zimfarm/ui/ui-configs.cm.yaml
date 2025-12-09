@@ -12,5 +12,5 @@ data:
       "MATOMO_HOST": "https://stats.kiwix.org",
       "MATOMO_SITE_ID": 8,
       "MATOMO_TRACKER_FILE_NAME": "matomo",
-      "MONITORING_URL": "https://monitoring.openzim.org"
+      "MONITORING_URL": "https://monitoring.openzim.org/v3"
     }

@@ -28,10 +28,10 @@ spec:
           protocol: TCP
           containerPort: 19999
         volumeMounts:
-        - mountPath: "/etc/netdata"
-          subPath: etc_netdata
-          name: data-volume
-          readOnly: false
+        # - mountPath: "/etc/netdata"
+        #   subPath: etc_netdata
+        #   name: data-volume
+        #   readOnly: false
         - mountPath: "/var/cache/netdata"
           subPath: var_cache_netdata
           name: data-volume
