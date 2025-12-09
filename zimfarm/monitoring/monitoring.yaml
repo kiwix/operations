@@ -16,7 +16,7 @@ spec:
         app: monitoring-app
     spec:
       containers:
-      - image: ghcr.io/kiwix/netdata:latest
+      - image: ghcr.io/openzim/zimfarm-monitor-parent:latest
         imagePullPolicy: Always
         name: netdata
         envFrom:
@@ -28,6 +28,10 @@ spec:
           protocol: TCP
           containerPort: 19999
         volumeMounts:
+        - mountPath: "/etc/netdata"
+          subPath: etc_netdata
+          name: data-volume
+          readOnly: false
         - mountPath: "/var/cache/netdata"
           subPath: var_cache_netdata
           name: data-volume
@@ -51,7 +55,7 @@ spec:
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 1
-          initialDelaySeconds: 30
+          initialDelaySeconds: 5
         readinessProbe:
           httpGet:
             path: /api/v1/info
@@ -60,7 +64,7 @@ spec:
           periodSeconds: 30
           successThreshold: 1
           timeoutSeconds: 1
-          initialDelaySeconds: 30
+          initialDelaySeconds: 5
       terminationGracePeriodSeconds: 300
       volumes:
       - name: data-volume
