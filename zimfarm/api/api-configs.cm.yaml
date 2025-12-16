@@ -62,4 +62,8 @@ data:
   # Default publisher to set in ZIMs
   DEFAULT_PUBLISHER: "openZIM"
   ALLOWED_ORIGINS: https://farm.openzim.org
-
+  BLOB_PRIVATE_STORAGE_URL: https://drive.farm.openzim.org/blobs
+  BLOB_PUBLIC_STORAGE_URL: https://drive.farm.openzim.org/blobs
+  BLOB_STORAGE_USERNAME: admin
+  BLOB_MAX_SIZE: 1MB
+  DELETE_ORPHANED_BLOBS_INTERVAL: 24h

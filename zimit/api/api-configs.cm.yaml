@@ -16,3 +16,8 @@ data:
   # Default publisher to set in ZIMs
   DEFAULT_PUBLISHER: "openZIM"
   ALLOWED_ORIGINS: https://farm.zimit.kiwix.org,https://zimit.kiwix.org
+  BLOB_PRIVATE_STORAGE_URL: https://drive.zimit.kiwix.org/blobs
+  BLOB_PUBLIC_STORAGE_URL: https://drive.zimit.kiwix.org/blobs
+  BLOB_STORAGE_USERNAME: admin
+  BLOB_MAX_SIZE: 1MB
+  DELETE_ORPHANED_BLOBS_INTERVAL: 24h
