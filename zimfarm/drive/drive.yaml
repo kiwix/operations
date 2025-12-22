@@ -34,6 +34,10 @@ spec:
         - name: data-volume
           mountPath: "/data"
           readOnly: false
+        - name: configs
+          mountPath: "/etc/nginx/snippets/custom.conf"
+          subPath: custom.conf
+          readOnly: true
         ports:
         - containerPort: 80
         resources:
@@ -44,6 +48,9 @@ spec:
       - name: data-volume
         persistentVolumeClaim:
           claimName: drive-local-pvc
+      - name: configs
+        configMap:
+          name: drive-configs
       nodeSelector:
         k8s.kiwix.org/role: "services"
 ---
