@@ -10,7 +10,8 @@ metadata:
         set $shouldRedirect 0;
       }
       if ($uri ~* "^/catalog/" ){
-        return 404 "Not Found";
+        rewrite ^/(.*) https://library.kiwix.org/$1 permanent;
+        return 301 "https://library.kiwix.org/";
       }
       if ( $shouldRedirect = 1 ) {
         rewrite ^/(.*) https://library.kiwix.org/catalog/$1 permanent;
