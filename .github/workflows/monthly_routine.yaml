@@ -51,7 +51,7 @@ jobs:
         ISSUE_BODY: |
 
           ## Worker system upgrades
-        
+
           Find a maintenance window for the service:
           - wait for no more ongoing task on imager then stop the worker (`docker stop imager-worker` ; restart with `imager-worker-restart`)
           - run `zimfarm stop manager` on zimfarm worker
@@ -64,7 +64,7 @@ jobs:
           - [ ] imager-worker
           - [ ] ondemand
           - [ ] sisyphus
-          
+
           **Note**: this is an *automatic reminder* intended for the assignee(s).
 
           ## Zimfarms
@@ -75,7 +75,7 @@ jobs:
 
           ## Borgbase
 
-          - [ ] Start compaction of Borgbase repositories manually through the UI (beware `wp1db` which needs you to stop `backup` container on `mwcurator` before to release lock: `sudo docker-compose -f /data/code/wp1/docker-compose.yml stop backup`)
+          - [ ] Start compaction of Borgbase repositories manually through the UI (beware `wp1db` which needs you to stop `backup` container on `mwcurator` before to release lock: `sudo docker compose -f /data/code/wp1/docker-compose.yml stop backup`)
           - [ ] Check compaction completed succesfully on all repositories (and not not forget to restart `backup` container on `mwcurator`
 
           ## Delayed task
