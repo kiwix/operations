@@ -26,4 +26,4 @@ data:
   DATA_DIR: "/data"
   CSRF_TRUSTED_ORIGINS: "https://imager.kiwix.org"
   # | separated
-  BRANDING_ORGS: "orange|cordial.dust1431@fastmail.com"
+  BRANDING_ORGS: "orange|orange_liberia|cordial.dust1431@fastmail.com"
