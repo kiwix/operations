@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: master-kiwix-nightly-pvc
+  namespace: zim
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: local-storage
+  volumeName: srv-m-kiwix-nightly-local-pv
