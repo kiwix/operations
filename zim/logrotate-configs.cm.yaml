@@ -1,0 +1,38 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logrotate-configs
+  namespace: zim
+data:
+  logrotate.conf: |
+    copytruncate
+    daily
+    dateext
+    compress
+    delaycompress
+    ifempty
+    rotate 30
+    maxage 30
+    missingok
+    nomail
+    include /etc/logrotate.d
+  mirror-download-kiwix.conf: |
+    /data/nginx-logs/mirror-download-kiwix/*.log {
+      olddir /data/nginx-logs/archives/mirror-download-kiwix
+    }
+  download-kiwix.conf: |
+    /data/nginx-logs/download-kiwix/*.log {
+      olddir /data/nginx-logs/archives/download-kiwix
+    }
+  download-openzim.conf: |
+    /data/nginx-logs/download-openzim/*.log {
+      olddir /data/nginx-logs/archives/download-openzim
+    }
+  library-kiwix.conf: |
+    /data/nginx-logs/library-kiwix/*.log {
+      olddir /data/nginx-logs/archives/library-kiwix
+    }
+  demo-library-kiwix.conf: |
+    /data/nginx-logs/demo-library-kiwix/*.log {
+      olddir /data/nginx-logs/archives/demo-library-kiwix
+    }
