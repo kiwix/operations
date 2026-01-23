@@ -1,0 +1,104 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: internal-rsyncd-configs
+  namespace: zim
+data:
+  rsyncd.conf: |
+    [global]
+    charset = utf-8
+    # logs already sent to stdout for k8s to handle
+    # log file = /var/log/rsync.log
+
+    # alpine-based image have xfs user on uid 33 and xfa group on gid 33
+    # which corresponds to www-data/www-data on debian
+    numeric ids = yes
+    # allow enough time for --list-only on whole thing (20m)
+    timeout = 1200
+
+    list = yes
+    uid = 33
+    gid = 33
+    read only = true
+
+    dont compress = *.zim *.gz *.xz *.bz2 *.zip *.img
+
+    hosts allow = 100.64.0.0/15
+    max connections = 3
+
+    [download]
+    # internal module for mirrorbrain discovery or our own mirror
+    path = /data/download/
+    comment = SRV-B download repository
+    lock file = /var/lock/download-repo.lock
+---
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: internal-rsyncd-app
+  name: internal-rsyncd-deployment
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: internal-rsyncd-app
+  template:
+    metadata:
+      labels:
+        app: internal-rsyncd-app
+    spec:
+      containers:
+      # this image is not tagged other than latest.
+      # at time of this SHA, it includes alpine 3.21.1
+      # with patched version 3.4.0 of rsync
+      - image: docker.io/alpinelinux/rsyncd@sha256:1f6d1953386bb0149a999c9b14fa171e6d340bb68fc61c82a955fabbfe102f77
+        imagePullPolicy: IfNotPresent
+        name: rsyncd
+        command: ["rsync", "--daemon", "--no-detach", "--log-file", "/dev/stdout", "--config", "/etc/rsyncd.conf"]
+        securityContext:
+          capabilities:
+            add:
+              - SYS_NICE
+        volumeMounts:
+        - mountPath: "/data/download"
+          name: download-volume
+          readOnly: true
+        - mountPath: "/etc/rsyncd.conf"
+          name: rsyncd-configs
+          subPath: rsyncd.conf
+          readOnly: true
+        resources:
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        ports:
+        - containerPort: 873
+      volumes:
+      - name: download-volume
+        persistentVolumeClaim:
+          claimName: browser-download-pvc
+      - name: rsyncd-configs
+        configMap:
+          name: internal-rsyncd-configs
+      nodeSelector:
+        k8s.kiwix.org/role: "browser"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: internal-rsyncd-service
+  labels:
+    app: internal-rsyncd-app
+spec:
+  selector:
+    app: internal-rsyncd-app
+  ports:
+  - protocol: TCP
+    port: 873
+    targetPort: 873

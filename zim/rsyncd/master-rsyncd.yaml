@@ -1,0 +1,96 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: master-rsyncd-app
+  name: master-rsyncd-deployment
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: master-rsyncd-app
+  template:
+    metadata:
+      labels:
+        app: master-rsyncd-app
+    spec:
+      containers:
+      # this image is not tagged other than latest.
+      # at time of this SHA, it includes alpine 3.21.1
+      # with patched version 3.4.0 of rsync
+      - image: docker.io/alpinelinux/rsyncd@sha256:1f6d1953386bb0149a999c9b14fa171e6d340bb68fc61c82a955fabbfe102f77
+        imagePullPolicy: IfNotPresent
+        name: rsyncd
+        command: ["rsync", "--daemon", "--no-detach", "--log-file", "/dev/stdout", "--config", "/etc/rsyncd.conf"]
+        securityContext:
+          capabilities:
+            add:
+              - SYS_NICE
+        volumeMounts:
+        - mountPath: "/var/www/download.kiwix.org/zim"
+          name: zim-volume
+          readOnly: true
+        - mountPath: "/var/www/download.kiwix.org/release"
+          name: kiwix-release-volume
+          readOnly: true
+        - mountPath: "/var/www/download.kiwix.org/nightly"
+          name: kiwix-nightly-volume
+          readOnly: true
+        - mountPath: "/var/www/download.openzim.org/release"
+          name: openzim-release-volume
+          readOnly: true
+        - mountPath: "/var/www/download.openzim.org/nightly"
+          name: openzim-nightly-volume
+          readOnly: true
+        - mountPath: "/etc/rsyncd.conf"
+          name: rsyncd-configs
+          subPath: rsyncd.conf
+          readOnly: true
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "1000m"
+        ports:
+        # we don't want to request mirrors to use an alternate port
+        - containerPort: 873
+          hostPort: 873
+      volumes:
+      - name: zim-volume
+        persistentVolumeClaim:
+          claimName: master-zim-pvc
+      - name: kiwix-release-volume
+        persistentVolumeClaim:
+          claimName: master-kiwix-release-pvc
+      - name: kiwix-nightly-volume
+        persistentVolumeClaim:
+          claimName: master-kiwix-nightly-pvc
+      - name: openzim-release-volume
+        persistentVolumeClaim:
+          claimName: master-openzim-release-pvc
+      - name: openzim-nightly-volume
+        persistentVolumeClaim:
+          claimName: master-openzim-nightly-pvc
+      - name: rsyncd-configs
+        configMap:
+          name: rsyncd-configs
+      nodeSelector:
+        k8s.kiwix.org/role: "master"
+---
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: master-rsyncd-service
+  labels:
+    app: master-rsyncd-app
+spec:
+  selector:
+    app: master-rsyncd-app
+  ports:
+  - protocol: TCP
+    port: 873
+    targetPort: 873
