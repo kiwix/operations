@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rsyncd-configs
+  namespace: zim
+data:
+  rsyncd.conf: |
+    [global]
+    charset = utf-8
+    # logs already sent to stdout for k8s to handle
+    # log file = /var/log/rsync.log
+
+    # alpine-based image have xfs user on uid 33 and xfa group on gid 33
+    # which corresponds to www-data/www-data on debian
+    numeric ids = yes
+    # allow enough time for --list-only on whole thing (20m)
+    timeout = 1200
+
+    list = yes
+    uid = 33
+    gid = 33
+    read only = true
+
+    dont compress = *.zim *.gz *.xz *.bz2 *.zip *.img
+
+    # anonymous module
+    [download.kiwix.org]
+    path = /var/www/download.kiwix.org
+    comment = Kiwix download repository
+    max connections = 1
+    lock file = /var/lock/public.lock
+
+    # private module for official mirrors
+    [master.download.kiwix.org]
+    path = /var/www/download.kiwix.org
+    comment = Kiwix download repository (mirrors only)
+    max connections = 17
+    lock file = /var/lock/mirrors.lock
+    list = no
+    hosts allow = hippo.yeleman.com ftp.rrze.uni-erlangen.de 131.188.12.211 2001:638:a000:1021:21::1 mirrors.dotsrc.org 130.225.254.116 2001:878:346::116 www.mirrorservice.org 212.219.56.128/26 2001:630:341:0012::/64 ftp.nluug.nl 145.220.21.40 poincare.acc.umu.se 130.239.18.154 2001:6b0:e:2018::154 192.115.2.70 192.115.2.0/24 ftpmirror.your.org.219.237.163.in-addr.arpa 163.237.219.7 md.mirrors.hacktegic.com 185.181.228.68 2a0a:d580:802:68::68 mirror-sites-fr.mblibrary.info 79.137.65.154 ny.mirror.driftless.cc 162.249.172.160/29 twcc.ossplanet.net 202.5.254.248 metalhead01.de.bluet.org 65.108.196.33 mirror.triplebit.org 103.17.154.77 2602:f81c:83:300::77 kathrin.kiwix.org 185.72.67.134
+
+    # Our mirrors
+    # ftp.fau.de (Michael Meier <rrze-ftp-admins@fau.de>): ftp.rrze.uni-erlangen.de 131.188.12.211 2001:638:a000:1021:21::1
+    # mirrors.dotsrc.org (Anders Trier Olesen <staff@dotsrc.org>): mirrors.dotsrc.org 130.225.254.116 2001:878:346::116
+    # www.mirrorservice.org (Tim Bishop <help@mirrorservice.org>): www.mirrorservice.org 212.219.56.128/26 2001:630:341:0012::/64
+    # ftp.nluug.nl (Mike Hulsman  <ftpmirror-beheer@nluug.nl>): ftp.nluug.nl 145.220.21.40
+    # mirror.accum.se (Niklas Edmundsson <ftp-adm@accum.se>): poincare.acc.umu.se 130.239.18.154 2001:6b0:e:2018::154
+    # mirror.isoc.org.il: 192.115.2.70 192.115.2.0/24
+    # ftpmirror.your.org (Ryan Steinmetz <noc@your.org>): ftpmirror.your.org.219.237.163.in-addr.arpa 163.237.219.7
+    # md.mirrors.hacktegic.com (Artiom Mocrenco <amocrenco@protonmail.com>) md.mirrors.hacktegic.com 185.181.228.68 2a0a:d580:802:68::68
+    # mirror-sites-fr.mblibrary.info (Dr. Mamdouh Barakat <MB@mbgroup.global>) mirror-sites-fr.mblibrary.info 79.137.65.154 (+ 2 other mirrors in CA + IN, mirrored internally from this FR one)
+    # mirror.triplebit.org (Jonah Aragon <jonah@triplebit.org>) mirror.triplebit.org 103.17.154.77 2602:f81c:83:300::77
+    #
+    # Backups
+    # @kelson42: kathrin.kiwix.org 185.72.67.134
+    #
+    # Candidates
+    # ny.mirror.driftless.cc (Jim Neumann <jim@jneumann.com>) 162.249.172.160/29
+    # twcc.ossplanet.net [tw] Matthew Lien <bluet@bluet.org> 202.5.254.248
+    # metalhead01.de.bluet.org [de] Matthew Lien <bluet@bluet.org> 65.108.196.33
+
+    [wmf.download.kiwix.org]
+    # Ariel <ariel@wikimedia.org>
+    path = /var/www/download.kiwix.org
+    comment = Kiwix download repository (wikimedia foundation only)
+    max connections = 8
+    lock file = /var/lock/wmf.lock
+    list = no
+    hosts allow = 208.80.154.0/23
+
+    [self.download.kiwix.org]
+    # internal module for mirrorbrain discovery or our own mirror
+    path = /var/www/download.kiwix.org
+    comment = Kiwix download repository (mirror.kiwix only)
+    max connections = 3
+    lock file = /var/lock/self.lock
+    list = no
+    # using clusterCIDR from kube-proxy's config.conf
+    hosts allow = 100.64.0.0/15 51.159.106.143 51.159.104.213 51.159.97.236
+
+    [download.openzim.org]
+    path = /var/www/download.openzim.org
+    comment = openZIM download repository
+    max connections = 3
+    lock file = /var/lock/openzim.lock
