@@ -81,5 +81,5 @@ data:
     [download.openzim.org]
     path = /var/www/download.openzim.org
     comment = openZIM download repository
-    max connections = 3
+    max connections = 1
     lock file = /var/lock/openzim.lock
