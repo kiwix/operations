@@ -21,7 +21,7 @@ spec:
       - image: ghcr.io/kiwix/ftpd:latest
         imagePullPolicy: IfNotPresent
         name: pureftpd
-        command: ["/usr/sbin/pure-ftpd", "-4", "-p", "2000:2050", "-S", "0.0.0.0,21", "-P", "srv-m.k8s.kiwix.org"] #"master.download.kiwix.org"]
+        command: ["/usr/sbin/pure-ftpd", "-4", "-H", "-p", "2000:2050", "-S", "0.0.0.0,21", "-P", "srv-m.k8s.kiwix.org"] # "master.download.kiwix.org"]
         volumeMounts:
         - mountPath: "/var/lib/ftp/zim"
           name: zim-volume
@@ -40,7 +40,7 @@ spec:
           readOnly: true
         resources:
           requests:
-            memory: "8Mi"
+            memory: "32Mi"
             cpu: "100m"
         ports:
           # using hostPort is reliable with any FTP client for passive mode
