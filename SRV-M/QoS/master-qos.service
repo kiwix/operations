@@ -1,0 +1,14 @@
+[Unit]
+Description=master QoS
+ConditionFileIsExecutable=/usr/local/bin/setup-qos.sh
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/setup-qos.sh
+ExecStartPre=/usr/local/bin/flush-qos.sh
+ExecStop=/usr/local/bin/flush-qos.sh
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
