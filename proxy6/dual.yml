@@ -1,0 +1,57 @@
+main:
+  # Worker threads
+  workers: 4
+  # Listen port
+  port: 1081
+  # Listen address (ipv4|ipv6)
+  #listen-address: '::'
+  listen-address: '::'
+  # UDP listen port (0: random, a-b: range)
+# udp-port: 0
+  # UDP listen address (ipv4|ipv6)
+# udp-listen-address: '::1'
+  # UDP public address (ipv4)
+# udp-public-address-v4: ''
+  # UDP public address (ipv6)
+# udp-public-address-v6: ''
+  # Listen ipv6 only
+  listen-ipv6-only: false
+  # Bind source address (ipv4|ipv6)
+  # It is overridden by bind-address-v{4,6} if specified
+  bind-address: ''
+  # Bind source address (ipv4)
+  bind-address-v4: ''
+  # Bind source address (ipv6)
+  bind-address-v6: ''
+  # Bind source network interface
+  bind-interface: ''
+  # Domain address type (ipv4|ipv6|unspec)
+  #domain-address-type: unspec
+  domain-address-type: unspec
+  # Socket mark (hex: 0x1, dec: 1, oct: 01)
+  mark: 0
+
+auth:
+  file: /etc/proxy/auth.txt
+
+misc:
+  # task stack size (bytes)
+# task-stack-size: 8192
+  # udp socket recv buffer (SO_RCVBUF) size (bytes)
+# udp-recv-buffer-size: 524288
+  # number of udp buffers in splice, 1500 bytes per buffer.
+# udp-copy-buffer-nums: 10
+  # TCP connect timeout (ms)
+# connect-timeout: 10000
+  # TCP read-write timeout (ms)
+# tcp-read-write-timeout: 300000
+  # UDP read-write timeout (ms)
+# udp-read-write-timeout: 60000
+  # stdout, stderr or file-path
+  log-file: stderr
+  # debug, info, warn or error
+  log-level: info
+  # If present, run as a daemon with this pid file
+# pid-file: /run/hev-socks5-server.pid
+  # If present, set rlimit nofile; else use default value
+# limit-nofile: 65535

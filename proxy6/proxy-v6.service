@@ -1,0 +1,10 @@
+[Unit]
+Description=IPv6 Proxy server
+ConditionFileIsExecutable=/usr/local/bin/hev-socks5-server
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/hev-socks5-server /etc/proxy/v6.yml
+
+[Install]
+WantedBy=multi-user.target
