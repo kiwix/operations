@@ -9,3 +9,4 @@ data:
   KRATOS_ADMIN_URL: "https://login.kiwix.org"
   HYDRA_PUBLIC_URL: "https://login.kiwix.org"
   HYDRA_ADMIN_URL: "https://login.kiwix.org"
+  NEXT_PUBLIC_APP_URL: "http://localhost:3000"
