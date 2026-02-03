@@ -28,7 +28,7 @@ services:
     md1:
       device: /dev/md1
       mounted: /
-services:
+system:
   label: system (bastion)
   instance: scw-kiwix-prod-foreign-fd47028c64314d1d98b4cbd
   disks:
@@ -38,6 +38,45 @@ services:
     sda15:
       device: /dev/sda15
       mounted: /boot/efi
+srv-b:
+  label: srv-b
+  instance: scw-kiwix-prod-foreign-1cfce2bf45c04b09a8a057a
+  disks:
+    md0:
+      device: /dev/md0
+      mounted: /boot
+    md1:
+      device: /dev/md1
+      mounted: /
+    md2:
+      device: /dev/md2
+      mounted: /data
+srv-s:
+  label: srv-s
+  instance: scw-kiwix-prod-foreign-584293b636534c82bf030e6
+  disks:
+    md0:
+      device: /dev/md0
+      mounted: /boot
+    md1:
+      device: /dev/md1
+      mounted: /
+    md2:
+      device: /dev/md127
+      mounted: /data
+srv-m:
+  label: srv-m
+  instance: scw-kiwix-prod-foreign-89d229b18d0f414cb3e78cf
+  disks:
+    md0:
+      device: /dev/md0
+      mounted: /boot
+    md1:
+      device: /dev/md1
+      mounted: /
+    md2:
+      device: /dev/md2
+      mounted: /data
 demo.hotspot:
   label: demo.hotspot.kiwix.org
   instance: demo.hotspot.kiwix.org
@@ -71,22 +110,22 @@ sisyphus:
     sda2:
       device: /dev/sda2
       mounted: /
-mwoffliner1:
-  label: mwoffliner1
-  instance: mwoffliner1.mwoffliner.eqiad1.wikimedia.cloud
+mwoffliner1b:
+  label: mwoffliner1b
+  instance: mwoffliner1b.mwoffliner.eqiad1.wikimedia.cloud
   disks:
     sdb15:
-      device: /dev/sdb15
+      device: /dev/sda15
       mounted: /boot/efi
     sdb1:
-      device: /dev/sdb1
+      device: /dev/sda1
       mounted: /
     sda1:
-      device: /dev/sda1
+      device: /dev/sdb1
       mounted: /data
-mwoffliner2:
-  label: mwoffliner2
-  instance: mwoffliner2.mwoffliner.eqiad1.wikimedia.cloud
+mwoffliner2b:
+  label: mwoffliner2b
+  instance: mwoffliner2b.mwoffliner.eqiad1.wikimedia.cloud
   disks:
     sda15:
       device: /dev/sda15
@@ -97,9 +136,9 @@ mwoffliner2:
     sdb1:
       device: /dev/sdb1
       mounted: /data
-mwoffliner3:
-  label: mwoffliner3
-  instance: mwoffliner3.mwoffliner.eqiad1.wikimedia.cloud
+mwoffliner3b:
+  label: mwoffliner3b
+  instance: mwoffliner3b.mwoffliner.eqiad1.wikimedia.cloud
   disks:
     sda15:
       device: /dev/sda15
@@ -110,9 +149,9 @@ mwoffliner3:
     sdb1:
       device: /dev/sdb1
       mounted: /data
-mwoffliner4:
-  label: mwoffliner4
-  instance: mwoffliner4.mwoffliner.eqiad1.wikimedia.cloud
+mwoffliner4b:
+  label: mwoffliner4b
+  instance: mwoffliner4b.mwoffliner.eqiad1.wikimedia.cloud
   disks:
     sda15:
       device: /dev/sda15
@@ -123,9 +162,9 @@ mwoffliner4:
     sdb1:
       device: /dev/sdb1
       mounted: /data
-mwcurator:
-  label: mwcurator
-  instance: mwcurator.mwoffliner.eqiad1.wikimedia.cloud
+mwcuratorb:
+  label: mwcuratorb
+  instance: mwcurator-b.mwoffliner.eqiad1.wikimedia.cloud
   disks:
     sda15:
       device: /dev/sda15
