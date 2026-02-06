@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: ory-admin-ui-configs
+  name: ory-admin-ui-prod-configs
   namespace: login
 data:
   IS_ORY_NETWORK: "true"

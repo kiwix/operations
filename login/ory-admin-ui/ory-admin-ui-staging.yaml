@@ -3,17 +3,17 @@ kind: Deployment
 metadata:
   namespace: login
   labels:
-    app: ory-admin-ui-app
-  name: ory-admin-ui-deployment
+    app: ory-admin-ui-staging-app
+  name: ory-admin-ui-deployment-staging
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: ory-admin-ui-app
+      app: ory-admin-ui-staging-app
   template:
     metadata:
       labels:
-        app: ory-admin-ui-app
+        app: ory-admin-ui-staging-app
     spec:
       containers:
       - image: dhiagharsallaoui/kratos-admin-ui:latest
@@ -21,9 +21,9 @@ spec:
         name: ory-admin-ui
         envFrom:
         - configMapRef:
-            name: ory-admin-ui-configs
+            name: ory-admin-ui-staging-configs
         - secretRef:
-            name: ory-admin-ui-secrets
+            name: ory-admin-ui-staging-secrets
         ports:
         - containerPort: 3000
         resources:

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ory-admin-ui-dev01-configs
+  namespace: login
+data:
+  IS_ORY_NETWORK: "true"
+  KRATOS_PUBLIC_URL: "https://youthful-kilby-gjmhdbfds6.projects.oryapis.com"
+  KRATOS_ADMIN_URL: "https://youthful-kilby-gjmhdbfds6.projects.oryapis.com"
+  HYDRA_PUBLIC_URL: "https://youthful-kilby-gjmhdbfds6.projects.oryapis.com"
+  HYDRA_ADMIN_URL: "https://youthful-kilby-gjmhdbfds6.projects.oryapis.com"
+  NEXT_PUBLIC_APP_URL: "http://localhost:3000"

@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: login
+  labels:
+    app: ory-admin-ui-dev01-app
+  name: ory-admin-ui-deployment-dev01
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ory-admin-ui-dev01-app
+  template:
+    metadata:
+      labels:
+        app: ory-admin-ui-dev01-app
+    spec:
+      containers:
+      - image: dhiagharsallaoui/kratos-admin-ui:latest
+        imagePullPolicy: Always
+        name: ory-admin-ui
+        envFrom:
+        - configMapRef:
+            name: ory-admin-ui-dev01-configs
+        - secretRef:
+            name: ory-admin-ui-dev01-secrets
+        ports:
+        - containerPort: 3000
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "20m"
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
