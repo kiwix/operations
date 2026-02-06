@@ -10,6 +10,8 @@ data:
       "ZIMFARM_WEBAPI": "https://api.farm.zimit.kiwix.org/v2",
       "MATOMO_ENABLED": false,
       "BLOB_MAX_SIZE": 1048576,
-      "LOGIN_MODES": ["local"]
+      "OAUTH_BASE_URL": "https://login.kiwix.org",
+      "OAUTH_MODE": "session",
+      "LOGIN_MODES": ["local", "oauth"]
     }
 
