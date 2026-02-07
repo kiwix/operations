@@ -522,9 +522,12 @@ metadata:
           return 301 "https://browse.library.kiwix.org/";
         }
 
+        proxy_hide_header Access-Control-Allow-Origin;
+        proxy_hide_header Access-Control-Allow-Methods;
+        proxy_hide_header Access-Control-Allow-Headers;
+        
         add_header Access-Control-Allow-Origin "*" always;
 
-        # Other CORS headers
         add_header Access-Control-Allow-Methods "GET, OPTIONS" always;
         add_header Access-Control-Allow-Headers "Content-Type, Authorization" always;
         add_header Access-Control-Allow-Credentials "true" always;
