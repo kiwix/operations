@@ -522,11 +522,14 @@ metadata:
           return 301 "https://browse.library.kiwix.org/";
         }
 
-        add_header Access-Control-Allow-Origin "*" always;
+        # kiwix-serve already sets Access-Control-Allow-Origin "*" always;
+        # see https://github.com/kiwix/libkiwix/blob/main/src/server/response.cpp#L130
+        proxy_hide_header Access-Control-Allow-Origin;
 
-        # Other CORS headers
-        add_header Access-Control-Allow-Methods "GET, OPTIONS" always;
-        add_header Access-Control-Allow-Headers "Content-Type, Authorization" always;
+        # CORS
+        add_header Access-Control-Allow-Origin "*" always;
+        add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Content-Type, Authorization, User-Agent" always;
         add_header Access-Control-Allow-Credentials "true" always;
 
         # Frame ancestors for both sites

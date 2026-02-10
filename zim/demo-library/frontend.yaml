@@ -434,7 +434,7 @@ data:
       return (deliver);
 
     }
-
+---
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -593,6 +593,17 @@ metadata:
           add_header Content-Type "text/plain";
           return 200 "User-agent: *\nDisallow: /";
         }
+
+        # kiwix-serve already sets Access-Control-Allow-Origin "*" always;
+        # see https://github.com/kiwix/libkiwix/blob/main/src/server/response.cpp#L130
+        proxy_hide_header Access-Control-Allow-Origin;
+
+        # CORS
+        add_header Access-Control-Allow-Origin "*" always;
+        add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Content-Type, Authorization, User-Agent" always;
+        add_header Access-Control-Allow-Credentials "true" always;
+        add_header 'Content-Security-Policy' "frame-ancestors 'self' https://library.kiwix.org https://browser-extension.kiwix.org https://pwa.kiwix.org";
 spec:
   ingressClassName: nginx
   tls:
