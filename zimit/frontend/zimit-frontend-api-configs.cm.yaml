@@ -24,7 +24,7 @@ data:
   TASK_MEMORY: "3840MiB"
   TASK_DISK: "12GiB" # three times ZIMIT_SIZE_LIMIT is recommended because we need at least two times (warc + ZIM) and some rome 
   TASK_CPU: "1"
-  TASK_WORKER: "sisyphus"
+  # TASK_WORKER: "sisyphus"
   PUBLIC_URL: "https://zimit.kiwix.org"
   PUBLIC_API_URL: "https://zimit.kiwix.org/api/v1"
   ZIMFARM_REQUESTS_TIMEOUT: 10s
