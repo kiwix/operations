@@ -34,6 +34,8 @@ pytest -v
 - You can change the target host by setting `LIBRARY_HOST` environment variable.
 - You can select which schemes (http, https) to check using `SCHEMES` environment variable.
 - You can disable Varnish-related tests using `-m "not varnish"` flag.
+- You can record any test's accessed URLs by setting `RECORD_URLS_TO`.
+- You can then test URLs over IPv6 using `READ_URLS_FROM` (and an `IP6_PROXY`)
 
 Examples:
 
@@ -55,6 +57,10 @@ pytest -v test_kube.py
 
 # catalog
 pytest -v test_catalog.py
+
+# URLs
+RECORD_URLS_TO=mirrors_urls.txt pytest -v test_mirrors.py
+READ_URLS_FROM=mirrors_urls.txt IP6_PROXY="socks5h://USER:PASS@proxy6.kiwix.org" pytest -v test_urls.py
 ```
 
 ## Sample output

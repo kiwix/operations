@@ -1,9 +1,17 @@
+import os
 import re
 import urllib.parse
+from pathlib import Path
+from typing import Any, Generator
 
 import pytest
 import requests
 from utils import Mirror, get_current_mirrors, get_url
+
+# used for test_urls.py behavior
+RECORD_URLS_TO = os.getenv("RECORD_URLS_TO", "")
+READ_URLS_FROM = os.getenv("READ_URLS_FROM", "")
+RECORDED_URLS: set[str] = set()
 
 # MB only provides the full list of mirrors through this.
 MIRRORS_LIST_URL: str = "https://download.kiwix.org/mirrors.html"
@@ -109,11 +117,37 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
                 item.add_marker(skips[marker])
 
 
+def patched_request(*args, **kwargs):
+    """requests.api.request replacement that save the URL in a set"""
+    url = kwargs.get("url", args[1])
+    RECORDED_URLS.add(url)
+    return requests.request(*args, **kwargs)
+
+
+@pytest.fixture(autouse=True, scope="function")
+def record_urls(monkeypatch) -> Generator[Any, Any, Any]:
+    """record URL to each call to requests in a file for later use"""
+    if not RECORD_URLS_TO:
+        yield None
+        return
+    monkeypatch.setattr("requests.api.request", patched_request)
+    yield RECORDED_URLS
+    Path(RECORD_URLS_TO).write_text("\n".join(RECORDED_URLS))
+
+
+@pytest.fixture
+def recorded_urls(monkeypatch) -> Generator[Any, Any, Any]:
+    """retrieve a list of URLs to test from a file"""
+    if not READ_URLS_FROM:
+        yield {}
+        return
+    yield Path(READ_URLS_FROM).read_text().splitlines()
+
+
 @pytest.fixture(scope="session")
 def illus_endpoint():
     resp = requests.get(get_url(path="/catalog/search?count=1"), timeout=5)
     for line in resp.text.splitlines():
-
         match = re.search(r"/catalog/v2/illustration/([^/]+)/\?size=48", line)
         if match:
             yield match.group()

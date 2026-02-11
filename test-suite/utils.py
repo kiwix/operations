@@ -34,7 +34,6 @@ COMPRESSABLE_OPDS_ENDPOINTS = {
 KIWIX_MIN_CONTENT_SIZE_TO_COMPRESS = 1400
 
 
-
 def get_url(
     path="/",
     scheme=DEFAULT_SCHEME,
@@ -75,7 +74,7 @@ def get_current_mirrors(
 
     def is_country_row(tag: Tag) -> bool:
         """Filters out table rows that do not contain mirror data."""
-        return tag.name == "tr" and tag.findChild("td", class_="newregion") is None
+        return tag.name == "tr" and tag.find("td", class_="newregion") is None
 
     resp = requests.get(mirrors_list_url, timeout=TIMEOUT, allow_redirects=True)
     resp.raise_for_status()
@@ -89,9 +88,7 @@ def get_current_mirrors(
 
     for row in body.find_all(is_country_row):
         base_url = row.find("a", string="HTTP")["href"]
-        hostname: Any = urlsplit(
-            base_url
-        ).netloc  # pyright: ignore [reportUnknownMemberType]
+        hostname: Any = urlsplit(base_url).netloc  # pyright: ignore [reportUnknownMemberType]
         country_code = row.find("img")["alt"].lower()
         if hostname in excluded_mirrors:
             continue

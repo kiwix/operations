@@ -19,4 +19,18 @@ jobs:
         run: .venv/bin/pip install -r test-suite/requirements.txt
       - name: Test mirrors
         working-directory: test-suite
+        env:
+          RECORD_URLS_TO: mirrors-urls.txt
         run: ../.venv/bin/python -m pytest -vvv test_mirrors.py
+      - name: Test mirrors URLs over IPv6
+        working-directory: test-suite
+        env:
+          READ_URLS_FROM: mirrors-urls.txt
+          IP6_PROXY: socks5h://ghci:${{ secrets.GHCI_PROXY6_PASSWORD }}@proxy6.kiwix.org
+        run: ../.venv/bin/python -m pytest -vvv test_urls.py
+      - name: Test mirrors URLs over a dual stack
+        working-directory: test-suite
+        env:
+          READ_URLS_FROM: mirrors-urls.txt
+          IP6_PROXY: socks5h://ghci:${{ secrets.GHCI_PROXY6_PASSWORD }}@proxy6.kiwix.org:1081
+        run: ../.venv/bin/python -m pytest -vvv test_urls.py
