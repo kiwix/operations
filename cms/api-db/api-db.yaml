@@ -6,7 +6,7 @@ metadata:
     app: api-db-app
   name: api-db-deployment
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: api-db-app
@@ -16,7 +16,7 @@ spec:
         app: api-db-app
     spec:
       containers:
-      - image: docker.io/library/postgres:10.4
+      - image: docker.io/library/postgres:18.1-trixie
         imagePullPolicy: IfNotPresent
         name: postgres
         envFrom:
@@ -24,7 +24,7 @@ spec:
             name: api-db-secrets
         volumeMounts:
         - name: data-volume
-          mountPath: "/var/lib/postgresql/data"
+          mountPath: "/var/lib/postgresql"
           readOnly: false
         ports:
         - containerPort: 5432

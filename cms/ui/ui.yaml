@@ -6,7 +6,7 @@ metadata:
     app: ui-app
   name: ui-deployment
 spec:
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: ui-app
