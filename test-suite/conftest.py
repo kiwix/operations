@@ -41,7 +41,7 @@ EXPECTED_APK_MIRRORS: list[str] = [
     "mirror-sites-fr.mblibrary.info",
     "mirror-sites-in.mblibrary.info",
     "mirror-sites-ca.mblibrary.info",
-    "mirror.triplebit.org",
+    # "mirror.triplebit.org",  # disabled mirrors due to apple errors
 ]
 ZIM_MIRRORS: list[Mirror] = get_current_mirrors(
     CANONICAL_MIRRORS_LIST_URL, EXCLUDED_MIRRORS
