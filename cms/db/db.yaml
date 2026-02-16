@@ -3,17 +3,17 @@ kind: Deployment
 metadata:
   namespace: cms
   labels:
-    app: api-db-app
-  name: api-db-deployment
+    app: db-app
+  name: db-deployment
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
-      app: api-db-app
+      app: db-app
   template:
     metadata:
       labels:
-        app: api-db-app
+        app: db-app
     spec:
       containers:
       - image: docker.io/library/postgres:18.1-trixie
@@ -21,11 +21,15 @@ spec:
         name: postgres
         envFrom:
         - secretRef:
-            name: api-db-secrets
+            name: db-secrets
         volumeMounts:
         - name: data-volume
           mountPath: "/var/lib/postgresql"
           readOnly: false
+        - name: init-extensions
+          mountPath: /docker-entrypoint-initdb.d/init-extensions.sh
+          readOnly: true
+          subPath: init-extensions.sh
         ports:
         - containerPort: 5432
         resources:
@@ -36,6 +40,11 @@ spec:
       - name: data-volume
         persistentVolumeClaim:
           claimName: cms-db-pvc
+      - name: init-extensions
+        configMap:
+          name: db-configs
+          defaultMode: 0755
+          optional: false
       nodeSelector:
         k8s.kiwix.org/role: "services"
 ---
@@ -43,12 +52,12 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: cms
-  name: api-db-service
+  name: db-service
   labels:
-    app: api-db-app
+    app: db-app
 spec:
   selector:
-    app: api-db-app
+    app: db-app
   ports:
   - protocol: TCP
     port: 5432

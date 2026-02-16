@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: cms
+  labels:
+    app: mill-app
+  name: mill-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mill-app
+  template:
+    metadata:
+      labels:
+        app: mill-app
+    spec:
+      containers:
+      - image: ghcr.io/openzim/cms-mill:latest
+        imagePullPolicy: Always
+        name: mill
+        envFrom:
+        - configMapRef:
+            name: mill-configs
+        - secretRef:
+            name: mill-secrets
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "100m"
+      nodeSelector:
+        k8s.kiwix.org/role: "services"

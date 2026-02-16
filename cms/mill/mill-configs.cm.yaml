@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mill-configs
+  namespace: cms
+data:
+  DEBUG: "1"
+  QUARANTINE_WAREHOUSE_ID: 1e9783eb-296e-4cb0-853a-5355a92b2323
+  QUARANTINE_BASE_PATH: quarantine
+  STAGING_WAREHOUSE_ID: 1e9783eb-296e-4cb0-853a-5355a92b2323
+  STAGING_BASE_PATH: staging

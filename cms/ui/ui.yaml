@@ -6,7 +6,7 @@ metadata:
     app: ui-app
   name: ui-deployment
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: ui-app
@@ -19,15 +19,23 @@ spec:
       - image: ghcr.io/openzim/cms-ui:latest
         imagePullPolicy: Always
         name: ui
-        envFrom:
-        - configMapRef:
-            name: ui-configs
+        volumeMounts:
+        - name: config
+          mountPath: /usr/share/nginx/html/config.json
+          readOnly: true
+          subPath: config.json
         ports:
         - containerPort: 80
         resources:
           requests:
             memory: "16Mi"
             cpu: "1m"
+      volumes:
+      - name: config
+        configMap:
+          name: ui-configs
+          defaultMode: 0755
+          optional: false
       nodeSelector:
         k8s.kiwix.org/role: "services"
 ---

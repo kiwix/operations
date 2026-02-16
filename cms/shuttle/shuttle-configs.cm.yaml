@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shuttle-configs
+  namespace: cms
+data:
+  DEBUG: "1"
+  LOCAL_WAREHOUSE_PATHS: 1e9783eb-296e-4cb0-853a-5355a92b2323:/data/download/zim

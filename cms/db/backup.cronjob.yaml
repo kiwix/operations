@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: api-db-backup
+  name: db-backup
   namespace: cms
 spec:
   schedule: "4 10 * * *"
@@ -19,7 +19,7 @@ spec:
               imagePullPolicy: Always
               envFrom:
               - secretRef:
-                  name: api-db-backup-credentials
+                  name: db-backup-credentials
               env:
                 - name: BITWARDEN_EMAIL
                   value: "contact+bitwarden-slave@kiwix.org"

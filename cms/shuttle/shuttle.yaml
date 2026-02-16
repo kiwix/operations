@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: cms
+  labels:
+    app: shuttle-app
+  name: shuttle-deployment
+spec:
+  replicas: 0
+  selector:
+    matchLabels:
+      app: shuttle-app
+  template:
+    metadata:
+      labels:
+        app: shuttle-app
+    spec:
+      containers:
+      - image: ghcr.io/openzim/cms-shuttle:latest
+        imagePullPolicy: Always
+        name: shuttle
+        envFrom:
+        - configMapRef:
+            name: shuttle-configs
+        - secretRef:
+            name: shuttle-secrets
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "100m"
+        volumeMounts:
+        - name: browser-download-volume
+          mountPath: "/data/download"
+          readOnly: true
+      volumes:
+      - name: browser-download-volume
+        persistentVolumeClaim:
+          claimName: browser-download-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "browser"
+
+        

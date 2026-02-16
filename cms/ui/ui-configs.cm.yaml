@@ -4,4 +4,10 @@ metadata:
   name: ui-configs
   namespace: cms
 data:
-  CMS_BACKEND_API: "https://api.cms.openzim.org/v1"
+  config.json: |
+    {
+      "CMS_API": "https://api.cms.openzim.org/v1",
+      "OAUTH_BASE_URL": "https://login.kiwix.org",
+      "LOGIN_MODES": ["oauth"]
+    }
+
