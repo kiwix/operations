@@ -1,12 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  namespace: cms
+  namespace: zim
   labels:
     app: shuttle-app
-  name: shuttle-deployment
+  name: cms-shuttle-deployment
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
       app: shuttle-app
@@ -21,9 +21,9 @@ spec:
         name: shuttle
         envFrom:
         - configMapRef:
-            name: shuttle-configs
+            name: cms-shuttle-configs
         - secretRef:
-            name: shuttle-secrets
+            name: cms-shuttle-secrets
         ports:
         - containerPort: 80
         resources:
