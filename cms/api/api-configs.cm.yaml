@@ -11,4 +11,4 @@ data:
   OAUTH_SESSION_AUDIENCE_ID: bada4130-5143-4524-a0bb-0d69671beee2
   OAUTH_SESSION_LOGIN_REQUIRE_2FA: "true"
   CREATE_NEW_OAUTH_ACCOUNT: "true"
-  AUTH_MODES: oauth-session
+  AUTH_MODES: local,oauth-session

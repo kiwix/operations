@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: cms
+  labels:
+    app: status-app
+  name: status-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: status-app
+  template:
+    metadata:
+      labels:
+        app: status-app
+    spec:
+      containers:
+      - image: ghcr.io/openzim/cms-healthcheck:latest
+        imagePullPolicy: Always
+        name: healthcheck
+        envFrom:
+        - configMapRef:
+            name: status-configs
+        - secretRef:
+            name: status-secrets
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "100Mi"
+            cpu: "10m"
+      nodeSelector:
+        k8s.kiwix.org/role: "system"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: cms
+  name: status-service
+  labels:
+    app: status-app
+spec:
+  selector:
+    app: status-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: status-ingress
+  namespace: cms
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+      - status.cms.openzim.org
+      secretName: status-cms-openzim-org-tls
+  rules:
+  - host: status.cms.openzim.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: status-service
+            port:
+              number: 80
