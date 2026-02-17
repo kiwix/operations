@@ -56,8 +56,8 @@ jobs:
           apt update && apt upgrade
           ```
 
-          - [ ] run systematically the upgrade on bastion, stats, services, storage, demo, mirrors-qa nodes
-          - [ ] check for and apply important security upgrade on worker nodes asap (imager-worker, ondemand, sisyphus)
+          - [ ] run systematically the upgrade on bastion, stats, services, storage, demo, srv-b, srv-m, srv-s, kproxy6 nodes
+          - [ ] check for and apply important security upgrade on worker nodes asap (imager-worker, ondemand, sisyphus, ...)
 
           (regular workers updates are done separately on a monthly basis for worker nodes to not impact production)
 

@@ -64,6 +64,7 @@ jobs:
           - [ ] imager-worker
           - [ ] ondemand
           - [ ] sisyphus
+          - [ ] kathrin
 
           **Note**: this is an *automatic reminder* intended for the assignee(s).
 
