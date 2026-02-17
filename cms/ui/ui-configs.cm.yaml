@@ -7,6 +7,10 @@ data:
   config.json: |
     {
       "CMS_API": "https://api.cms.openzim.org/v1",
+      "MATOMO_ENABLED": true,
+      "MATOMO_HOST": "https://stats.kiwix.org",
+      "MATOMO_SITE_ID": 12,
+      "MATOMO_TRACKER_FILE_NAME": "matomo",
       "OAUTH_BASE_URL": "https://login.kiwix.org",
       "LOGIN_MODES": ["oauth"]
     }
