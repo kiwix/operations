@@ -18,7 +18,7 @@ spec:
         spec:
           containers:
             - name: borg-backup
-              image: ghcr.io/kiwix/borg-backup:latest
+              image: ghcr.io/kiwix/borg-backup:upgrade
               imagePullPolicy: Always
               env:
                 # not secret, dedicated read-only user, only reachable on localhost (cyon) and whitelisted IP

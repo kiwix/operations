@@ -18,7 +18,7 @@ spec:
         spec:
           containers:
             - name: borg-backup
-              image: ghcr.io/kiwix/borg-backup:latest
+              image: ghcr.io/kiwix/borg-backup:upgrade
               imagePullPolicy: Always
               volumeMounts:
               - name: data-volume
