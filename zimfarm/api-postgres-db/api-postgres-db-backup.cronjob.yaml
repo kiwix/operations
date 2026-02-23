@@ -15,7 +15,7 @@ spec:
         spec:
           containers:
             - name: borg-backup
-              image: ghcr.io/kiwix/borg-backup:upgrade
+              image: ghcr.io/kiwix/borg-backup:latest
               imagePullPolicy: Always
               envFrom:
               - secretRef:
