@@ -40,7 +40,7 @@ demos: # Appear at clients.library.kiwix.org/home/name Refresh is at the hour, e
 - name: jrailpass
   zims:
     - .hidden/dev/jrailpass.com_en_all
-  expired_on: 2026_03_31
+  expired_on: 2026-03-31
 - name: mdwiki
   zims:
     - .hidden/custom_apps/mdwiki_en_all-app_maxi
