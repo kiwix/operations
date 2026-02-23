@@ -24,6 +24,6 @@ data:
   OAUTH_JWKS_URI: https://login.kiwix.org/.well-known/jwks.json
   OAUTH_ISSUER: https://login.kiwix.org
   OAUTH_SESSION_AUDIENCE_ID: bada4130-5143-4524-a0bb-0d69671beee2
-  OAUTH_SESSION_LOGIN_REQUIRE_2FA: "false"
+  OAUTH_SESSION_LOGIN_REQUIRE_2FA: "true"
   CREATE_NEW_OAUTH_ACCOUNT: "true"
   AUTH_MODES: local,oauth-session
