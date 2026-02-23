@@ -188,3 +188,10 @@ ondemand:
     xvdb1:
       device: /dev/xvdb1
       mounted: /data
+rhys:
+  label: rhys
+  instance: rhys.kiwix.org
+  disks:
+    sda1:
+      device: /dev/mapper/pve-root
+      mounted: /
