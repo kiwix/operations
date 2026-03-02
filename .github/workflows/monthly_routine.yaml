@@ -58,7 +58,7 @@ jobs:
 
           Then:
           ```sh
-          apt update && apt upgrade
+          apt-get update && apt-get dist-upgrade && apt-get autoremove
           ```
 
           - [ ] imager-worker

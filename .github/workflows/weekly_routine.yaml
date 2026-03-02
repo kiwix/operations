@@ -53,7 +53,7 @@ jobs:
           ## Nodes system upgrades
 
           ```sh
-          apt update && apt upgrade
+          apt-get update && apt-get dist-upgrade && apt-get autoremove
           ```
 
           - [ ] run systematically the upgrade on bastion, stats, services, storage, demo, srv-b, srv-m, srv-s, kproxy6, rhys nodes
