@@ -16,12 +16,12 @@ spec:
         app: demo-library-backend-app
     spec:
       containers:
+      # /!\ manually trigger update-kiwixserve-template Job on kiwix-serve upgrade
+      # after having updated the LIBKIWIX_VERSION field in env (and tested!)
       # /!\ manually purge kiwix-serve cache on kiwix-serve version upgrade
       # curl -X PURGE -H "X-Purge-Type: kiwix-serve" http://demo-library-frontend-service
       # also check that varnish hack still necessary (gzip, endpoints)
-      # /!\ manually trigger update-kiwixserve-template Job on kiwix-serve upgrade
-      # after having updated the LIBKIWIX_VERSION field in env (and tested!)
-      - image: ghcr.io/kiwix/kiwix-tools:3.8.1
+      - image: ghcr.io/kiwix/kiwix-tools:3.8.2
         imagePullPolicy: IfNotPresent
         name: kiwix-tools
         args: ["kiwix-serve", "-b", "--library", "--monitorLibrary", "--threads", "16", "--searchLimit", "5", "--nodatealias", "--customIndex", "/data/kiwix-serve-templates/index-template.html", "/data/library/internal_library.xml"]

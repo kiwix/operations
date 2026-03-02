@@ -18,7 +18,7 @@ spec:
       containers:
         # /!\ manually purge kiwix-serve cache on kiwix-serve version upgrade
         # curl -X PURGE -H "X-Purge-Type: kiwix-serve" http://library-frontend-service
-      - image: ghcr.io/kiwix/kiwix-tools:3.8.1
+      - image: ghcr.io/kiwix/kiwix-tools:3.8.2
         imagePullPolicy: IfNotPresent
         name: kiwix-tools
         args: ["kiwix-serve", "--library", "--monitorLibrary", "--threads", "16", "--searchLimit", "5", "--nodatealias", "/data/library/internal_library.xml"]
@@ -56,6 +56,7 @@ spec:
           claimName: kiwix-library-pvc
       nodeSelector:
         k8s.kiwix.org/role: "storage"
+---
 ---
 apiVersion: v1
 kind: Service
