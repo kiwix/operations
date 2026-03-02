@@ -53,10 +53,10 @@ jobs:
           ## Nodes system upgrades
 
           ```sh
-          apt update && apt upgrade
+          apt-get update && apt-get dist-upgrade && apt-get autoremove
           ```
 
-          - [ ] run systematically the upgrade on bastion, stats, services, storage, demo, srv-b, srv-m, srv-s, kproxy6 nodes
+          - [ ] run systematically the upgrade on bastion, stats, services, storage, demo, srv-b, srv-m, srv-s, kproxy6, rhys nodes
           - [ ] check for and apply important security upgrade on worker nodes asap (imager-worker, ondemand, sisyphus, ...)
 
           (regular workers updates are done separately on a monthly basis for worker nodes to not impact production)
