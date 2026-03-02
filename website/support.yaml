@@ -12,8 +12,8 @@ metadata:
       }
 
       if ( $shouldRedirect = 1 ) {
-        rewrite (?i)^/qr/H1/([A-Z0-9]*)$ "https://kiwix.org/en/hotspot-support/?sn=$1" permanent;
-        return 301 "https://kiwix.org/en/get-involved/#donate";
+        rewrite (?i)^/qr/H1/([A-Z0-9]*)$ "https://get.kiwix.org/en/hotspot-support/?sn=$1" permanent;
+        return 301 "https://donate.kiwix.org";
       }
 spec:
   tls:
