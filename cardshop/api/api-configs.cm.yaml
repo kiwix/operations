@@ -16,6 +16,7 @@ data:
   # public url to display link to
   PUBLIC_URL: "https://imager.kiwix.org"
   SHOP_PUBLIC_URL: "https://kiwix.org/en/kiwix-hotspot/"
+  SHOP_WOO_API_URL: "https://get.kiwix.org/"
   # URLS for download/upload warehouses
   DEFAULT_WAREHOUSE_DOWNLOAD_URI: "s3://s3.us-west-1.wasabisys.com/?bucketName=org-kiwix-hotspot-cardshop-warehouse"
   DEFAULT_WAREHOUSE_UPLOAD_URI: "s3://s3.us-west-1.wasabisys.com/?bucketName=org-kiwix-hotspot-cardshop-warehouse"
