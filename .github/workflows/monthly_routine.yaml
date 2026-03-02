@@ -65,6 +65,7 @@ jobs:
           - [ ] ondemand
           - [ ] sisyphus
           - [ ] kathrin
+          - [ ] rhys-github-runner
 
           **Note**: this is an *automatic reminder* intended for the assignee(s).
 
