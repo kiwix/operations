@@ -58,13 +58,14 @@ jobs:
 
           Then:
           ```sh
-          apt update && apt upgrade
+          apt-get update && apt-get dist-upgrade && apt-get autoremove
           ```
 
           - [ ] imager-worker
           - [ ] ondemand
           - [ ] sisyphus
           - [ ] kathrin
+          - [ ] rhys-github-runner
 
           **Note**: this is an *automatic reminder* intended for the assignee(s).
 
