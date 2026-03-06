@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: login
+  labels:
+    app: sso-app
+  name: sso
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sso-app
+  template:
+    metadata:
+      labels:
+        app: sso-app
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/sso:latest
+        imagePullPolicy: Always
+        name: sso
+        volumeMounts:
+        - name: configs
+          mountPath: /usr/share/caddy/assets/config.json
+          readOnly: true
+          subPath: config.json
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "10m"
+      volumes:
+      - name: configs
+        configMap:
+          name: sso-configs
+          defaultMode: 0755
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: login
+  name: sso-service
+  labels:
+    app: sso-app
+spec:
+  selector:
+    app: sso-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: sso-ingress
+  namespace: login
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+      - sso.kiwix.org
+      secretName: sso-kiwix-org-tls
+  rules:
+  - host: sso.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: sso-service
+            port:
+              number: 80

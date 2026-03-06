@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: sso-configs
+  namespace: login
+data:
+  config.json: |
+    {		
+      "oryUrl": "https://login.kiwix.org",		
+      "apps": [
+        {
+          "name": "CMS",
+          "url": "https://cms.openzim.org",
+          "icon": "fas fa-edit"
+        },
+        {
+          "name": "Zimfarm",
+          "url": "https://farm.openzim.org",
+          "icon": "fas fa-tractor"
+        }
+      ]
+    }
