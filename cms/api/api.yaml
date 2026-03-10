@@ -21,6 +21,8 @@ spec:
         name: api
         envFrom:
         - configMapRef:
+            name: shared-configs
+        - configMapRef:
             name: api-configs
         - secretRef:
             name: api-secrets

@@ -21,6 +21,8 @@ spec:
         name: healthcheck
         envFrom:
         - configMapRef:
+            name: shared-configs
+        - configMapRef:
             name: status-configs
         - secretRef:
             name: status-secrets

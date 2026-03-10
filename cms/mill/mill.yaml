@@ -21,6 +21,8 @@ spec:
         name: mill
         envFrom:
         - configMapRef:
+            name: shared-configs
+        - configMapRef:
             name: mill-configs
         - secretRef:
             name: mill-secrets
