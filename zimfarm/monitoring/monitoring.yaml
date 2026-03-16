@@ -19,6 +19,9 @@ spec:
       - image: ghcr.io/openzim/zimfarm-monitor-parent:latest
         imagePullPolicy: Always
         name: netdata
+        env:
+          - name: ZIMFARM_API_URL
+            value: https://api.farm.openzim.org/v2
         envFrom:
         # ZIMFARM_USERNAME, ZIMFARM_PASSWORD
         - secretRef:
