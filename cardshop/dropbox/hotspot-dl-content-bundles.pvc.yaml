@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: hotspot-dl-content-bundles-pvc
+  namespace: cardshop
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 4Ti
+  storageClassName: ""
+  volumeName: hotspot-dl-content-bundles-local-pv

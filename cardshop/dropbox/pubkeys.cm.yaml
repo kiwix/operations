@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dropbox-pubkeys
+  namespace: cardshop
+  annotations:
+    k8s.kiwix.org/description: SSH keys allowed to connect. Equivalent to authorized_keys file
+data:
+  users: |
+    [
+      {
+        "id": 1000,
+        "name": "cs-worker",
+        "keys": [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku"
+        ]
+      }
+    ]

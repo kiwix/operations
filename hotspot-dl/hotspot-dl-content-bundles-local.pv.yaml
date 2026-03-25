@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: hotspot-dl-content-bundles-local-pv
+spec:
+  capacity:
+    # content is ~9.5TB ATM (Jan 2026)
+    storage: 11Ti
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /data/content-bundles
+  claimRef:
+    name: hotspot-dl-content-bundles-pvc
+    namespace: cardshop
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: k8s.kiwix.org/role
+              operator: In
+              values:
+              - hotspot-dl

@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: cardshop
+  labels:
+    app: http-dl-app
+  name: http-dl-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: http-dl-app
+  template:
+    metadata:
+      labels:
+        app: http-dl-app
+    spec:
+      securityContext:
+        # fsGroup: 1000
+        # runAsUser: 1000
+        # runAsGroup: 33
+        # fsGroupChangePolicy: "OnRootMismatch"
+      containers:
+      - image: docker.io/library/nginx:mainline
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: "/usr/share/nginx/html"
+          subPath: "files"
+          name: bundles-volume
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "1m"
+          limits:
+            memory: "512Mi"
+            cpu: "1m"
+      volumes:
+      - name: bundles-volume
+        persistentVolumeClaim:
+          claimName: hotspot-dl-content-bundles-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "hotspot-dl"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: cardshop
+  name: http-dl-service
+  labels:
+    app: http-dl-app
+spec:
+  selector:
+    app: http-dl-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: http-dl-ingress
+  namespace: cardshop
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/server-snippet: |
+      if ($uri ~* "^/$" ) {
+        return 301 "https://imager.kiwix.org/";
+      }
+      add_header "Content-Disposition" "attachment";
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - scw.dl.hotspot.kiwix.org
+      secretName: scw-dl-hotspot-kiwix-org-tls
+  rules:
+  - host: scw.dl.hotspot.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: http-dl-service
+            port:
+              number: 80
