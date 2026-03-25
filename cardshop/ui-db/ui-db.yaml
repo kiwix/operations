@@ -19,7 +19,7 @@ spec:
       - image: docker.io/library/mariadb:10.4
         imagePullPolicy: IfNotPresent
         name: mariadb
-        args: ["mysqld", "--max-allowed-packet=128M", "--innodb-buffer-pool-size=512M"]
+        args: ["mysqld", "--max-allowed-packet=128M", "--innodb-buffer-pool-size=512M", "--skip-name-resolve"]
         envFrom:
         - secretRef:
             name: ui-db-secrets
