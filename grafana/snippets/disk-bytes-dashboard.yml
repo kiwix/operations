@@ -188,6 +188,19 @@ ondemand:
     xvdb1:
       device: /dev/xvdb1
       mounted: /data
+kathrin:
+  label: kathrin
+  instance: kathrin.kiwix.org
+  disks:
+    sda1:
+      device: /dev/sda1
+      mounted: /boot/efi
+    sda2:
+      device: /dev/sda2
+      mounted: /
+    sdb1:
+      device: /dev/md0
+      mounted: /data
 rhys:
   label: rhys
   instance: rhys.kiwix.org
