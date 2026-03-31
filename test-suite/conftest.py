@@ -22,7 +22,7 @@ EXCLUDED_MIRRORS: list[str] = []
 # from the permalink redirects (no warehouse path, no period in filename)
 # using wikipedia_he_* as this is the only pattern mirrored by all mirrors
 # good enough for now
-PERMANENT_ZIM_URL: str = "https://download.kiwix.org/zim/wikipedia_he_all_maxi.zim"
+PERMANENT_ZIM_URL: str = "https://download.kiwix.org/zim/wikipedia_fr_mathematics_maxi.zim"
 # all non-zim-only mirrors mirror all other files
 PERMANENT_APK_URL: str = (
     "https://download.kiwix.org/release/kiwix-android/"
