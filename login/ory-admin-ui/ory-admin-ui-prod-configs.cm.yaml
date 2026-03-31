@@ -5,8 +5,8 @@ metadata:
   namespace: login
 data:
   IS_ORY_NETWORK: "true"
-  KRATOS_PUBLIC_URL: "https://login.kiwix.org"
-  KRATOS_ADMIN_URL: "https://login.kiwix.org"
-  HYDRA_PUBLIC_URL: "https://login.kiwix.org"
-  HYDRA_ADMIN_URL: "https://login.kiwix.org"
+  KRATOS_PUBLIC_URL: "https://ory.login.kiwix.org"
+  KRATOS_ADMIN_URL: "https://ory.login.kiwix.org"
+  HYDRA_PUBLIC_URL: "https://ory.login.kiwix.org"
+  HYDRA_ADMIN_URL: "https://ory.login.kiwix.org"
   NEXT_PUBLIC_APP_URL: "http://localhost:3000"
