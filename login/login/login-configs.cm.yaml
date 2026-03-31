@@ -1,12 +1,12 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: sso-configs
+  name: login-configs
   namespace: login
 data:
   config.json: |
     {		
-      "oryUrl": "https://login.kiwix.org",		
+      "oryUrl": "https://ory.login.kiwix.org",		
       "apps": [
         {
           "name": "CMS",

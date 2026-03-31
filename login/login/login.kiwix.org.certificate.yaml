@@ -1,13 +1,13 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: sso-kiwix-org
+  name: login-kiwix-org
   namespace: login
 spec:
-  secretName: sso-kiwix-org-tls
+  secretName: login-kiwix-org-tls
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt-prod
-  commonName: sso.kiwix.org
+  commonName: login.kiwix.org
   dnsNames:
-  - sso.kiwix.org
+  - login.kiwix.org
