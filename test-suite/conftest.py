@@ -18,7 +18,7 @@ MIRRORS_LIST_URL: str = "https://download.kiwix.org/mirrors.html"
 CANONICAL_MIRRORS_LIST_URL: str = "https://mirror.download.kiwix.org/mirrors.html"
 # list of mirrors (hostname) not to use in tests
 EXCLUDED_MIRRORS: list[str] = [
-    "https://mirror.isoc.org.il",  # not up to date (2026-03-31)
+    "mirror.isoc.org.il",  # not up to date (2026-03-31)
 ]
 # this is using the permalink pattern
 # from the permalink redirects (no warehouse path, no period in filename)
