@@ -12,7 +12,8 @@ data:
         "id": 1000,
         "name": "cs-worker",
         "keys": [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku"
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku",
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF7nOeTUSsNCa/QCTo6Nt8vrtCLVWyGOFP6KpAT2qJ6a root@imager-worker"
         ]
       }
     ]
