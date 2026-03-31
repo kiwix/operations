@@ -17,12 +17,16 @@ RECORDED_URLS: set[str] = set()
 MIRRORS_LIST_URL: str = "https://download.kiwix.org/mirrors.html"
 CANONICAL_MIRRORS_LIST_URL: str = "https://mirror.download.kiwix.org/mirrors.html"
 # list of mirrors (hostname) not to use in tests
-EXCLUDED_MIRRORS: list[str] = []
+EXCLUDED_MIRRORS: list[str] = [
+    "https://mirror.isoc.org.il",  # not up to date (2026-03-31)
+]
 # this is using the permalink pattern
 # from the permalink redirects (no warehouse path, no period in filename)
 # using wikipedia_he_* as this is the only pattern mirrored by all mirrors
 # good enough for now
-PERMANENT_ZIM_URL: str = "https://download.kiwix.org/zim/wikipedia_fr_mathematics_maxi.zim"
+PERMANENT_ZIM_URL: str = (
+    "https://download.kiwix.org/zim/wikipedia_fr_mathematics_maxi.zim"
+)
 # all non-zim-only mirrors mirror all other files
 PERMANENT_APK_URL: str = (
     "https://download.kiwix.org/release/kiwix-android/"
