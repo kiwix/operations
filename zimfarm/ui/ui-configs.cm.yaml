@@ -16,5 +16,5 @@ data:
       "BLOB_MAX_SIZE": 1048576,
       "OAUTH_BASE_URL": "https://ory.login.kiwix.org",
       "OAUTH_MODE": "session",
-      "LOGIN_MODES": ["local", "oauth"]
+      "LOGIN_MODES": ["oauth"]
     }
