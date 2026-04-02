@@ -5,7 +5,10 @@ metadata:
   namespace: cms
 data:
   CMS_FRONTEND_URL: https://cms.openzim.org
-  CMS_USERNAME: healthcheck
   CMS_API_URL: https://api.cms.openzim.org/v1
+  AUTH_MODE: oauth
+  CMS_OAUTH_ISSUER: https://ory.login.kiwix.org
+  CMS_OAUTH_CLIENT_ID: 07e5e999-bfb5-4e50-98f9-c69536a06b11
+  CMS_OAUTH_AUDIENCE_ID: bada4130-5143-4524-a0bb-0d69671beee2
 
 
