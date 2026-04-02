@@ -23,7 +23,8 @@ spec:
           - name: ZIMFARM_API_URL
             value: https://api.farm.openzim.org/v2
         envFrom:
-        # ZIMFARM_USERNAME, ZIMFARM_PASSWORD
+        - configMapRef:
+            name: monitoring-configs
         - secretRef:
             name: monitoring-secrets
         ports:

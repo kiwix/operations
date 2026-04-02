@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: monitoring-configs
+  namespace: zimfarm
+data:
+  AUTH_MODE: oauth
+  ZIMFARM_OAUTH_ISSUER: https://ory.login.kiwix.org
+  ZIMFARM_OAUTH_CLIENT_ID: 5c97229f-01f3-4dde-8768-0598ce55b8f3
+  ZIMFARM_OAUTH_AUDIENCE_ID: bada4130-5143-4524-a0bb-0d69671beee2
+
+

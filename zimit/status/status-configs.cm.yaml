@@ -8,6 +8,9 @@ data:
   REQUESTS_TIMEOUT: 30s
   ZIMFARM_API_URL: https://api.farm.zimit.kiwix.org/v2
   ZIMFARM_FRONTEND_URL: https://farm.zimit.kiwix.org
-  ZIMFARM_USERNAME: healthcheck
+  AUTH_MODE: oauth
+  ZIMFARM_OAUTH_ISSUER: https://ory.login.kiwix.org
+  ZIMFARM_OAUTH_CLIENT_ID: 3f714063-91aa-4e64-8b69-8445979a06cb
+  ZIMFARM_OAUTH_AUDIENCE_ID: bada4130-5143-4524-a0bb-0d69671beee2
 
 

@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: watcher-configs
+  namespace: zimfarm
+data:
+  AUTH_MODE: oauth
+  ZIMFARM_OAUTH_ISSUER: https://ory.login.kiwix.org
+  ZIMFARM_OAUTH_CLIENT_ID: 09cdc790-e84f-42d9-98de-a8d982056d34
+  ZIMFARM_OAUTH_AUDIENCE_ID: bada4130-5143-4524-a0bb-0d69671beee2
+
+
