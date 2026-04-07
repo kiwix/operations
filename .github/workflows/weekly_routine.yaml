@@ -73,7 +73,7 @@ jobs:
           ```
           - [ ] Check Pod restarts
           ```sh
-          k get pods -A -o wide | pyp -i 'print("\n".join([line for line in l if re.split(r"\s+", line)[4] != "0"]))'
+          k get pods -A -o wide | pyp -i 'p if p.split()[4].strip() != "0" else ""'
           ```
           - [ ] Check if k8s should/could be upgraded
           
