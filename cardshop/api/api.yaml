@@ -24,12 +24,22 @@ spec:
             name: api-configs
         - secretRef:
             name: api-secrets
+        volumeMounts:
+          - name: secrets
+            subPath: "PRIVATE_SSH_KEY"
+            mountPath: "/etc/ssh/uploader.key"
+            readOnly: true
         ports:
         - containerPort: 80
         resources:
           requests:
             memory: "512Mi"
             cpu: "150m"
+      volumes:
+        - name: secrets
+          secret:
+            secretName: api-secrets
+            defaultMode: 0600
       nodeSelector:
         k8s.kiwix.org/role: "services"
 ---
