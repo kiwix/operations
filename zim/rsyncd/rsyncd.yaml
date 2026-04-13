@@ -1,4 +1,4 @@
-apiVersion: v1
+apiVersion: apps/v1
 kind: Deployment
 metadata:
   namespace: zim
@@ -33,6 +33,26 @@ spec:
         - mountPath: "/var/www/download.kiwix.org"
           name: download-volume
           readOnly: true
+        - mountPath: "/var/www/hidden/endless"
+          subPath: "endless"
+          name: hidden-volume
+          readOnly: true
+        - mountPath: "/var/www/hidden/bard"
+          subPath: "bard"
+          name: hidden-volume
+          readOnly: true
+        - mountPath: "/var/www/hidden/bsf"
+          subPath: "bsf"
+          name: hidden-volume
+          readOnly: true
+        - mountPath: "/var/www/hidden/custom_apps"
+          subPath: "custom_apps"
+          name: hidden-volume
+          readOnly: true
+        - mountPath: "/var/www/hidden/dev"
+          subPath: "dev"
+          name: hidden-volume
+          readOnly: true
         - mountPath: "/var/www/download.openzim.org"
           name: openzim-volume
           readOnly: true
@@ -61,6 +81,9 @@ spec:
       - name: tmp-volume
         persistentVolumeClaim:
           claimName: kiwix-tmp-pvc
+      - name: hidden-volume
+        persistentVolumeClaim:
+          claimName: hidden-zim-pvc
       - name: rsyncd-configs
         configMap:
           name: rsyncd-configs

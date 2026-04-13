@@ -68,12 +68,11 @@ data:
     list = no
     hosts allow = 208.80.154.0/23
 
-    [self.download.kiwix.org]
-    # internal module for mirrorbrain discovery or our own mirror
-    path = /var/www/download.kiwix.org
-    comment = Kiwix download repository (mirror.kiwix only)
+    [hidden]
+    path = /var/www/hidden
+    comment = Hidden ZIM repository
     max connections = 3
-    lock file = /var/lock/self.lock
+    lock file = /var/lock/hidden.lock
     list = no
     # using clusterCIDR from kube-proxy's config.conf
     hosts allow = 100.64.0.0/15 51.159.106.143 51.159.104.213 51.159.97.236
