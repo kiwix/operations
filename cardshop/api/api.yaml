@@ -29,6 +29,10 @@ spec:
             subPath: "PRIVATE_SSH_KEY"
             mountPath: "/etc/ssh/uploader.key"
             readOnly: true
+          - name: secrets
+            subPath: "KNOWN_HOSTS"
+            mountPath: "/etc/ssh/known_hosts"
+            readOnly: true
         ports:
         - containerPort: 80
         resources:
