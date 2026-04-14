@@ -35,8 +35,8 @@ spec:
             memory: "64Mi"
             cpu: "1m"
           limits:
-            memory: "512Mi"
-            cpu: "1m"
+            memory: "1Gi"
+            cpu: "2"
       volumes:
       - name: bundles-volume
         persistentVolumeClaim:
