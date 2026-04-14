@@ -71,6 +71,7 @@ metadata:
         return 301 "https://imager.kiwix.org/";
       }
       add_header "Content-Disposition" "attachment";
+      etag on;
 spec:
   ingressClassName: nginx
   tls:
