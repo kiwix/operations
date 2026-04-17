@@ -34,10 +34,16 @@ spec:
         - name: browser-download-volume
           mountPath: "/data/download"
           readOnly: true
+        - name: browser-hidden-volume
+          mountPath: "/data/hidden"
+          readOnly: true
       volumes:
       - name: browser-download-volume
         persistentVolumeClaim:
           claimName: browser-download-pvc
+      - name: browser-hidden-volume
+        persistentVolumeClaim:
+          claimName: browser-hidden-pvc
       nodeSelector:
         k8s.kiwix.org/role: "browser"
 
