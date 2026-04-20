@@ -1,47 +1,10 @@
-demos: # Appear at clients.library.kiwix.org/home/name Refresh is at the hour, every hour
-# - name: benoit
-#   zims:
-#     - ted/ted_mul_all
-#   expired_on: 2024-11-31
-# - name: orange # name is case-sensitive
+demos: 
+# Appear at clients.library.kiwix.org/home/name Refresh is at the hour, every hour
+# - name: orange # name is case-sensitive, will appear at Will appear at clients.library.kiwix.org/home/orange
 #   zims: # no limit on number of zims listed
-#     # - videos/deus-ex-silicium_fr_all Files are at mirror.download.kiwix.org/zim/.hidden This particular link however points to a PROD file
-#     - .hidden/dev/hansard-botswana_en #Removing the _date.zim allows automatic update. Removing .zim only does not work
+#     # Link to a PROD file
+#     - videos/deus-ex-silicium_fr_all 
+#     # Link to hidden files (at mirror.download.kiwix.org/zim/.hidden)
+#     - .hidden/dev/hansard-botswana_en # Removing the _date.zim allows automatic update. Removing .zim only does not work
 #     - .hidden/dev/Bundesministerium_fuer_Inneres_2024-07.zim 
 #   expired_on: 2025-01-01  # Always set a date, even if far in the future. Expires at 00:01 on d day 
-- name: jim
-  zims:
-    - .hidden/dev/true_prepper.com_en_all
-  expired_on: 2026-08-01
-- name: libretexts
-  zims:
-    - libretexts/libretexts.org_en_bio
-    - libretexts/libretexts.org_en_biz
-    - libretexts/libretexts.org_en_chem
-    - libretexts/libretexts.org_en_eng
-    - libretexts/libretexts.org_en_geo
-    - libretexts/libretexts.org_en_human
-    - libretexts/libretexts.org_en_k12
-    - libretexts/libretexts.org_en_math
-    - libretexts/libretexts.org_en_med
-    - libretexts/libretexts.org_en_phys
-    - libretexts/libretexts.org_en_socialsci
-    - libretexts/libretexts.org_en_stats
-    - libretexts/libretexts.org_en_workforce
-  expired_on: 2025-02-01
-- name: cyberhymnal #Will appear at clients.library.kiwix.org/home/cyberhymnal
-  zims:
-    - .hidden/dev/cyberhymnal_en_all
-  expired_on: 2026-06-30
-- name: ascension
-  zims:
-    - .hidden/dev/ascensionglossary_en_all_maxi
-  expired_on: 2026-03-06
-- name: jrailpass
-  zims:
-    - .hidden/dev/jrailpass.com_en_all
-  expired_on: 2026-03-31
-- name: mdwiki
-  zims:
-    - .hidden/custom_apps/mdwiki_en_all-app_maxi
-  expired_on: 2025-10-01
