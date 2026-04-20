@@ -1,4 +1,5 @@
-demos: 
+demos: [] # empty list when there is not demo
+# demos: # list of demos (not empty)
 # Appear at clients.library.kiwix.org/home/name Refresh is at the hour, every hour
 # - name: orange # name is case-sensitive, will appear at Will appear at clients.library.kiwix.org/home/orange
 #   zims: # no limit on number of zims listed
