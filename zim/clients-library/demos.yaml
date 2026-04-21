@@ -9,3 +9,8 @@ demos: [] # empty list when there is not demo
 #     - .hidden/dev/hansard-botswana_en # Removing the _date.zim allows automatic update. Removing .zim only does not work
 #     - .hidden/dev/Bundesministerium_fuer_Inneres_2024-07.zim 
 #   expired_on: 2025-01-01  # Always set a date, even if far in the future. Expires at 00:01 on d day 
+- name: jrailpass
+  zims:
+    - .hidden/dev/jrailpass.com_en_all
+  expired_on: 2026_06_31
+  - name: jrailpass
