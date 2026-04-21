@@ -20,8 +20,8 @@ data:
   # URLS for download/upload warehouses
   DEFAULT_WAREHOUSE_DOWNLOAD_URI: "s3://s3.us-west-1.wasabisys.com/?bucketName=org-kiwix-hotspot-cardshop-warehouse"
   DEFAULT_WAREHOUSE_UPLOAD_URI: "s3://s3.us-west-1.wasabisys.com/?bucketName=org-kiwix-hotspot-cardshop-warehouse"
-  DOWNLOAD_WAREHOUSE_DOWNLOAD_URI: "https+torrent://org-kiwix-hotspot-cardshop-download.s3.us-west-1.wasabisys.com"
-  DOWNLOAD_WAREHOUSE_UPLOAD_URI: "s3://s3.us-west-1.wasabisys.com/?bucketName=org-kiwix-hotspot-cardshop-download"
+  DOWNLOAD_WAREHOUSE_DOWNLOAD_URI: "https://org-kiwix-hotspot-cardshop-bundles.s3.us-east-1.wasabisys.com"
+  DOWNLOAD_WAREHOUSE_UPLOAD_URI: "s3://s3.us-east-1.wasabisys.com/?bucketName=org-kiwix-hotspot-cardshop-bundles"
   # mail sending via mailgun
   MAILGUN_API_URL: "https://api.mailgun.net/v3/cardshop.hotspot.kiwix.org"
   MAIL_FROM: "Kiwix <hotspot@kiwix.org>"

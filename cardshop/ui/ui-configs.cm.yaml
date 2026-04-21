@@ -16,7 +16,7 @@ data:
   # status health-check details
   STATUS_CARDSHOP_API_URL: "https://api.imager.kiwix.org"
   STATUS_CARDSHOP_URL: "https://imager.kiwix.org"
-  STATUS_S3_URL: "http://org-kiwix-hotspot-cardshop-download.s3.us-west-1.wasabisys.com"
+  STATUS_S3_URL: "http://org-kiwix-hotspot-cardshop-bundles.s3.us-east-1.wasabisys.com"
   STATUS_SCHEDULER_USERNAME: "status"
   STATUS_MANAGER_USERNAME: "status"
   # email to display for support requests
