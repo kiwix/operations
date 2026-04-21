@@ -8,10 +8,10 @@ Documentation on [SRV-M-QoS Wiki](https://github.com/kiwix/operations/wiki/SRV%E
 ## Deployment
 
 ```sh
-curl -O /usr/local/bin/setup-qos.sh https://github.com/kiwix/operations/blob/main/SRV-M/QoS/setup-qos.sh
-curl -O /usr/local/bin/flush-qos.sh https://github.com/kiwix/operations/blob/main/SRV-M/QoS/flush-qos.sh
+curl -L -o /usr/local/bin/setup-qos.sh https://github.com/kiwix/operations/raw/refs/heads/main/SRV-M/QoS/setup-qos.sh
+curl -L -o /usr/local/bin/flush-qos.sh https://github.com/kiwix/operations/raw/refs/heads/main/SRV-M/QoS/flush-qos.sh
 chmod +x /usr/local/bin/{setup,flush}-qos.sh
-curl -O /etc/systemd/system/master-qos.service https://github.com/kiwix/operations/blob/main/SRV-M/QoS/master-qos.service
+curl -L -o /etc/systemd/system/master-qos.service https://github.com/kiwix/operations/raw/refs/heads/main/SRV-M/QoS/master-qos.service
 systemctl daemon-reload
 systemctl enable --now master-qos.service
 ```
