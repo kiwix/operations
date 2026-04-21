@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: zim
+  labels:
+    app: lb-mirrorbrain-db
+  name: lb-mirrorbrain-db-sts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lb-mirrorbrain-db
+  serviceName: lb-mirrorbrain-db-service
+  template:
+    metadata:
+      labels:
+        app: lb-mirrorbrain-db
+    spec:
+      securityContext:
+        fsGroup: 999
+        runAsUser: 999
+        runAsGroup: 999
+      initContainers:
+      - image: docker.io/busybox
+        name: chmod-pgdata
+        command: ["/bin/sh", "-c", "chmod 700 /var/lib/postgresql/data"]
+        volumeMounts:
+        - name: data-volume
+          subPath: data
+          mountPath: "/var/lib/postgresql/data"
+          readOnly: false
+        resources:
+          requests:
+            memory: "16Mi"
+            cpu: "1m"
+          limits:
+            memory: "16Mi"
+            cpu: "1m"
+      containers:
+      - image: docker.io/postgres:11
+        imagePullPolicy: IfNotPresent
+        name: postgres
+        command: ["postgres", "-c", "shared_buffers=256MB", "-c", "max_connections=200"]
+        volumeMounts:
+        - name: data-volume
+          subPath: data
+          mountPath: "/var/lib/postgresql/data"
+          readOnly: false
+        - mountPath: /dev/shm
+          name: devshm
+        env:
+        - name: POSTGRES_USER
+          value: mirrorbrain
+        - name: POSTGRES_DATABASE
+          value: mirrorbrain
+        - name: POSTGRES_HOST_AUTH_METHOD
+          value: trust
+        ports:
+        - containerPort: 5432
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "200m"
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: dlsvc-mirrorbrain-db-pvc
+      - name: devshm
+        emptyDir:
+          medium: Memory
+      nodeSelector:
+        k8s.kiwix.org/role: "dlservices"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: lb-mirrorbrain-db-service
+  labels:
+    app: lb-mirrorbrain-db
+spec:
+  selector:
+    app: lb-mirrorbrain-db
+  ports:
+  - protocol: TCP
+    port: 5432
+    targetPort: 5432
