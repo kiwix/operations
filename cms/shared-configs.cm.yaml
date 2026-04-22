@@ -4,8 +4,8 @@ metadata:
   name: shared-configs
   namespace: cms
 data:
-  QUARANTINE_WAREHOUSE_ID: 1e9783eb-296e-4cb0-853a-5355a92b2323
-  QUARANTINE_BASE_PATH: quarantine
+  QUARANTINE_WAREHOUSE_ID: dc0ac66e-5f55-4491-b930-aba47abef40f
+  QUARANTINE_BASE_PATH: ""
   STAGING_WAREHOUSE_ID: c6bec3c1-46be-40ff-8bd9-eb789d3b3a22
   STAGING_BASE_PATH: dev
   STAGING_DOWNLOAD_BASE_URL: https://mirror.download.kiwix.org/zim/.hidden/dev/
