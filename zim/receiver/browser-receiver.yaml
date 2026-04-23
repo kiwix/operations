@@ -42,6 +42,9 @@ spec:
           mountPath: "/mnt/zim"
           readOnly: false
           # chown -R 999:100 zim/
+        env:
+        - name: ENABLE_ZIM_MOVE
+          value: "0"
         ports:
           - containerPort: 22
         resources:

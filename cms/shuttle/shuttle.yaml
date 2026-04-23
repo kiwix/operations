@@ -33,10 +33,11 @@ spec:
         volumeMounts:
         - name: browser-download-volume
           mountPath: "/data/download"
-          readOnly: true
         - name: browser-hidden-volume
           mountPath: "/data/hidden"
-          readOnly: true
+        - name: browser-receiver-volume
+          mountPath: "/data/zim-receiver"
+          subPath: zim
       volumes:
       - name: browser-download-volume
         persistentVolumeClaim:
@@ -44,6 +45,9 @@ spec:
       - name: browser-hidden-volume
         persistentVolumeClaim:
           claimName: browser-hidden-pvc
+      - name: browser-receiver-volume
+        persistentVolumeClaim:
+          claimName: browser-receiver-pvc
       nodeSelector:
         k8s.kiwix.org/role: "browser"
 

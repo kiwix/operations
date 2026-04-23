@@ -4,4 +4,9 @@ metadata:
   name: background-tasks-configs
   namespace: zimfarm
 data:
-
+  REQUEST_TASKS_INTERVAL: "0"
+  # switch from "oauth" to "local" for local username/password auth
+  CMS_AUTH_MODE: "oauth"
+  CMS_USERNAME: "zimfarm"
+  CMS_OAUTH_CLIENT_ID: "4c08aee4-d420-45da-b190-c5e713152223"
+  CMS_OAUTH_AUDIENCE_ID: "bada4130-5143-4524-a0bb-0d69671beee2"
