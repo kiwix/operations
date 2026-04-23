@@ -50,6 +50,7 @@ data:
   # CMS connection
   INFORM_CMS: "1"
   CMS_BASE_URL: "https://api.cms.openzim.org/v1"
+  DISABLE_WAREHOUSE_PATH: "1"
   # obsolete keys
   # SOCKET_URI: "tcp://relay.backend.zimfarm.kiwixoffline.node.intern:5000"
   UWSGI_CHEAPER: "4"
