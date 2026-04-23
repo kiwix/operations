@@ -24,13 +24,20 @@ data:
     dont compress = *.zim *.gz *.xz *.bz2 *.zip *.img
 
     hosts allow = 100.64.0.0/15
-    max connections = 3
+    # max connections = 3
+    max connections = 6
 
     [download]
     # internal module for mirrorbrain discovery or our own mirror
     path = /data/download/
     comment = SRV-B download repository
     lock file = /var/lock/download-repo.lock
+
+    [hidden]
+    # internal module for mirrorbrain discovery or our own mirror
+    path = /data/hidden/
+    comment = SRV-B hidden repository
+    lock file = /var/lock/hidden-repo.lock
 ---
 ---
 apiVersion: apps/v1
@@ -68,6 +75,9 @@ spec:
         - mountPath: "/data/download"
           name: download-volume
           readOnly: true
+        - mountPath: "/data/hidden"
+          name: hidden-volume
+          readOnly: true
         - mountPath: "/etc/rsyncd.conf"
           name: rsyncd-configs
           subPath: rsyncd.conf
@@ -82,6 +92,9 @@ spec:
       - name: download-volume
         persistentVolumeClaim:
           claimName: browser-download-pvc
+      - name: hidden-volume
+        persistentVolumeClaim:
+          claimName: browser-hidden-pvc
       - name: rsyncd-configs
         configMap:
           name: internal-rsyncd-configs
