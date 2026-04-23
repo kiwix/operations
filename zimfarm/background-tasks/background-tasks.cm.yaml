@@ -4,7 +4,8 @@ metadata:
   name: background-tasks-configs
   namespace: zimfarm
 data:
-  REQUEST_TASKS_INTERVAL: "0"
+  # Comment-out line below to stop Zimfarm periodic-scheduler from creating requested tasks
+  # REQUEST_TASKS_INTERVAL: "0"
   # switch from "oauth" to "local" for local username/password auth
   CMS_AUTH_MODE: "oauth"
   CMS_USERNAME: "zimfarm"
