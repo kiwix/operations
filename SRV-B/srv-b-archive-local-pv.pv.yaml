@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: srv-b-archive-local-pv
+spec:
+  capacity:
+    # content is ~1.5TB ATM (Apr 2026)
+    storage: 2Ti
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /data/download/archive/
+  claimRef:
+    name: browser-archive-pvc
+    namespace: zim
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: k8s.kiwix.org/role
+              operator: In
+              values:
+              - browser

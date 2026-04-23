@@ -1,0 +1,26 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: srv-b-zim-local-pv
+spec:
+  capacity:
+    # content is ~8TB ATM (Apr 2026)
+    storage: 10Ti
+  volumeMode: Filesystem
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: local-storage
+  local:
+    path: /data/download/zim/
+  claimRef:
+    name: browser-zim-pvc
+    namespace: zim
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: k8s.kiwix.org/role
+              operator: In
+              values:
+              - browser
