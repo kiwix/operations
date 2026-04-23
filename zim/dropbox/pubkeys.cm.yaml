@@ -20,11 +20,51 @@ data:
         ]
       },
       {
-        "id": 1001,
-        "name": "cms",
+        "id": 1002,
+        "name": "kiwix-android",
         "keys": [
-          "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDRxtsUb8FwN1EjfjVETmpNztBWLVI3/ywG/76GGEKG0a4WjPDsBdjd7cV1gowYLMLJqGcLHjwRmYJpL7jFk64oDi9w586jLmW6fCiTMcZ+36gUxAYoDWXxT8olhIaL0Cvm4rlPLgeVcJgFKmD7BnNSB1GasUY02YRuum0itHFj3y2IAKZOAnK0OLFeVR3JWowQaP3uhhjVcLvj2fZC+j4fC9o1a4BgclY4XqTWhRyitY/cR3CT0foeWrGrrM/wQqvMV6mxLW0rJ5VF+nDtEje+F0/LNR+GJ5uFfuBu5RoiZwSxTkINaRLLr5WhmNdFseami3sQVBX6ftNd0E3ZQHtiXNtgetwNkUDS9WmE4Km0/CPKNzac9ce6OzmcfkT6q2SvjCi0vcnqyZb6q1beyQRb5mBRv4uxkkj0EwLeMZL+IodoBY8JKFLLzBR7WLY/8K8LSUddO6/GOLzIhgMd7MTCgnd5Wcz8aqQDSfPwPpCMWt3n/0ijhpkABDUjMpITCe0= cms@kiwix",
-          "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC4UTXOYXrKA6dR7KizO2AvqqHKQGJE/FZF2oKTiofWEYDf+UWylksH4WjFmVczDUHN653Ve/QOIyRfI6IUuVa2hJ+l02xFV7rdl7L5zSZwKiSJr+SefouzWIFwS3VS3gbLOqk864a1NkUR97yKYjxsZiT9fISf771HqEKhsXOzZDOFbxt5u+YAaAJIJlU0EMKkDRBBtAVxmLFHme0uSpZ8DlYMFARGe1s0I++1eby0NVtzP3TarouvkPN1cFmS7UhQCsHzcmDMcNyrtHGBnlgjihd4m2bppmY75xTTR/PQTKDWqwklyYZhiDCKjZYzxWTk493SwKfZfaT9FOU0r4FT reg@kiwix"
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku",
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGfP5Sd/0MzDYo2fnV76a5vZoX9QK8pzarrSzOupfAKM kiwix-android@github"
+        ]
+      },
+      {
+        "id": 1003,
+        "name": "kiwix-js",
+        "keys": [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku",
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID27xbbFHLZe+n7RH7wJidyCpbyfSXcy7a+zIkQPzM6y kiwix-js@github"
+        ]
+      },
+      {
+        "id": 1004,
+        "name": "kiwix-js-pwa",
+        "keys": [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku",
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBbkjFpg0mG1q9UPMaHeGo9Z6Ot/bONKMDTRN95LyRX3 kiwix-js-pwa@github"
+        ]
+      },
+      {
+        "id": 1005,
+        "name": "kiwix-build",
+        "keys": [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku",
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJGW1XM4K+RSxhZPUC9s+EIOgLSjquuy87V8Gq3tiWhI kiwix-build@github"
+        ]
+      },
+      {
+        "id": 1006,
+        "name": "javascript-libzim",
+        "keys": [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku",
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB4gMct7XqS6V7pTZMXC40U4GN4jLf0Kp0vWAPvHL3kg javascript-libzim@github"
+        ]
+      },
+      {
+        "id": 1007,
+        "name": "kiwix-apple",
+        "keys": [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku",
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGxr7XeOZwjyRRgFp1alDroZduDx5cXQ+XsV/nnh85Nv kiwix-apple@github"
         ]
       }
     ]

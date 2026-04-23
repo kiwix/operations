@@ -1,0 +1,193 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: builds-dropbox-app
+  name: builds-dropbox-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: builds-dropbox-app
+  template:
+    metadata:
+      labels:
+        app: builds-dropbox-app
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/dropbox:latest
+        imagePullPolicy: Always
+        name: dropbox
+        env:
+          - name: USERS
+            valueFrom:
+              configMapKeyRef:
+                name: dropbox-pubkeys
+                key: users
+                optional: false
+        volumeMounts:
+        # user: kiwix-js (nightly and own releases)
+        - name: kiwix-nightly-volume
+          mountPath: "/jails/kiwix-js/data/kiwix/nightly"
+          readOnly: false
+        - name: kiwix-release-volume
+          subPath: "firefox-os"
+          mountPath: "/jails/kiwix-js/data/kiwix/release/firefox-os"
+          readOnly: false
+        - name: kiwix-release-volume
+          subPath: "ubuntu-touch"
+          mountPath: "/jails/kiwix-js/data/kiwix/release/ubuntu-touch"
+          readOnly: false
+        - name: kiwix-release-volume
+          subPath: "browsers/chrome"
+          mountPath: "/jails/kiwix-js/data/kiwix/release/browsers/chrome"
+          readOnly: false
+        - name: kiwix-release-volume
+          subPath: "browsers/edge"
+          mountPath: "/jails/kiwix-js/data/kiwix/release/browsers/edge"
+          readOnly: false
+        - name: kiwix-release-volume
+          subPath: "browsers/firefox"
+          mountPath: "/jails/kiwix-js/data/kiwix/release/browsers/firefox"
+          readOnly: false
+
+        # user: kiwix-js-pwa (nightly and own releases)
+        - name: kiwix-nightly-volume
+          mountPath: "/jails/kiwix-js-pwa/data/kiwix/nightly"
+          readOnly: false
+        - name: kiwix-release-volume
+          subPath: "kiwix-js-windows"
+          mountPath: "/jails/kiwix-js-pwa/data/kiwix/release/kiwix-js-windows"
+          readOnly: false
+        - name: kiwix-release-volume
+          subPath: "kiwix-js-electron"
+          mountPath: "/jails/kiwix-js-pwa/data/kiwix/release/kiwix-js-electron"
+          readOnly: false
+
+        # user: kiwix-android (kiwix nightly)
+        - name: kiwix-nightly-volume
+          mountPath: "/jails/kiwix-android/data/kiwix/nightly"
+          readOnly: false
+
+        # user: javascript-libzim (own release and oz nightly)
+        - name: openzim-nightly-volume
+          mountPath: "/jails/javascript-libzim/data/openzim/nightly"
+          readOnly: false
+        - name: openzim-release-volume
+          subPath: "javascript-libzim"
+          mountPath: "/jails/javascript-libzim/data/openzim/release/javascript-libzim"
+          readOnly: false
+
+        # user: kiwix-apple (nightly and own releases)
+        - name: kiwix-nightly-volume
+          mountPath: "/jails/kiwix-apple/data/kiwix/nightly"
+          readOnly: false
+        - name: kiwix-release-volume
+          subPath: "kiwix-macos"
+          mountPath: "/jails/kiwix-apple/data/kiwix/release/kiwix-macos"
+          readOnly: false
+
+        # user: kiwix-build (nightly and built projects)
+        - name: kiwix-nightly-volume
+          mountPath: "/jails/kiwix-build/data/kiwix/nightly"
+          readOnly: false
+        - name: openzim-nightly-volume
+          mountPath: "/jails/kiwix-build/data/openzim/nightly"
+          readOnly: false
+        - name: kiwix-release-volume
+          subPath: "kiwix-desktop"
+          mountPath: "/jails/kiwix-build/data/kiwix/release/kiwix-desktop"
+          readOnly: false
+        - name: kiwix-release-volume
+          subPath: "kiwix-tools"
+          mountPath: "/jails/kiwix-build/data/kiwix/release/kiwix-tools"
+          readOnly: false
+        - name: kiwix-release-volume
+          subPath: "libkiwix"
+          mountPath: "/jails/kiwix-build/data/kiwix/release/libkiwix"
+          readOnly: false
+        - name: openzim-release-volume
+          subPath: "libzim"
+          mountPath: "/jails/kiwix-build/data/openzim/release/libzim"
+          readOnly: false
+        - name: openzim-release-volume
+          subPath: "zim-tools"
+          mountPath: "/jails/kiwix-build/data/openzim/release/zim-tools"
+          readOnly: false
+        - name: openzim-release-volume
+          subPath: "zimwriterfs"
+          mountPath: "/jails/kiwix-build/data/openzim/release/zimwriterfs"
+          readOnly: false
+
+        # keys
+        - name: host-keys
+          subPath: ecdsa
+          mountPath: "/etc/ssh/ssh_host_ecdsa_key"
+          readOnly: true
+        - name: host-pubkeys
+          subPath: ecdsa
+          mountPath: "/etc/ssh/ssh_host_ecdsa_key.pub"
+          readOnly: true
+        - name: host-keys
+          subPath: ed25519
+          mountPath: "/etc/ssh/ssh_host_ed25519_key"
+          readOnly: true
+        - name: host-pubkeys
+          subPath: ed25519
+          mountPath: "/etc/ssh/ssh_host_ed25519_key.pub"
+          readOnly: true
+        - name: host-keys
+          subPath: rsa
+          mountPath: "/etc/ssh/ssh_host_rsa_key"
+          readOnly: true
+        - name: host-pubkeys
+          subPath: rsa
+          mountPath: "/etc/ssh/ssh_host_rsa_key.pub"
+          readOnly: true
+        ports:
+          - containerPort: 22
+        resources:
+          requests:
+            memory: "20Mi"
+            cpu: "200m"
+      volumes:
+      - name: kiwix-release-volume
+        persistentVolumeClaim:
+          claimName: master-kiwix-release-pvc
+      - name: kiwix-nightly-volume
+        persistentVolumeClaim:
+          claimName: master-kiwix-nightly-pvc
+      - name: openzim-release-volume
+        persistentVolumeClaim:
+          claimName: master-openzim-release-pvc
+      - name: openzim-nightly-volume
+        persistentVolumeClaim:
+          claimName: master-openzim-nightly-pvc
+      - name: host-keys
+        secret:
+          secretName: dropbox-host-keys
+          defaultMode: 0600
+      - name: host-pubkeys
+        configMap:
+          name: dropbox-host-pubkeys
+          defaultMode: 0644
+      nodeSelector:
+        k8s.kiwix.org/role: "master"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: builds-dropbox-service
+  labels:
+    app: builds-dropbox-app
+spec:
+  type: NodePort
+  selector:
+    app: builds-dropbox-app
+  ports:
+  - protocol: TCP
+    port: 30322
+    targetPort: 22
+    nodePort: 30322
