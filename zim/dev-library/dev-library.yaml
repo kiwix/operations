@@ -15,10 +15,51 @@ spec:
       labels:
         app: dev-library-app
     spec:
+      initContainers:
+      - image: docker.io/busybox
+        name: create-empty-library
+        command: ["/bin/sh", "-c", 'echo -e "<library version=\"20110515\">\n</library>" > /library/catalog.xml']
+        volumeMounts:
+        - mountPath: "/library"
+          name: catalog-volume
+          readOnly: false
+        resources:
+          requests:
+            memory: "16Mi"
+            cpu: "1m"
+          limits:
+            memory: "16Mi"
+            cpu: "1m"
       containers:
+      - image: ghcr.io/kiwix/catalog-retriever:latest
+        imagePullPolicy: Always
+        name: catalog-retriever
+        env:
+          - name: SAVE_TO
+            value: /library/catalog.xml
+          - name: CMS_API_URL
+            value: http://api-service.cms.svc.cluster.local/v1
+          - name: CMS_COLLECTION_ID
+            value: staging
+          - name: REFRESH_EVERY_SECONDS
+            value: "300"
+          - name: DEBUG
+            value: ""
+        volumeMounts:
+        - mountPath: "/library"
+          name: catalog-volume
+          readOnly: false
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "20m"
+          limits:
+            memory: "128Mi"
+            cpu: "20m"
+
       - image: ghcr.io/kiwix/kiwix-tools-nightly:latest
         imagePullPolicy: Always
-        command: ["kiwix-serve", "-b", "--library", "--monitorLibrary", "--searchLimit", "5", "/library/dev_library.xml"]
+        command: ["kiwix-serve", "-b", "--library", "--monitorLibrary", "--searchLimit", "5", "/library/catalog.xml"]
         name: kiwix-tools
         ports:
         - containerPort: 80
@@ -27,7 +68,7 @@ spec:
           mountPath: "/data"
           readOnly: true
         - mountPath: "/library"
-          name: kiwix-library
+          name: catalog-volume
           readOnly: true
         resources:
           requests:
@@ -37,14 +78,15 @@ spec:
             memory: "2.5Gi"
             cpu: "800m"
       volumes:
+      - name: catalog-volume
+        emptyDir:
+          sizeLimit: 30Mi
+          medium: Memory
       - name: hidden-volume
         persistentVolumeClaim:
-          claimName: hidden-zim-pvc
-      - name: kiwix-library
-        persistentVolumeClaim:
-          claimName: kiwix-library-pvc
+          claimName: browser-hidden-pvc
       nodeSelector:
-        k8s.kiwix.org/role: "storage"
+        k8s.kiwix.org/role: "browser"
 ---
 apiVersion: v1
 kind: Service
