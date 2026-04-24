@@ -1,5 +1,5 @@
-demos: [] # empty list when there is not demo
-# demos: # list of demos (not empty)
+# demos: [] # empty list when there is not demo
+demos: # list of demos (not empty)
 # Appear at clients.library.kiwix.org/home/name Refresh is at the hour, every hour
 # - name: orange # name is case-sensitive, will appear at Will appear at clients.library.kiwix.org/home/orange
 #   zims: # no limit on number of zims listed
@@ -13,4 +13,3 @@ demos: [] # empty list when there is not demo
   zims:
     - .hidden/dev/jrailpass.com_en_all
   expired_on: 2026_06_31
-  - name: jrailpass
