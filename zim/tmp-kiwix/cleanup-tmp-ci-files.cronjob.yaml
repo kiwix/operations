@@ -1,0 +1,39 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: cleanup-tmp-ci-files
+  namespace: zim
+spec:
+  schedule: "30 2 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - image: ghcr.io/kiwix/maintenance:latest
+              imagePullPolicy: Always
+              name: jobrunner
+              env:
+              - name: INSTALL_SCRIPTS
+                value: github://kiwix/operations/zim/tmp-kiwix/cleanup-old-files.py
+              volumeMounts:
+              - name: files-volume
+                subPath: "ci"
+                mountPath: "/data"
+              workingDir: /data
+              args: ["cleanup-old-files.py", "-f", "/data", "-n", "90"]
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 64Mi
+          volumes:
+          - name: files-volume
+            persistentVolumeClaim:
+              claimName: services-tmp-kiwix-pvc
+          nodeSelector:
+            k8s.kiwix.org/role: "services"

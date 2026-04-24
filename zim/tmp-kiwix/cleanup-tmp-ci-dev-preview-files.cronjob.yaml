@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: tmp-cleanup-files
+  name: cleanup-tmp-ci-dev-preview-files
   namespace: zim
 spec:
   schedule: "0 2 * * *"
@@ -22,18 +22,18 @@ spec:
               - name: INSTALL_SCRIPTS
                 value: github://kiwix/operations/zim/tmp-kiwix/cleanup-old-files.py
               volumeMounts:
-              - mountPath: "/data/tmp"
-                name: tmp-kiwix-volume
-              workingDir: /data/tmp
-              args: ["cleanup-old-files.py", "-f", "/data/tmp/ci/dev_preview", "-n", "30"]
+              - name: files-volume
+                subPath: "ci/dev_preview"
+                mountPath: "/data"              
+              workingDir: /data
+              args: ["cleanup-old-files.py", "-f", "/data", "-n", "30"]
               resources:
                 requests:
                   cpu: 100m
                   memory: 64Mi
           volumes:
-          - name: tmp-kiwix-volume
+          - name: files-volume
             persistentVolumeClaim:
-              # /!\ name is inverted compared to this file
-              claimName: kiwix-tmp-pvc
+              claimName: services-tmp-kiwix-pvc
           nodeSelector:
-            k8s.kiwix.org/role: "storage"
+            k8s.kiwix.org/role: "services"

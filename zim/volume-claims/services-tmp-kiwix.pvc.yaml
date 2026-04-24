@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: services-tmp-kiwix-pvc
+  namespace: zim
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: local-storage
+  volumeName: srv-services-tmp-kiwix-local-pv

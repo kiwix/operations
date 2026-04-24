@@ -17,7 +17,10 @@ data:
       location = /50x.html {
           root   /usr/share/nginx/html;
       }
-      rewrite ^/zim/(.*)$ https://download.kiwix.org/zim/$1 permanent;
+      location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+      }
     }
 ---
 apiVersion: apps/v1
@@ -38,7 +41,7 @@ spec:
         app: tmp-kiwix-app
     spec:
       containers:
-      - image: docker.io/nginx:1.21
+      - image: docker.io/library/nginx:1.29
         imagePullPolicy: IfNotPresent
         name: nginx
         ports:
@@ -66,8 +69,7 @@ spec:
       volumes:
       - name: tmp-kiwix-volume
         persistentVolumeClaim:
-          # /!\ name is inverted compared to this file
-          claimName: kiwix-tmp-pvc
+          claimName: services-tmp-kiwix-pvc
       - name: configs
         configMap:
           name: tmp-kiwix-configs
@@ -75,7 +77,7 @@ spec:
         configMap:
           name: nginx-configs
       nodeSelector:
-        k8s.kiwix.org/role: "storage"
+        k8s.kiwix.org/role: "services"
 ---
 apiVersion: v1
 kind: Service
