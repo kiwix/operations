@@ -1,0 +1,64 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: master-binaries-maps-generator
+  namespace: zim
+spec:
+  schedule: "@hourly"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            - name: maintenance
+              image: ghcr.io/kiwix/maintenance:latest
+              imagePullPolicy: Always
+              env:
+                - name: INSTALL_SCRIPTS
+                  value: "create-releases-redirects-map.py#github://kiwix/operations/zim/download-kiwix/jobs/create-releases-redirects-map.py"
+                - name: PIP_INSTALL
+                  value: "packaging"
+              volumeMounts:
+              - mountPath: "/data/maps"
+                name: maps-volume
+                readOnly: false
+              - mountPath: "/data/openzim/nightly"
+                name: openzim-nightly-volume
+                readOnly: true
+              - mountPath: "/data/openzim/release"
+                name: openzim-release-volume
+                readOnly: true
+              - mountPath: "/data/kiwix/nightly"
+                name: kiwix-nightly-volume
+                readOnly: true
+              - mountPath: "/data/kiwix/release"
+                name: kiwix-release-volume
+                readOnly: true
+              args: ["/bin/sh", "-c", "create-releases-redirects-map.py kiwix openzim"]
+              resources:
+                requests:
+                  memory: "128Mi"
+                  cpu: "100m"
+          volumes:
+            - name: kiwix-release-volume
+              persistentVolumeClaim:
+                claimName: master-kiwix-release-pvc
+            - name: kiwix-nightly-volume
+              persistentVolumeClaim:
+                claimName: master-kiwix-nightly-pvc
+            - name: openzim-release-volume
+              persistentVolumeClaim:
+                claimName: master-openzim-release-pvc
+            - name: openzim-nightly-volume
+              persistentVolumeClaim:
+                claimName: master-openzim-nightly-pvc
+            - name: maps-volume
+              persistentVolumeClaim:
+                claimName: master-maps-pvc
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "master"
