@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: master-remove-nightly-config
+  namespace: zim
+data:
+  remove-nightlies.sh: |
+    #!/bin/sh
+    find /data/kiwix/nightly/ -mindepth 1 -maxdepth 1 -type d -mtime +30 -exec rm -rf {} \;
+    find /data/openzim/nightly/ -mindepth 1 -maxdepth 1 -type d -mtime +30 -exec rm -rf {} \;
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: master-remove-nightly
+  namespace: zim
+spec:
+  schedule: "@daily"
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            - image: docker.io/alpine:3
+              imagePullPolicy: IfNotPresent
+              name: debian
+              command: ["remove-nightlies"]
+              volumeMounts:
+                - name: kiwix-nightly-volume 
+                  mountPath: "/data/kiwix/nightly"
+                  readOnly: false
+                - name: openzim-nightly-volume 
+                  mountPath: "/data/openzim/nightly"
+                  readOnly: false
+                - name: scripts
+                  subPath: remove-nightlies.sh
+                  mountPath: "/usr/local/bin/remove-nightlies"
+                  readOnly: true
+              resources:
+                requests:
+                  memory: "128Mi"
+                  cpu: "20m"
+          volumes:
+            - name: kiwix-nightly-volume
+              persistentVolumeClaim:
+                claimName: master-kiwix-nightly-pvc
+            - name: openzim-nightly-volume
+              persistentVolumeClaim:
+                claimName: master-openzim-nightly-pvc
+            - name: scripts
+              configMap:
+                name: master-remove-nightly-config
+                defaultMode: 0755
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "master"
