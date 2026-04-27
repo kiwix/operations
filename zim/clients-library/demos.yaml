@@ -12,4 +12,4 @@ demos: # list of demos (not empty)
 - name: jrailpass
   zims:
     - .hidden/dev/jrailpass.com_en_all
-  expired_on: 2026_06_31
+  expired_on: 2026-06-31
