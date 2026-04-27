@@ -1,0 +1,49 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: master-releases-feed-gen
+  namespace: zim
+spec:
+  # we want it after completion of release redirects and nginx reload
+  schedule: "15 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            - name: maintenance
+              image: ghcr.io/kiwix/maintenance:latest
+              imagePullPolicy: Always
+              env:
+                - name: INSTALL_SCRIPTS
+                  value: |
+                    create_release_feeds.py#github://kiwix/operations/zim/download-kiwix/jobs/create_release_feeds.py
+                    genRSS.py#github://kiwix/operations/zim/download-kiwix/jobs/genRSS.py
+                - name: PIP_INSTALL
+                  value: "packaging"
+              volumeMounts:
+              - mountPath: "/data/openzim/release"
+                name: openzim-release-volume
+                readOnly: false
+              - mountPath: "/data/kiwix/release"
+                name: kiwix-release-volume
+                readOnly: false
+              args: ["create_release_feeds.py"]
+              resources:
+                requests:
+                  memory: "64Mi"
+                  cpu: "100m"
+          volumes:
+            - name: openzim-release-volume
+              persistentVolumeClaim:
+                claimName: master-openzim-release-pvc
+            - name: kiwix-release-volume
+              persistentVolumeClaim:
+                claimName: master-kiwix-release-pvc
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "master"

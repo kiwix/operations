@@ -38,7 +38,7 @@ spec:
               - mountPath: "/data/kiwix/release"
                 name: kiwix-release-volume
                 readOnly: true
-              args: ["/bin/sh", "-c", "create-releases-redirects-map.py kiwix openzim"]
+              args: ["create-releases-redirects-map.py", "kiwix", "openzim"]
               resources:
                 requests:
                   memory: "128Mi"

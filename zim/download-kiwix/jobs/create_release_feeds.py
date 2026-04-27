@@ -8,7 +8,7 @@ import contextlib
 
 @contextlib.contextmanager
 def cwd(path):
-    old_path = os   .getcwd()
+    old_path = os.getcwd()
     os.chdir(path)
     yield path
     os.chdir(old_path)
