@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+
+import os
+import pathlib
+import subprocess
+import contextlib
+
+
+@contextlib.contextmanager
+def cwd(path):
+    old_path = os   .getcwd()
+    os.chdir(path)
+    yield path
+    os.chdir(old_path)
+
+
+def create_feeds(root, org_name, base_url):
+    root = pathlib.Path(root).expanduser().resolve()
+
+    # loop on all folders
+    for path in root.rglob("**/**"):
+        if not path.is_dir():
+            continue
+        create_feed(root, path, org_name, base_url)
+
+
+def create_feed(root, folder, org_name, base_url):
+    if str(folder.relative_to(root)) == ".":
+        title = f"{org_name} releases"
+    else:
+        title = f"{org_name} {folder.stem} releases"
+
+    with cwd(root):
+        subprocess.run(
+            [
+                "/usr/local/bin/genRSS.py",
+                "-H",
+                base_url,
+                "-t",
+                title,
+                "-C",  # sort by creation time
+                "-r",
+                "-e" "xz,gz,zip,apk,dmg,exe,appimage,appxbundle,flatpak,crx,xpi",
+                "-d",
+                str(folder.relative_to(root)),
+                "-o",
+                str(folder.relative_to(root) / "feed.xml"),
+            ]
+        )
+
+
+create_feeds(
+    "/data/openzim/release",
+    "OpenZIM",
+    "https://download.openzim.org/release",
+)
+
+create_feeds(
+    "/data/kiwix/release",
+    "Kiwix",
+    "https://download.kiwix.org/release",
+)
