@@ -30,7 +30,7 @@ def run(root: Path, map_path: Path, dry_run: bool) -> int:
         ).name
     )
     with open(tmp_file, "w") as fh:
-        for ident, versions in folders.items():
+        for ident, version in folders.items():
             line = rf"~^/{ident}(|[^_].*)$ /{ident}_{version}$1;"
             print(line)
             fh.write(line)
