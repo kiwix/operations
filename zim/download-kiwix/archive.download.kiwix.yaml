@@ -1,0 +1,146 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: archive-download-kiwix-configs
+  namespace: zim
+data:
+  vhost.conf: |
+    server {
+      listen 80;
+      server_name _;
+      access_log /var/log/nginx/access.log vhost;
+      access_log /dev/stdout vhost;
+      root /var/www;
+      autoindex on;
+      autoindex_exact_size off;
+      autoindex_localtime off;
+      error_page   500 502 503 504  /50x.html;
+      location = /50x.html {
+          root   /usr/share/nginx/html;
+      }
+      location = /favicon.ico {
+        log_not_found off;
+        access_log off;
+      }
+      location = /README {
+        types { } default_type "text/plain; charset=utf-8";
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: archive-download-kiwix-app
+  name: archive-download-kiwix-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: archive-download-kiwix-app
+  template:
+    metadata:
+      labels:
+        app: archive-download-kiwix-app
+    spec:
+      securityContext:
+        # fsGroup: 1000
+        # runAsUser: 1000
+        # runAsGroup: 33
+        # fsGroupChangePolicy: "OnRootMismatch"
+      containers:
+      - image: docker.io/library/nginx:mainline
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: "/var/www"
+          name: files-volume
+        - name: configs
+          mountPath: "/etc/nginx/conf.d/default.conf"
+          subPath: vhost.conf
+          readOnly: true
+        - name: nginx-configs
+          mountPath: "/etc/nginx/mime.types"
+          subPath: mime.types
+          readOnly: true
+        - name: nginx-configs
+          mountPath: "/etc/nginx/conf.d/gzip.conf"
+          subPath: gzip.conf
+          readOnly: true
+        - name: nginx-configs
+          mountPath: "/etc/nginx/conf.d/01vhost-logfmt.conf"
+          subPath: vhost-logfmt.conf
+          readOnly: true
+        - mountPath: "/var/log/nginx"
+          subPath: archive-download-kiwix
+          name: www-logs-volume
+          readOnly: false
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "1m"
+          limits:
+            memory: "1Gi"
+            cpu: "2"
+      volumes:
+      - name: files-volume
+        persistentVolumeClaim:
+          claimName: browser-archive-pvc
+      - name: www-logs-volume
+        persistentVolumeClaim:
+          claimName: browser-www-logs-pvc
+      - name: configs
+        configMap:
+          name: archive-download-kiwix-configs
+      - name: nginx-configs
+        configMap:
+          name: nginx-configs
+      - name: nginx-configs-scripts
+        configMap:
+          name: nginx-configs
+          defaultMode: 0755
+      nodeSelector:
+        k8s.kiwix.org/role: browser
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: archive-download-kiwix-service
+  labels:
+    app: archive-download-kiwix-app
+spec:
+  selector:
+    app: archive-download-kiwix-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: archive-download-kiwix-ingress
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - archive.download.kiwix.org
+      secretName: archive-download-kiwix-org-tls
+  rules:
+  - host: archive.download.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: archive-download-kiwix-service
+            port:
+              number: 80
