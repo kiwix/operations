@@ -31,21 +31,21 @@ spec:
             memory: "512Mi"
             cpu: "100m"
         volumeMounts:
-        - name: browser-download-volume
-          mountPath: "/data/download"
-        - name: browser-hidden-volume
+        - name: zim-volume
+          mountPath: "/data/download/zim"
+        - name: hidden-volume
           mountPath: "/data/hidden"
-        - name: browser-receiver-volume
+        - name: receiver-volume
           mountPath: "/data/zim-receiver"
           subPath: zim
       volumes:
-      - name: browser-download-volume
+      - name: zim-volume
         persistentVolumeClaim:
-          claimName: browser-download-pvc
-      - name: browser-hidden-volume
+          claimName: browser-zim-pvc
+      - name: hidden-volume
         persistentVolumeClaim:
           claimName: browser-hidden-pvc
-      - name: browser-receiver-volume
+      - name: receiver-volume
         persistentVolumeClaim:
           claimName: browser-receiver-pvc
       nodeSelector:

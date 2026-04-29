@@ -12,7 +12,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage
   local:
-    path: /data/download/zim/
+    path: /data/zim/
   claimRef:
     name: browser-zim-pvc
     namespace: zim

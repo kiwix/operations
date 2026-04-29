@@ -27,11 +27,11 @@ data:
     # max connections = 3
     max connections = 6
 
-    [download]
+    [zim]
     # internal module for mirrorbrain discovery or our own mirror
-    path = /data/download/
-    comment = SRV-B download repository
-    lock file = /var/lock/download-repo.lock
+    path = /data/zim/
+    comment = SRV-B ZIM repository
+    lock file = /var/lock/zim-repo.lock
 
     [hidden]
     # internal module for mirrorbrain discovery or our own mirror
@@ -72,8 +72,8 @@ spec:
             add:
               - SYS_NICE
         volumeMounts:
-        - mountPath: "/data/download"
-          name: download-volume
+        - mountPath: "/data/zim"
+          name: zim-volume
           readOnly: true
         - mountPath: "/data/hidden"
           name: hidden-volume
@@ -89,9 +89,9 @@ spec:
         ports:
         - containerPort: 873
       volumes:
-      - name: download-volume
+      - name: zim-volume
         persistentVolumeClaim:
-          claimName: browser-download-pvc
+          claimName: browser-zim-pvc
       - name: hidden-volume
         persistentVolumeClaim:
           claimName: browser-hidden-pvc
