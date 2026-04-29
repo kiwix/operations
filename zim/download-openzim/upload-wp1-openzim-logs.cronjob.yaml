@@ -17,8 +17,7 @@ spec:
             - name: matomo-uploader
               image: ghcr.io/kiwix/matomo-log-analytics:latest
               imagePullPolicy: Always
-              # command: ["import-log"]
-              command: ["/bin/bash", "-c", "sleep Infinity"]
+              command: ["import-log"]
               env:
                 - name: MATOMO_SITE_ID
                   value: "21"
