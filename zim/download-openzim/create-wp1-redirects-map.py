@@ -23,23 +23,27 @@ def run(root: Path, map_path: Path, dry_run: bool) -> int:
 
     tmp_file = Path(
         tempfile.NamedTemporaryFile(
-            prefix=map_path.stem,
+            prefix=f"{map_path.stem}_",
             suffix=map_path.suffix,
             dir=map_path.parent,
             delete=False,
         ).name
     )
-    with open(tmp_file, "w") as fh:
-        for ident, version in folders.items():
-            line = rf"~^/{ident}(|[^_].*)$ /{ident}_{version}$1;"
-            print(line)
-            fh.write(line)
+    try:
+        with open(tmp_file, "w") as fh:
+            for ident, version in folders.items():
+                line = rf"~^/{ident}(|[^_].*)$ /{ident}_{version}$1;"
+                print(line)
+                fh.write(line)
 
-    if dry_run:
-        print("DRY-RUN, no change to map file.")
-        return 0
+        if dry_run:
+            print("DRY-RUN, no change to map file.")
+            return 0
 
-    tmp_file.rename(map_path)
+        tmp_file.rename(map_path)
+    finally:
+        tmp_file.unlink(missing_ok=True)
+
     print(f"Updated {map_path!s}")
     return 0
 
