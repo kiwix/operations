@@ -34,7 +34,7 @@ def run(root: Path, map_path: Path, dry_run: bool) -> int:
             for ident, version in folders.items():
                 line = rf"~^/{ident}(|[^_].*)$ /{ident}_{version}$1;"
                 print(line)
-                fh.write(line)
+                fh.write(f"{line}\n")
 
         if dry_run:
             print("DRY-RUN, no change to map file.")
