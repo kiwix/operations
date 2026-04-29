@@ -1,0 +1,45 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: browser-wp1-map-generator
+  namespace: zim
+spec:
+  schedule: "@hourly"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            # estimated duration: <5s
+            - image: ghcr.io/kiwix/maintenance:latest
+              imagePullPolicy: Always
+              name: jobrunner
+              env:
+              - name: INSTALL_SCRIPTS
+                value: create-wp1-redirects-map#github://kiwix/operations/zim/download-openzim/create-wp1-redirects-map.py
+              volumeMounts:
+              - mountPath: "/data/maps"
+                name: maps-volume
+                readOnly: false
+              - mountPath: "/data/wp1"
+                name: wp1-volume
+                readOnly: true
+              args: ["create-wp1-redirects-map", "/data/wp1", "/data/maps/wp1.map"]
+              resources:
+                requests:
+                  memory: "128Mi"
+                  cpu: "100m"
+          volumes:
+            - name: wp1-volume
+              persistentVolumeClaim:
+                claimName: browser-wp1-pvc
+            - name: maps-volume
+              persistentVolumeClaim:
+                claimName: browser-maps-pvc
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: browser

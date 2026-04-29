@@ -36,3 +36,7 @@ data:
     /data/nginx-logs/demo-library-kiwix/*.log {
       olddir /data/nginx-logs/archives/demo-library-kiwix
     }
+  wp1-download-openzim.conf: |
+    /data/nginx-logs/wp1-download-openzim/*.log {
+      olddir /data/nginx-logs/archives/wp1-download-openzim
+    }

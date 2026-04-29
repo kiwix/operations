@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: remove-old-wp1-files
+  namespace: zim
+spec:
+  schedule: "30 2 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          restartPolicy: Never
+          containers:
+            - image: ghcr.io/kiwix/maintenance:latest
+              imagePullPolicy: Always
+              name: jobrunner
+              env:
+              - name: INSTALL_SCRIPTS
+                value: github://kiwix/operations/zim/download-openzim/remove_old_wp1_files.py
+              volumeMounts:
+              - name: wp1-volume
+                mountPath: "/data/wp1"
+              workingDir: /data/wp1
+              args: ["python3", "/usr/local/bin/remove_old_wp1_files.py", "--keep-versions", "2", "/data/wp1"]
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 64Mi
+          volumes:
+          - name: wp1-volume
+            persistentVolumeClaim:
+              claimName: browser-wp1-pvc
+          nodeSelector:
+            k8s.kiwix.org/role: "browser"

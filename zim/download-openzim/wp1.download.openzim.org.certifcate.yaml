@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: wp1-download-openzim-org
+  namespace: zim
+spec:
+  secretName: wp1-download-openzim-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: wp1.download.openzim.org
+  dnsNames:
+  - wp1.download.openzim.org
