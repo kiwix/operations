@@ -66,6 +66,7 @@ jobs:
           - [ ] sisyphus
           - [ ] kathrin
           - [ ] rhys-github-runner
+          - [ ] duncan
 
           **Note**: this is an *automatic reminder* intended for the assignee(s).
 
