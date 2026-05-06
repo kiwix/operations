@@ -77,7 +77,7 @@ def main(roots: list[Path], digester: Callable, suffix: str, chunk_size: int) ->
         f"\n- {total_nb_errors=}\n- {total_nb_skipped=}\n- {total_nb_computed=}"
     )
 
-    return total_nb_errors == 0
+    return total_nb_errors
 
 
 if __name__ == "__main__":
