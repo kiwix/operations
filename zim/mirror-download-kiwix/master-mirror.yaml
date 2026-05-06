@@ -5,6 +5,13 @@ metadata:
   namespace: zim
 data:
   vhost.conf: |
+    map_hash_max_size 2048;
+    map_hash_bucket_size 256;
+    map $uri $redirect_uri {
+        include /data/maps/kiwix-releases.map;
+        include /data/maps/kiwix-nightly.map;
+    }
+
     server {
       listen 80;
       server_name _;
@@ -21,6 +28,12 @@ data:
       }
       location = /README {
         types { } default_type "text/plain; charset=utf-8";
+      }
+      location / {
+        if ($redirect_uri) {
+          add_header Cache-Control "no-store, no-cache, must-revalidate";
+          rewrite ^ https://$host$redirect_uri permanent;
+        }
       }
     }
   README: |
@@ -53,7 +66,26 @@ spec:
       labels:
         app: master-mirror-app
     spec:
+      shareProcessNamespace: true
       containers:
+      - image: docker.io/library/bash:5-alpine3.15
+        imagePullPolicy: IfNotPresent
+        name: reloader
+        # reload nginx config every hour at *:10
+        command: ["crond", "-f"]
+        securityContext:
+          capabilities:
+            add:
+            - SYS_PTRACE
+        volumeMounts:
+        - name: nginx-configs-scripts
+          mountPath: "/usr/bin/reload-nginx"
+          subPath: reload-nginx.sh
+          readOnly: true
+        - name: nginx-configs-scripts
+          mountPath: "/etc/crontabs/root"
+          subPath: reload-nginx.crontab
+          readOnly: true
       - image: docker.io/nginx:1.21
         imagePullPolicy: IfNotPresent
         name: nginx
@@ -93,6 +125,9 @@ spec:
           mountPath: "/etc/nginx/conf.d/01vhost-logfmt.conf"
           subPath: vhost-logfmt.conf
           readOnly: true
+        - mountPath: "/data/maps"
+          name: maps-volume
+          readOnly: true
         resources:
           requests:
             memory: "64Mi"
@@ -116,6 +151,13 @@ spec:
       - name: nginx-configs
         configMap:
           name: nginx-configs
+      - name: maps-volume
+        persistentVolumeClaim:
+          claimName: master-maps-pvc
+      - name: nginx-configs-scripts
+        configMap:
+          name: nginx-configs
+          defaultMode: 0755
       nodeSelector:
         k8s.kiwix.org/role: "master"
 ---
@@ -165,20 +207,22 @@ metadata:
         text/plain
         text/xml
         text/x-component;
+      
+      location /robots.txt {
+        add_header Content-Type "text/plain";
+        return 200 "User-agent: *\nDisallow: /";
+      }
 spec:
   ingressClassName: nginx
   tls:
-    # - hosts:
-    #   - mirror.download.kiwix.org
-    #   secretName: mirror-download-kiwix-org-tls
     - hosts:
-      - mirror2.download.kiwix.org
-      secretName: mirror2-download-kiwix-org-tls
-    # - hosts:
-    #   - master.download.kiwix.org
-    #   secretName: master-download-kiwix-org-tls
+      - mirror.download.kiwix.org
+      secretName: mirror-download-kiwix-org-tls
+    - hosts:
+      - master.download.kiwix.org
+      secretName: master-download-kiwix-org-tls
   rules:
-  - host: mirror2.download.kiwix.org
+  - host: mirror.download.kiwix.org
     http:
       paths:
       - path: /
@@ -188,13 +232,13 @@ spec:
             name: master-mirror-service
             port:
               number: 80
-  # - host: master.download.kiwix.org
-  #   http:
-  #     paths:
-  #     - path: /
-  #       pathType: Prefix
-  #       backend:
-  #         service:
-  #           name: master-mirror-service
-  #           port:
-  #             number: 80
+  - host: master.download.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: master-mirror-service
+            port:
+              number: 80
