@@ -6,8 +6,6 @@ metadata:
   annotations:
     k8s.kiwix.org/description: SSH keys allowed to connect using user ci. Equivalent to authorized_keys file
 data:
-  ci: |
-    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDx7fsFmpV55BVHlD8ReS2ODIWYTs+dHxJxwwWFPIssM kiwix@file_upload
   users: |
     [
       {
@@ -85,6 +83,14 @@ data:
         "name": "levon",
         "keys": [
           "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC+Jb1LImVPK40xxlz3BeVBBGCdOL+yQQe24BkQiMX6cTFt8/XnFj/fcVnimM8D73JYEMprkQxCzifz6UJeEQ0g1UcFb0Q6HceSIUMWolX5bc0MEc/7WYGARwznMEj78B9GClEfM8T7DQ2tEQI+tdORmL0VG7Be25SFAlLDxIXFD8nTHk/edQJwLdZxBDOAxw214Bv7zFNY5EwtR9Uld3Ds7F3YvFu8jpwEuH5vNM67NjjeGqoAsUXUd6DibOMWYtbrhjorSH3HAK2ZyZlrXENLi35PW8kvPoelo2AOSpjij55BkEcd5oqd09jzfgihn9iXb+7Wo/mX7U7Hh0kQP7eBTlsmNszDW+ImeBrtYAEVf6hp4eeOBfw4S4MBhNxSq33gxZsnHq7WTnRF84SWZ3kymREzk/GBf60BHwgKYi4HbDAVyZG4cBB8Gw+shcVSBJx9Ls2eoJ2Sc6TD6Co309AFimtpHIhGDETMPmm07ktdY10RVwyfEZ8HQDiWx/kXHIE= levon@kiwix"
+        ]
+      },
+      {
+        "id": 1011,
+        "name": "wp1-selection-tools",
+        "keys": [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku",
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINAgtbzkDDkXBBqXn1BkH4QvFuUix6Ji51Ov1oY1nFyP wp1-selection-tools@mwcurator"
         ]
       }
     ]
