@@ -19,7 +19,6 @@ CANONICAL_MIRRORS_LIST_URL: str = "https://lbo.download.kiwix.org/mirrors.html"
 # list of mirrors (hostname) not to use in tests
 EXCLUDED_MIRRORS: list[str] = [
     "mirror.isoc.org.il",  # not up to date (2026-03-31)
-    "mirror.accum.se",  # DEV (allowed from github)
 ]
 # this is using the permalink pattern
 # from the permalink redirects (no warehouse path, no period in filename)
