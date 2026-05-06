@@ -11,7 +11,7 @@ data:
     [main]
     dbuser = mirrorbrain
     dbdriver = postgresql
-    dbhost = mirrorbrain-db-service
+    dbhost = svc-mirrorbrain-db-service
     dbname = mirrorbrain
     dbpass =
     scan_top_include = /var/www/download.kiwix.org
@@ -273,6 +273,7 @@ data:
     #
     #ServerName www.example.com:80
     ServerName download.kiwix.org:80
+    # ServerAlias lbo.download.kiwix.org
 
 
     #
@@ -674,6 +675,7 @@ data:
   httpd-vhosts.conf: |
     <VirtualHost *:80>
       ServerName https://download.kiwix.org
+      ServerAlias https://lbo.download.kiwix.org
       ServerAdmin contact+download@kiwix.org
       DocumentRoot /var/www/download.kiwix.org
       Alias /static/ /var/www/static/
@@ -734,6 +736,12 @@ data:
       # HTTP 301 without a cache.
       <IfModule mod_rewrite.c>
          RewriteEngine on
+
+         # redirect to mirror server first (should skip below)
+         RewriteRule   "^/nightly/(.*)"  "https://mirror.download.kiwix.org/nightly/$1"  [last,redirect=301,E=NOCACHE:1]
+         RewriteRule   "^/release/(.*)"  "https://mirror.download.kiwix.org/release/$1"  [last,redirect=301,E=NOCACHE:1]
+         RewriteRule   "^/other/(.*)"  "https://archive.download.kiwix.org/other/$1"  [last,redirect=301,E=NOCACHE:1]
+         RewriteRule   "^/archive/(.*)"  "https://archive.download.kiwix.org/$1"  [last,redirect=301,E=NOCACHE:1]
 
          # RewriteMap redirects-map "txt:/var/www/library.kiwix.org/download.kiwix.org.permalinks"
          # RewriteCond ${redirects-map:$1} !=""
