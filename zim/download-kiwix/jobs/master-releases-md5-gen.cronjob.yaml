@@ -1,0 +1,47 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: master-releases-md5-gen
+  namespace: zim
+spec:
+  schedule: "*/5 * * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - name: maintenance
+              image: ghcr.io/kiwix/maintenance:latest
+              imagePullPolicy: Always
+              env:
+                - name: INSTALL_SCRIPTS
+                  value: |
+                    create_release_digests.py#github://kiwix/operations/zim/download-kiwix/jobs/create-release-digests.py
+                - name: PIP_INSTALL
+                  value: "humanfriendly"
+              volumeMounts:
+              - mountPath: "/data/openzim/release"
+                name: openzim-release-volume
+                readOnly: false
+              - mountPath: "/data/kiwix/release"
+                name: kiwix-release-volume
+                readOnly: false
+              args: ["create_release_digests.py", "/data/openzim/release", "/data/kiwix/release"]
+              resources:
+                requests:
+                  memory: "64Mi"
+                  cpu: "100m"
+          volumes:
+            - name: openzim-release-volume
+              persistentVolumeClaim:
+                claimName: master-openzim-release-pvc
+            - name: kiwix-release-volume
+              persistentVolumeClaim:
+                claimName: master-kiwix-release-pvc
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "master"
