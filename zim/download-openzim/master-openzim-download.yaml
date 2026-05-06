@@ -5,6 +5,13 @@ metadata:
   namespace: zim
 data:
   vhost.conf: |
+    map_hash_max_size 2048;
+    map_hash_bucket_size 256;
+    map $uri $redirect_uri {
+        include /data/maps/openzim-releases.map;
+        include /data/maps/openzim-nightly.map;
+    }
+
     server {
       listen 80;
       server_name _;
@@ -21,6 +28,14 @@ data:
       }
       location = /README {
         types { } default_type "text/plain; charset=utf-8";
+      }
+
+      location / {
+        if ($redirect_uri) {
+          add_header Cache-Control "no-store, no-cache, must-revalidate";
+          rewrite ^ https://$host$redirect_uri permanent;
+        }
+        rewrite ^/wp1/(.*) https://wp1.download.openzim.org/$1 permanent;
       }
     }
   README: |
@@ -55,6 +70,12 @@ spec:
         ports:
         - containerPort: 80
         volumeMounts:
+        - mountPath: "/var/www/wp1"
+          name: empty-volume
+          readOnly: true
+        - mountPath: "/data/maps"
+          name: maps-volume
+          readOnly: true
         - mountPath: "/var/www/release"
           name: openzim-release-volume
           readOnly: true
@@ -90,6 +111,9 @@ spec:
             memory: "64Mi"
             cpu: "100m"
       volumes:
+      - name: empty-volume
+        emptyDir:
+          medium: Memory
       - name: openzim-release-volume
         persistentVolumeClaim:
           claimName: master-openzim-release-pvc
@@ -99,6 +123,9 @@ spec:
       - name: nginx-logs-volume
         persistentVolumeClaim:
           claimName: master-www-logs-pvc
+      - name: maps-volume
+        persistentVolumeClaim:
+          claimName: master-maps-pvc
       - name: configs
         configMap:
           name: master-openzim-configs
@@ -154,26 +181,18 @@ metadata:
         text/plain
         text/xml
         text/x-component;
+
+      location /robots.txt {
+        add_header Content-Type "text/plain";
+        return 200 "User-agent: *\nDisallow: /";
+      }
 spec:
   ingressClassName: nginx
   tls:
     - hosts:
       - download.openzim.org
       secretName: download-openzim-org-tls
-    - hosts:
-      - download2.openzim.org
-      secretName: download2-openzim-org-tls
   rules:
-  - host: download2.openzim.org
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: master-openzim-service
-            port:
-              number: 80
   - host: download.openzim.org
     http:
       paths:
