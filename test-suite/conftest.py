@@ -15,7 +15,7 @@ RECORDED_URLS: set[str] = set()
 
 # MB only provides the full list of mirrors through this.
 MIRRORS_LIST_URL: str = "https://lbo.download.kiwix.org/mirrors.html"
-CANONICAL_MIRRORS_LIST_URL: str = "https://lbo.download.kiwix.org/mirrors.html"
+CANONICAL_MIRRORS_LIST_URL: str = "https://mirror.download.kiwix.org/mirrors.html"
 # list of mirrors (hostname) not to use in tests
 EXCLUDED_MIRRORS: list[str] = [
     "mirror.isoc.org.il",  # not up to date (2026-03-31)
