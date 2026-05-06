@@ -28,7 +28,7 @@ def get_digest_for(fpath: Path, func: Callable, chunk_size: int):
 def scan_and_compute(root: Path, digester: Callable, suffix: str, chunk_size: int):
     errors = skipped = computed = 0
     for fpath in root.rglob("*.*"):
-        if fpath.is_dir() or fpath.suffix == suffix:
+        if fpath.is_dir() or fpath.suffix in (suffix, ".xml", ""):  # (feed.xml)
             continue
         logger.debug(fpath)
         digest_path = fpath.with_suffix(f"{fpath.suffix}{suffix}")
