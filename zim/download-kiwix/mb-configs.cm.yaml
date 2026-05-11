@@ -11,7 +11,7 @@ data:
     [main]
     dbuser = mirrorbrain
     dbdriver = postgresql
-    dbhost = svc-mirrorbrain-db-service
+    dbhost = mirrorbrain-db-service
     dbname = mirrorbrain
     dbpass =
     scan_top_include = /var/www/download.kiwix.org
