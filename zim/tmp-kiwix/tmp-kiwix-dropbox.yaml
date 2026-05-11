@@ -27,7 +27,7 @@ spec:
                 key: users
                 optional: false
         volumeMounts:
-        # chmod -R 2777 /data/tmp-kiwix/
+        # chmod 3775 /data/tmp-kiwix/ /data/tmp-kiwix/ci
         - name: tmp-kiwix-volume
           mountPath: "/jails/kiwix-build/data/tmp"
           readOnly: false

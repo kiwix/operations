@@ -1,3 +1,86 @@
+# builds dropbox
+# filesystem configuration
+#
+# GENERALS
+# - rules are same for openzim and kiwix
+# - each tool/product sits in its own folder with release
+# - there is no subfolder per tool (only applies to some archives)
+# - each of such tool folder is own by one expected uploader user
+# - each of those are readable by users (gid100) group and world executable (nginx, uid101)
+# - each of those folder has sticky bit and setgid
+#
+# - nightlies has one folder per day
+# - all projects push to that single folder
+# - no subfolders
+# - nightly folders are own by root and group users (gid100)
+#
+# NOTES
+# - nightly folders have to be created automatically with root:100 and chmod 3775
+# otherwise the first project uploading to it would create it with improper mode/owner
+# - new release project folders must be created manually and assigned to its owner
+#
+# RULES
+#
+# release and nightly top folders are owned by root:users with 645
+# - can be listed by anyone both for traversal and nginx
+# each nighly folder is created by root:users with 3775
+# - group users can write to it and list its content
+# - others can list its content (nginx)
+# - setgid so new files are owned by :users as well
+# - sticky bit so that only the one uploading a file can remove/rename it
+# per-project release folder are own by owner user and users group with 3745
+# - only owner can write
+# - others can list (nginx)
+# - setgid so new files are owned by :users as well
+# - sticky bit so that only the owner can remove/rename it
+# 
+#
+# cd /data/kiwix
+# chmod -R 645 release
+# chown root:users nightly/*
+# chmod -R 645 nightly
+# chmod 2655 nightly
+# chmod 3775 nightly/*
+# 
+# chown -R 1003:users release/firefox-os
+# chmod 3745 release/firefox-os
+# chown -R 1003:users release/ubuntu-touch
+# chmod 3745 release/ubuntu-touch
+# chown -R 1003:users release/browsers/chrome
+# chmod 3745 release/browsers/chrome
+# chown -R 1003:users release/browsers/edge
+# chmod 3745 release/browsers/edge
+# chown -R 1003:users release/browsers/firefox
+# chmod 3745 release/browsers/firefox
+# chown -R 1002:users release/kiwix-android
+# chmod 3745 release/kiwix-android
+# chown -R 1004:users release/kiwix-js-windows
+# chmod 3745 release/kiwix-js-windows
+# chown -R 1004:users release/kiwix-js-electron
+# chmod 3745 release/kiwix-js-electron
+# chown -R 1007:users release/kiwix-macos
+# chmod 3745 release/kiwix-macos
+# chown -R 1005:users release/kiwix-desktop
+# chmod 3745 release/kiwix-desktop
+# chown -R 1005:users release/kiwix-tools
+# chmod 3745 release/kiwix-tools
+# chown -R 1005:users release/libkiwix
+# chmod 3745 release/libkiwix
+# 
+# cd /data/openzim
+# chmod -R 645 release
+# chown root:users nightly/*
+# chmod -R 645 nightly
+# chmod 2655 nightly
+# chmod 3775 nightly/*
+# chown -R 1006:users release/javascript-libzim
+# chmod 3745 release/javascript-libzim
+# chown -R 1005:users release/libzim
+# chmod 3745 release/libzim
+# chown -R 1005:users release/zim-tools
+# chmod 3745 release/zim-tools
+# chown -R 1005:users release/zimwriterfs
+# chmod 3745 release/zimwriterfs
 apiVersion: apps/v1
 kind: Deployment
 metadata:

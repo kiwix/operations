@@ -9,18 +9,9 @@ data:
   users: |
     [
       {
-        "id": 1000,
-        "name": "ci",
-        "keys": [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDx7fsFmpV55BVHlD8ReS2ODIWYTs+dHxJxwwWFPIssM kiwix@file_upload",
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku"
-        ]
-      },
-      {
         "id": 1002,
         "name": "kiwix-android",
         "keys": [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku",
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGfP5Sd/0MzDYo2fnV76a5vZoX9QK8pzarrSzOupfAKM kiwix-android@github"
         ]
       },
@@ -28,7 +19,6 @@ data:
         "id": 1003,
         "name": "kiwix-js",
         "keys": [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku",
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAID27xbbFHLZe+n7RH7wJidyCpbyfSXcy7a+zIkQPzM6y kiwix-js@github"
         ]
       },
@@ -36,7 +26,6 @@ data:
         "id": 1004,
         "name": "kiwix-js-pwa",
         "keys": [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku",
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBbkjFpg0mG1q9UPMaHeGo9Z6Ot/bONKMDTRN95LyRX3 kiwix-js-pwa@github"
         ]
       },
@@ -44,7 +33,6 @@ data:
         "id": 1005,
         "name": "kiwix-build",
         "keys": [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku",
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJGW1XM4K+RSxhZPUC9s+EIOgLSjquuy87V8Gq3tiWhI kiwix-build@github"
         ]
       },
@@ -52,7 +40,6 @@ data:
         "id": 1006,
         "name": "javascript-libzim",
         "keys": [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku",
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIB4gMct7XqS6V7pTZMXC40U4GN4jLf0Kp0vWAPvHL3kg javascript-libzim@github"
         ]
       },
@@ -60,7 +47,6 @@ data:
         "id": 1007,
         "name": "kiwix-apple",
         "keys": [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku",
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGxr7XeOZwjyRRgFp1alDroZduDx5cXQ+XsV/nnh85Nv kiwix-apple@github"
         ]
       },
@@ -89,7 +75,6 @@ data:
         "id": 1011,
         "name": "wp1-selection-tools",
         "keys": [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIByVJVXfimW3nuS/440H0qbr8ZjNBm61OzGV6pNlAlXj reg@faku",
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAINAgtbzkDDkXBBqXn1BkH4QvFuUix6Ji51Ov1oY1nFyP wp1-selection-tools@mwcurator"
         ]
       }
