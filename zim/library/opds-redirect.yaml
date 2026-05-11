@@ -5,6 +5,20 @@ metadata:
   namespace: zim
   annotations:
     nginx.ingress.kubernetes.io/server-snippet: |
+      # CORS
+      add_header Access-Control-Allow-Origin "*" always;
+      add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
+      add_header Access-Control-Allow-Headers "Content-Type, Authorization, User-Agent" always;
+      add_header Access-Control-Allow-Credentials "true" always;
+
+      # Frame ancestors for both sites
+      add_header Content-Security-Policy "frame-ancestors 'self' https://browser-extension.kiwix.org https://pwa.kiwix.org" always;
+
+      # Handle preflight requests
+      if ($request_method = 'OPTIONS') {
+          return 204;
+      }
+
       set $shouldRedirect 1;
       if ($uri ~* "/.well-known/acme-challenge/(.+)") {
         set $shouldRedirect 0;
