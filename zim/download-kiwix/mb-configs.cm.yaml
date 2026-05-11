@@ -738,6 +738,7 @@ data:
          RewriteEngine on
 
          # redirect to mirror server first (should skip below)
+         RewriteRule   "^/mirrors.html$"  "https://mirror.download.kiwix.org/mirrors.html"  [last,redirect=302,E=NOCACHE:1]
          RewriteRule   "^/nightly/(.*)"  "https://mirror.download.kiwix.org/nightly/$1"  [last,redirect=301,E=NOCACHE:1]
          RewriteRule   "^/release/(.*)"  "https://mirror.download.kiwix.org/release/$1"  [last,redirect=301,E=NOCACHE:1]
          RewriteRule   "^/other/(.*)"  "https://archive.download.kiwix.org/other/$1"  [last,redirect=301,E=NOCACHE:1]
