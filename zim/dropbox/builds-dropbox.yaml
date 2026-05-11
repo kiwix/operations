@@ -69,6 +69,10 @@ spec:
         - name: kiwix-nightly-volume
           mountPath: "/jails/kiwix-android/data/kiwix/nightly"
           readOnly: false
+        - name: kiwix-release-volume
+          subPath: "kiwix-android"
+          mountPath: "/jails/kiwix-android/data/kiwix/release/kiwix-android"
+          readOnly: false
 
         # user: javascript-libzim (own release and oz nightly)
         - name: openzim-nightly-volume
