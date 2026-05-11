@@ -1,223 +1,329 @@
 import json
 import math
-from yaml import load, dump
+from typing import Any
+from yaml import load
 
 try:
-    from yaml import CLoader as Loader, CDumper as Dumper
+    from yaml import CLoader as Loader
 except ImportError:
-    from yaml import Loader, Dumper
+    from yaml import Loader
 
 with open("disk-bytes-dashboard.yml", "r") as fh:
     data = load(fh, Loader=Loader)
 
-dashboard = {}
+dashboard: dict[str, Any] = {}
 
-panels = []
+elements: dict[str, Any] = {}
+rows: list[dict[str, Any]] = []
 
 panel_id = 1
-instance_id = 1
-consumed_y = 0
 for instance_key, instance_data in data.items():
-    panels.append(
-        {
-            "collapsed": False,
-            "gridPos": {"h": 1, "w": 24, "x": 0, "y": consumed_y},
-            "id": panel_id,
-            "panels": [],
-            "title": instance_data.get("label"),
-            "type": "row",
-        }
-    )
     panel_id += 1
-    consumed_y += 1
     disk_id = 1
+    row_items: list[dict[str, Any]] = []
     for disk_key, disk_data in instance_data.get("disks").items():
-        panels.append(
-            {
-                "datasource": {"type": "prometheus", "uid": "grafanacloud-prom"},
-                "fieldConfig": {
-                    "defaults": {
-                        "color": {"mode": "palette-classic"},
-                        "custom": {
-                            "axisBorderShow": False,
-                            "axisCenteredZero": False,
-                            "axisColorMode": "text",
-                            "axisLabel": "",
-                            "axisPlacement": "auto",
-                            "barAlignment": 0,
-                            "barWidthFactor": 0.6,
-                            "drawStyle": "line",
-                            "fillOpacity": 0,
-                            "gradientMode": "none",
-                            "hideFrom": {
-                                "legend": False,
-                                "tooltip": False,
-                                "viz": False,
+        elements[f"panel-{panel_id}"] = {
+            "kind": "Panel",
+            "spec": {
+                "data": {
+                    "kind": "QueryGroup",
+                    "spec": {
+                        "queries": [
+                            {
+                                "kind": "PanelQuery",
+                                "spec": {
+                                    "hidden": False,
+                                    "query": {
+                                        "datasource": {"name": "grafanacloud-prom"},
+                                        "group": "prometheus",
+                                        "kind": "DataQuery",
+                                        "spec": {
+                                            "editorMode": "code",
+                                            "expr": f'sum(node_filesystem_size_bytes{{device="{disk_data.get("device")}", instance="{instance_data.get("instance")}"}})',
+                                            "legendFormat": "Filesystem size",
+                                            "range": True,
+                                        },
+                                        "version": "v0",
+                                    },
+                                    "refId": "A",
+                                },
                             },
-                            "insertNulls": False,
-                            "lineInterpolation": "linear",
-                            "lineWidth": 1,
-                            "pointSize": 5,
-                            "scaleDistribution": {"type": "linear"},
-                            "showPoints": "auto",
-                            "spanNulls": False,
-                            "stacking": {"group": "A", "mode": "none"},
-                            "thresholdsStyle": {"mode": "off"},
-                        },
-                        "mappings": [],
-                        "min": 0,
-                        "thresholds": {
-                            "mode": "absolute",
-                            "steps": [
-                                {"color": "green"},
-                                {"color": "red", "value": 80},
-                            ],
-                        },
-                        "unit": "decbytes",
+                            {
+                                "kind": "PanelQuery",
+                                "spec": {
+                                    "hidden": False,
+                                    "query": {
+                                        "datasource": {"name": "grafanacloud-prom"},
+                                        "group": "prometheus",
+                                        "kind": "DataQuery",
+                                        "spec": {
+                                            "editorMode": "code",
+                                            "expr": f'sum(node_filesystem_size_bytes{{device="{disk_data.get("device")}", instance="{instance_data.get("instance")}"}} - node_filesystem_free_bytes{{device="{disk_data.get("device")}", instance="{instance_data.get("instance")}"}})',
+                                            "instant": False,
+                                            "legendFormat": "Used bytes",
+                                            "range": True,
+                                        },
+                                        "version": "v0",
+                                    },
+                                    "refId": "B",
+                                },
+                            },
+                        ],
+                        "queryOptions": {},
+                        "transformations": [],
                     },
-                    "overrides": [],
                 },
-                "gridPos": {
-                    "h": 8,
-                    "w": 8,
-                    "x": (disk_id - 1) % 2 * 12,
-                    "y": consumed_y + 8 * math.floor((disk_id - 1) / 2),
-                },
+                "description": "",
                 "id": panel_id,
-                "options": {
-                    "legend": {
-                        "calcs": [],
-                        "displayMode": "list",
-                        "placement": "bottom",
-                        "showLegend": True,
-                    },
-                    "tooltip": {"hideZeros": False, "mode": "single", "sort": "none"},
-                },
-                "pluginVersion": "12.1.0-88106",
-                "targets": [
-                    {
-                        "datasource": {
-                            "type": "prometheus",
-                            "uid": "grafanacloud-prom",
-                        },
-                        "editorMode": "code",
-                        "expr": f'sum(node_filesystem_size_bytes{{device="{disk_data.get("device")}", instance="{instance_data.get("instance")}"}})',
-                        "legendFormat": "Filesystem size",
-                        "range": True,
-                        "refId": "A",
-                    },
-                    {
-                        "datasource": {
-                            "type": "prometheus",
-                            "uid": "grafanacloud-prom",
-                        },
-                        "editorMode": "code",
-                        "expr": f'sum(node_filesystem_size_bytes{{device="{disk_data.get("device")}", instance="{instance_data.get("instance")}"}} - node_filesystem_free_bytes{{device="{disk_data.get("device")}", instance="{instance_data.get("instance")}"}})',
-                        "hide": False,
-                        "instant": False,
-                        "legendFormat": "Used bytes",
-                        "range": True,
-                        "refId": "B",
-                    },
-                ],
+                "links": [],
                 "title": f'{disk_data.get("device")} (supposedly mounted on {disk_data.get("mounted")})',
-                "type": "timeseries",
+                "vizConfig": {
+                    "group": "timeseries",
+                    "kind": "VizConfig",
+                    "spec": {
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {"mode": "palette-classic"},
+                                "custom": {
+                                    "axisBorderShow": False,
+                                    "axisCenteredZero": False,
+                                    "axisColorMode": "text",
+                                    "axisLabel": "",
+                                    "axisPlacement": "auto",
+                                    "barAlignment": 0,
+                                    "barWidthFactor": 0.6,
+                                    "drawStyle": "line",
+                                    "fillOpacity": 0,
+                                    "gradientMode": "none",
+                                    "hideFrom": {
+                                        "legend": False,
+                                        "tooltip": False,
+                                        "viz": False,
+                                    },
+                                    "insertNulls": False,
+                                    "lineInterpolation": "linear",
+                                    "lineWidth": 1,
+                                    "pointSize": 5,
+                                    "scaleDistribution": {"type": "linear"},
+                                    "showPoints": "auto",
+                                    "showValues": False,
+                                    "spanNulls": False,
+                                    "stacking": {"group": "A", "mode": "none"},
+                                    "thresholdsStyle": {"mode": "off"},
+                                },
+                                "min": 0,
+                                "thresholds": {
+                                    "mode": "absolute",
+                                    "steps": [
+                                        {"color": "green", "value": 0},
+                                        {"color": "red", "value": 80},
+                                    ],
+                                },
+                                "unit": "decbytes",
+                            },
+                            "overrides": [],
+                        },
+                        "options": {
+                            "annotations": {"clustering": -1, "multiLane": False},
+                            "legend": {
+                                "calcs": [],
+                                "displayMode": "list",
+                                "placement": "bottom",
+                                "showLegend": True,
+                            },
+                            "tooltip": {
+                                "hideZeros": False,
+                                "mode": "single",
+                                "sort": "none",
+                            },
+                        },
+                    },
+                    "version": "13.1.0-25365784498",
+                },
+            },
+        }
+        row_items.append(
+            {
+                "kind": "GridLayoutItem",
+                "spec": {
+                    "element": {
+                        "kind": "ElementReference",
+                        "name": f"panel-{panel_id}",
+                    },
+                    "height": 8,
+                    "width": 8,
+                    "x": (disk_id - 1) % 2 * 12,
+                    "y": 8 * math.floor((disk_id - 1) / 2),
+                },
             }
         )
         panel_id += 1
-        panels.append(
-            {
-                "datasource": {"type": "prometheus", "uid": "grafanacloud-prom"},
-                "fieldConfig": {
-                    "defaults": {
-                        "color": {"mode": "thresholds"},
-                        "mappings": [],
-                        "thresholds": {
-                            "mode": "percentage",
-                            "steps": [
-                                {"color": "green"},
-                                {"color": "red", "value": 80},
-                            ],
-                        },
-                        "unit": "percentunit",
+        elements[f"panel-{panel_id}"] = {
+            "kind": "Panel",
+            "spec": {
+                "data": {
+                    "kind": "QueryGroup",
+                    "spec": {
+                        "queries": [
+                            {
+                                "kind": "PanelQuery",
+                                "spec": {
+                                    "hidden": False,
+                                    "query": {
+                                        "datasource": {"name": "grafanacloud-prom"},
+                                        "group": "prometheus",
+                                        "kind": "DataQuery",
+                                        "spec": {
+                                            "editorMode": "code",
+                                            "expr": f'sum((node_filesystem_size_bytes{{device="{disk_data.get("device")}", instance="{instance_data.get("instance")}"}} - node_filesystem_free_bytes{{device="{disk_data.get("device")}", instance="{instance_data.get("instance")}"}}) / node_filesystem_size_bytes{{device="{disk_data.get("device")}", instance="{instance_data.get("instance")}"}})',
+                                            "legendFormat": "__auto",
+                                            "range": True,
+                                        },
+                                        "version": "v0",
+                                    },
+                                    "refId": "A",
+                                },
+                            }
+                        ],
+                        "queryOptions": {},
+                        "transformations": [],
                     },
-                    "overrides": [],
                 },
-                "gridPos": {
-                    "h": 8,
-                    "w": 4,
-                    "x": (disk_id - 1) % 2 * 12 + 8,
-                    "y": consumed_y + 8 * math.floor((disk_id - 1) / 2),
-                },
+                "description": "",
                 "id": panel_id,
-                "options": {
-                    "minVizHeight": 75,
-                    "minVizWidth": 75,
-                    "orientation": "auto",
-                    "reduceOptions": {
-                        "calcs": ["lastNotNull"],
-                        "fields": "",
-                        "values": False,
-                    },
-                    "showThresholdLabels": False,
-                    "showThresholdMarkers": True,
-                    "sizing": "auto",
-                },
-                "pluginVersion": "12.1.0-88106",
-                "targets": [
-                    {
-                        "datasource": {
-                            "type": "prometheus",
-                            "uid": "grafanacloud-prom",
-                        },
-                        "editorMode": "code",
-                        "expr": f'sum((node_filesystem_size_bytes{{device="{disk_data.get("device")}", instance="{instance_data.get("instance")}"}} - node_filesystem_free_bytes{{device="{disk_data.get("device")}", instance="{instance_data.get("instance")}"}}) / node_filesystem_size_bytes{{device="{disk_data.get("device")}", instance="{instance_data.get("instance")}"}})',
-                        "legendFormat": "__auto",
-                        "range": True,
-                        "refId": "A",
-                    }
-                ],
+                "links": [],
                 "title": f'{disk_data.get("device")} usage',
-                "type": "gauge",
+                "vizConfig": {
+                    "group": "gauge",
+                    "kind": "VizConfig",
+                    "spec": {
+                        "fieldConfig": {
+                            "defaults": {
+                                "color": {"mode": "thresholds"},
+                                "thresholds": {
+                                    "mode": "percentage",
+                                    "steps": [
+                                        {"color": "green", "value": 0},
+                                        {"color": "red", "value": 80},
+                                    ],
+                                },
+                                "unit": "percentunit",
+                            },
+                            "overrides": [],
+                        },
+                        "options": {
+                            "barShape": "flat",
+                            "barWidthFactor": 0.5,
+                            "effects": {
+                                "barGlow": False,
+                                "centerGlow": False,
+                                "gradient": False,
+                            },
+                            "endpointMarker": "point",
+                            "minVizHeight": 75,
+                            "minVizWidth": 75,
+                            "orientation": "auto",
+                            "reduceOptions": {
+                                "calcs": ["lastNotNull"],
+                                "fields": "",
+                                "values": False,
+                            },
+                            "segmentCount": 1,
+                            "segmentSpacing": 0.3,
+                            "shape": "gauge",
+                            "showThresholdLabels": False,
+                            "showThresholdMarkers": True,
+                            "sizing": "auto",
+                            "sparkline": False,
+                            "textMode": "auto",
+                        },
+                    },
+                    "version": "13.1.0-25365784498",
+                },
+            },
+        }
+        row_items.append(
+            {
+                "kind": "GridLayoutItem",
+                "spec": {
+                    "element": {
+                        "kind": "ElementReference",
+                        "name": f"panel-{panel_id}",
+                    },
+                    "height": 8,
+                    "width": 4,
+                    "x": (disk_id - 1) % 2 * 12 + 8,
+                    "y": 8 * math.floor((disk_id - 1) / 2),
+                },
             }
         )
         panel_id += 1
         disk_id += 1
 
-    instance_id += 1
-    consumed_y += 8 * (
-        1 + math.floor((len(instance_data.get("disks").items()) - 1) / 2)
+    rows.append(
+        {
+            "kind": "RowsLayoutRow",
+            "spec": {
+                "collapse": False,
+                "layout": {
+                    "kind": "GridLayout",
+                    "spec": {"items": row_items},
+                },
+                "title": instance_data.get("label"),
+            },
+        }
     )
 
 dashboard = {
-    "annotations": {
-        "list": [
-            {
-                "builtIn": 1,
-                "datasource": {"type": "grafana", "uid": "-- Grafana --"},
+    "annotations": [
+        {
+            "kind": "AnnotationQuery",
+            "spec": {
+                "builtIn": True,
                 "enable": True,
                 "hide": True,
                 "iconColor": "rgba(0, 211, 255, 1)",
                 "name": "Annotations & Alerts",
-                "type": "dashboard",
-            }
-        ]
-    },
+                "query": {
+                    "datasource": {"name": "-- Grafana --"},
+                    "group": "grafana",
+                    "kind": "DataQuery",
+                    "spec": {},
+                    "version": "v0",
+                },
+            },
+        }
+    ],
+    "cursorSync": "Off",
     "editable": True,
-    "fiscalYearStartMonth": 0,
-    "graphTooltip": 0,
-    "id": 42,
+    "elements": elements,
+    "layout": {"kind": "RowsLayout", "spec": {"rows": rows}},
     "links": [],
-    "panels": panels,
+    "liveNow": False,
     "preload": False,
-    "schemaVersion": 41,
     "tags": [],
-    "templating": {"list": []},
-    "time": {"from": "now-7d", "to": "now"},
-    "timepicker": {},
-    "timezone": "browser",
+    "timeSettings": {
+        "autoRefresh": "",
+        "autoRefreshIntervals": [
+            "5s",
+            "10s",
+            "30s",
+            "1m",
+            "5m",
+            "15m",
+            "30m",
+            "1h",
+            "2h",
+            "1d",
+        ],
+        "fiscalYearStartMonth": 0,
+        "from": "now-7d",
+        "hideTimepicker": False,
+        "timezone": "browser",
+        "to": "now",
+    },
     "title": "Disk bytes usage",
-    "uid": "8ee7e349-af68-4aac-8eba-23c561cedbc0",
+    "variables": [],
 }
 
 with open("disk-bytes-dashboard.json", "w") as fh:
