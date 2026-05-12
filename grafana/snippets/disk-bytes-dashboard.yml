@@ -110,6 +110,9 @@ sisyphus:
     sda2:
       device: /dev/sda2
       mounted: /
+    sda3:
+      device: /dev/sda3
+      mounted: /boot
 mwoffliner1b:
   label: mwoffliner1b
   instance: mwoffliner1b.mwoffliner.eqiad1.wikimedia.cloud
@@ -208,3 +211,13 @@ rhys:
     sda1:
       device: /dev/mapper/pve-root
       mounted: /
+duncan:
+  label: duncan
+  instance: duncan.kiwix.org
+  disks:
+    sda1:
+      device: /dev/sda1
+      mounted: /
+    sdb1:
+      device: /dev/sdb1
+      mounted: /data
