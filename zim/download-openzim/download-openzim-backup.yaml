@@ -19,16 +19,7 @@ spec:
               imagePullPolicy: Always
               volumeMounts:
               - name: data-volume
-                subPath: README
-                mountPath: "/storage/README"
-                readOnly: true
-              - name: data-volume
-                subPath: archive
-                mountPath: "/storage/archive"
-                readOnly: true
-              - name: data-volume
-                subPath: release
-                mountPath: "/storage/release"
+                mountPath: "/storage"
                 readOnly: true
               envFrom:
                 - secretRef:
@@ -48,7 +39,7 @@ spec:
           volumes:
           - name: data-volume
             persistentVolumeClaim:
-              claimName: openzim-download-pvc
+              claimName: master-openzim-release-pvc
           restartPolicy: Never
           nodeSelector:
-            k8s.kiwix.org/role: "storage"
+            k8s.kiwix.org/role: "master"
