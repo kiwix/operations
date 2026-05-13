@@ -19,7 +19,7 @@ pip install -r requirements.txt
 This tests suite targets 3 main use cases:
 
 - testing library.kiwix.org which is our production catalog with a Varnish cache frontend
-- testing dev.library.kiwix.org which is a dev environment catalog exposing kiwix-serve
+- testing staging.library.kiwix.org which is a dev environment catalog exposing kiwix-serve
 - testing download.kiwix.org mirrorbain and its mirrors
 
 Set the appropriate environment variables, flags and test file depending on your use case.
@@ -44,7 +44,7 @@ Examples:
 SCHEMES=http LIBRARY_HOST="localhost:9000" pytest -v -m "not varnish"  test_library.py
 
 # dev library
-LIBRARY_HOST="dev.library.kiwix.org" pytest -v -m "not varnish" test_library.py
+LIBRARY_HOST="staging.library.kiwix.org" pytest -v -m "not varnish" test_library.py
 
 # main online library
 pytest -v test_library.py

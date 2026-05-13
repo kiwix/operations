@@ -11,4 +11,4 @@ data:
   STAGING_WAREHOUSE_ID: c6bec3c1-46be-40ff-8bd9-eb789d3b3a22
   STAGING_BASE_PATH: dev
   STAGING_DOWNLOAD_BASE_URL: https://staging.download.kiwix.org/zim/dev/
-  STAGING_VIEW_BASE_URL: https://dev.library.kiwix.org/viewer#
+  STAGING_VIEW_BASE_URL: https://staging.library.kiwix.org/viewer#

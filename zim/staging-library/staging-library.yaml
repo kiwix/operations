@@ -3,17 +3,17 @@ kind: Deployment
 metadata:
   namespace: zim
   labels:
-    app: dev-library-app
-  name: dev-library-deployment
+    app: staging-library-app
+  name: staging-library-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: dev-library-app
+      app: staging-library-app
   template:
     metadata:
       labels:
-        app: dev-library-app
+        app: staging-library-app
     spec:
       initContainers:
       - image: docker.io/busybox
@@ -92,12 +92,12 @@ apiVersion: v1
 kind: Service
 metadata:
   namespace: zim
-  name: dev-library-service
+  name: staging-library-service
   labels:
-    app: dev-library-app
+    app: staging-library-app
 spec:
   selector:
-    app: dev-library-app
+    app: staging-library-app
   ports:
   - protocol: TCP
     port: 80
@@ -106,7 +106,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: dev-library-ingress
+  name: staging-library-ingress
   namespace: zim
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
@@ -121,16 +121,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - dev.library.kiwix.org
-      secretName: dev-library-kiwix-org-tls
+      - staging.library.kiwix.org
+      secretName: staging-library-kiwix-org-tls
   rules:
-  - host: dev.library.kiwix.org
+  - host: staging.library.kiwix.org
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: dev-library-service
+            name: staging-library-service
             port:
               number: 80

@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: staging-library-kiwix-org
+  namespace: zim
+spec:
+  secretName: staging-library-kiwix-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: staging.library.kiwix.org
+  dnsNames:
+  - staging.library.kiwix.org
