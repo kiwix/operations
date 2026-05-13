@@ -1,0 +1,88 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: staging-http-dl-app
+  name: staging-http-dl-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: staging-http-dl-app
+  template:
+    metadata:
+      labels:
+        app: staging-http-dl-app
+    spec:
+      securityContext:
+      containers:
+      - image: docker.io/library/nginx:mainline
+        imagePullPolicy: IfNotPresent
+        name: nginx
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: "/usr/share/nginx/html/zim"
+          name: zim-volume
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "1m"
+          limits:
+            memory: "1Gi"
+            cpu: "2"
+      volumes:
+      - name: zim-volume
+        persistentVolumeClaim:
+          claimName: browser-hidden-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "browser"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: staging-http-dl-service
+  labels:
+    app: staging-http-dl-app
+spec:
+  selector:
+    app: staging-http-dl-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: staging-http-dl-ingress
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/server-snippet: |
+      location /zim {
+        add_header "Content-Disposition" "attachment";
+        etag on;
+      }
+      if ($uri ~* "^/$" ) {
+        return 200 "<!DOCTYPE html>\n<html lang=en>\n<head><meta charset=utf-8 /><title>👋</title></head><body><h1>👋</h1></body></html>\n";
+      }      
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - staging.download.kiwix.org
+      secretName: staging-download-kiwix-org-tls
+  rules:
+  - host: staging.download.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: staging-http-dl-service
+            port:
+              number: 80

@@ -152,7 +152,7 @@ def get_ziminfo(zim_archive: str) -> ZimInfo:
 
     Supports both prod and .hidden paths.
     """
-    is_hidden = zim_archive.startswith(".hidden/")
+    is_hidden = zim_archive.split("/", 1)[0] in ("bard", "bsf", "custom_apps", "dev", "endless")
     base_path = hidden_zim_path if is_hidden else normal_zim_path
     if is_hidden:
         zim_archive = zim_archive[8:]
@@ -191,7 +191,7 @@ def get_ziminfo(zim_archive: str) -> ZimInfo:
     values = filename_match.groupdict()
 
     download_url = (
-        f"https://mirror.download.kiwix.org/zim/.hidden/{zim_path.relative_to(base_path)}"
+        f"https://staging.download.kiwix.org/zim/{zim_path.relative_to(base_path)}"
         if is_hidden
         else f"https://download.kiwix.org/zim/{zim_path.relative_to(base_path)}"
     )
