@@ -21,6 +21,9 @@ data:
     [mirrorprobe]
     logfile = /var/log/mirrorbrain/mirrorprobe.log
     loglevel = INFO
+    scan_top_include = zim
+    scan_exclude_rsync = *.xml
+    scan_exclude = *.xml
   httpd.conf: |
     #
     # This is the main Apache HTTP server configuration file.  It contains the
