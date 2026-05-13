@@ -1,3 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: staging-http-dl-configs
+  namespace: zim
+data:
+  vhost.conf: |
+    server {
+      listen 80;
+      server_name _;
+      access_log off;
+      root /var/www;
+      autoindex on;
+      autoindex_exact_size off;
+      autoindex_localtime off;
+      error_page   500 502 503 504  /50x.html;
+      location = /50x.html {
+          root   /usr/share/nginx/html;
+      }
+      location = /favicon.ico {
+        log_not_found off;
+      }
+      location = /zim {
+        add_header "Content-Disposition" "attachment";
+        etag on;
+      }
+    }
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,8 +51,20 @@ spec:
         ports:
         - containerPort: 80
         volumeMounts:
-        - mountPath: "/usr/share/nginx/html/zim"
+        - mountPath: "/var/www/zim"
           name: zim-volume
+        - name: configs
+          mountPath: "/etc/nginx/conf.d/default.conf"
+          subPath: vhost.conf
+          readOnly: true
+        - name: nginx-configs
+          mountPath: "/etc/nginx/mime.types"
+          subPath: mime.types
+          readOnly: true
+        - name: nginx-configs
+          mountPath: "/etc/nginx/conf.d/gzip.conf"
+          subPath: gzip.conf
+          readOnly: true
         resources:
           requests:
             memory: "64Mi"
@@ -36,6 +76,12 @@ spec:
       - name: zim-volume
         persistentVolumeClaim:
           claimName: browser-hidden-pvc
+      - name: configs
+        configMap:
+          name: staging-http-dl-configs
+      - name: nginx-configs
+        configMap:
+          name: nginx-configs
       nodeSelector:
         k8s.kiwix.org/role: "browser"
 ---
@@ -61,14 +107,6 @@ metadata:
   namespace: zim
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/server-snippet: |
-      location /zim {
-        add_header "Content-Disposition" "attachment";
-        etag on;
-      }
-      if ($uri ~* "^/$" ) {
-        return 200 "<!DOCTYPE html>\n<html lang=en>\n<head><meta charset=utf-8 /><title>👋</title></head><body><h1>👋</h1></body></html>\n";
-      }      
 spec:
   ingressClassName: nginx
   tls:
