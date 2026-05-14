@@ -29,24 +29,12 @@ PERMANENT_ZIM_URL: str = (
 )
 # all non-zim-only mirrors mirror all other files
 PERMANENT_APK_URL: str = (
-    "https://lbo.download.kiwix.org/release/kiwix-android/"
+    "https://mirror.download.kiwix.org/release/kiwix-android/"
     "org.kiwix.kiwixmobile.standalone.apk"
 )
 
-# we have no other way to know which mirrors are supposed to have APKs
-# taken from https://github.com/kiwix/container-images
-#            /blob/main/mirrorbrain/bin/update_mirrorbrain_db.sh
-EXPECTED_APK_MIRRORS: list[str] = [
-    "mirrors.dotsrc.org",
-    "mirror.download.kiwix.org",
-    "ftp.nluug.nl",
-    "ftp.fau.de",
-    # "md.mirrors.hacktegic.com",
-    "mirror-sites-fr.mblibrary.info",
-    "mirror-sites-in.mblibrary.info",
-    "mirror-sites-ca.mblibrary.info",
-    # "mirror.triplebit.org",  # disabled mirrors due to apple errors
-]
+# APK is not mirrored anymore so there's only one source
+EXPECTED_APK_MIRRORS: list[str] = ["mirror.download.kiwix.org"]
 ZIM_MIRRORS: list[Mirror] = get_current_mirrors(
     CANONICAL_MIRRORS_LIST_URL, EXCLUDED_MIRRORS
 )
@@ -60,16 +48,16 @@ APK_MIRRORS: list[Mirror] = [
 ]
 APK_MIRRORS_IDS: list[str] = [mirror.hostname for mirror in APK_MIRRORS]
 PERMANENT_KIWIX_RELEASE_URL: str = (
-    "https://lbo.download.kiwix.org/release/kiwix-tools/kiwix-tools_linux-x86_64.tar.gz"
+    "https://mirror.download.kiwix.org/release/kiwix-tools/kiwix-tools_linux-x86_64.tar.gz"
 )
 PERMANENT_KIWIX_NIGHTLY_URL: str = (
-    "https://lbo.download.kiwix.org/nightly/kiwix-tools_linux-x86_64.tar.gz"
+    "https://mirror.download.kiwix.org/nightly/kiwix-tools_linux-x86_64.tar.gz"
 )
 PERMANENT_OPENZIM_RELEASE_URL: str = (
     "https://download.openzim.org/release/libzim/libzim.tar.xz"
 )
 PERMANENT_OPENZIM_NIGHTLY_URL: str = (
-    "https://lbo.download.kiwix.org/nightly/libzim_linux-x86_64.tar.gz"
+    "https://mirror.download.kiwix.org/nightly/libzim_linux-x86_64.tar.gz"
 )
 CATALOG_URL: str = "https://library.kiwix.org/catalog/v2"
 # list of book ident from the Catalog that should be excluded from tests
