@@ -32,6 +32,9 @@ data:
       location = /mirrors.html {
         types { } default_type "text/html; charset=utf-8";
       }
+      location = /library/library_zim.xml {
+        rewrite ^ https://download.kiwix.org/library/library_zim.xml permanent;
+      }
       location / {
         if ($redirect_uri) {
           add_header Cache-Control "no-store, no-cache, must-revalidate";
