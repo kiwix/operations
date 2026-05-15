@@ -1,0 +1,124 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: prod-kiwix-catalog-backend-retriever-app
+  name: prod-kiwix-catalog-backend-retriever-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prod-kiwix-catalog-backend-retriever-app
+  template:
+    metadata:
+      labels:
+        app: prod-kiwix-catalog-backend-retriever-app
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/catalog-retriever:latest
+        imagePullPolicy: Always
+        name: catalog-retriever
+        env:
+          - name: SAVE_TO
+            value: "/library/catalog.xml"
+          - name: CMS_API_URL
+            value: "http://api-service.cms.svc.cluster.local/v1"
+          - name: CMS_COLLECTION_ID
+            value: "96fb60c0-2de6-46bd-8e67-41213298a5e8"
+          - name: REFRESH_EVERY_SECONDS
+            value: "300"
+          - name: KIWIX_SERVE_RELOAD_DELAY
+            value: "10"
+          - name: ADD_BOOK_PATH_TO_XML
+            value: "/data/zim"  # value doesnt matter here except not empty
+          - name: PURGE_VARNISH_URL
+            value: http://prod-kiwix-catalog-frontend-service
+          - name: DEBUG
+            value: ""
+        volumeMounts:
+        - mountPath: "/library"
+          name: library-volume
+          readOnly: false
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "0.5"
+          limits:
+            memory: "512Mi"
+            cpu: "1"
+      volumes:
+      - name: library-volume
+        hostPath:
+          path: /data/library-volatile
+      nodeSelector:
+        k8s.kiwix.org/role: "dlservices"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: prod-kiwix-catalog-backend-app
+  name: prod-kiwix-catalog-backend-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: prod-kiwix-catalog-backend-app
+  template:
+    metadata:
+      labels:
+        app: prod-kiwix-catalog-backend-app
+    spec:
+      containers:
+        # /!\ manually purge kiwix-serve cache on kiwix-serve version upgrade
+        # curl -X PURGE -H "X-Purge-Type: kiwix-serve" http://library-frontend-service
+      - image: ghcr.io/kiwix/kiwix-tools:3.8.2
+        imagePullPolicy: IfNotPresent
+        name: kiwix-tools
+        args: ["kiwix-serve", "--library", "--catalogOnly", "--contentServerURL", "https://browse.library.kiwix.org", "--monitorLibrary", "--threads", "16", "--searchLimit", "5", "--nodatealias", "/library/catalog.xml"]
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /catalog/search?count=1
+            port: 80
+            httpHeaders:
+              - name: Host
+                value: localhost
+          initialDelaySeconds: 20
+          periodSeconds: 5
+        volumeMounts:
+        - mountPath: "/library"
+          name: library-volume
+          readOnly: true
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "500m"
+          limits:
+            memory: "6Gi"
+            cpu: "500m"
+      volumes:
+      - name: library-volume
+        hostPath:
+          path: /data/library-volatile
+      nodeSelector:
+        k8s.kiwix.org/role: "dlservices"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: prod-kiwix-catalog-backend-service
+  labels:
+    app: prod-kiwix-catalog-backend-app
+spec:
+  selector:
+    app: prod-kiwix-catalog-backend-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    name: http

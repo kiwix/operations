@@ -1,0 +1,37 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: library-redirect-ingress
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+      # CORS
+      add_header Access-Control-Allow-Origin "*" always;
+      add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
+      add_header Access-Control-Allow-Headers "Content-Type, Authorization, User-Agent" always;
+      add_header Access-Control-Allow-Credentials "true" always;
+
+      # Frame ancestors for both sites
+      add_header Content-Security-Policy "frame-ancestors 'self' https://browser-extension.kiwix.org https://pwa.kiwix.org" always;
+
+      # Handle preflight requests
+      if ($request_method = 'OPTIONS') {
+          return 204;
+      }
+
+      set $shouldRedirect 1;
+      if ($uri ~* "/.well-known/acme-challenge/(.+)") {
+        set $shouldRedirect 0;
+      }
+      if ( $shouldRedirect = 1 ) {
+        rewrite ^/catalog/(.*) https://opds.library.kiwix.org/catalog/$1 permanent;
+        rewrite ^/(.*) https://browse.library.kiwix.org/$1 permanent;
+      }
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - library.kiwix.org
+      secretName: library-kiwix-org-tls
+  rules:
+  - host: library.kiwix.org

@@ -56,7 +56,6 @@ spec:
           limits:
             memory: "128Mi"
             cpu: "20m"
-
       - image: ghcr.io/kiwix/kiwix-tools-nightly:latest
         imagePullPolicy: Always
         command: ["kiwix-serve", "-b", "--library", "--monitorLibrary", "--searchLimit", "5", "/library/catalog.xml"]

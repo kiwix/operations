@@ -1,0 +1,135 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: prod-kiwix-browse-backend-retriever-app
+  name: prod-kiwix-browse-backend-retriever-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prod-kiwix-browse-backend-retriever-app
+  template:
+    metadata:
+      labels:
+        app: prod-kiwix-browse-backend-retriever-app
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/catalog-retriever:latest
+        imagePullPolicy: Always
+        name: catalog-retriever
+        env:
+          - name: SAVE_TO
+            value: "/library/catalog.xml"
+          - name: CMS_API_URL
+            value: "http://api-service.cms.svc.cluster.local/v1"
+          - name: CMS_COLLECTION_ID
+            value: "96fb60c0-2de6-46bd-8e67-41213298a5e8"
+          - name: REFRESH_EVERY_SECONDS
+            value: "300"
+          - name: KIWIX_SERVE_RELOAD_DELAY
+            value: "10"
+          - name: ADD_BOOK_PATH_TO_XML
+            value: "/data/zim/"
+          - name: PURGE_VARNISH_URL
+            value: http://prod-kiwix-browse-frontend-service
+          - name: DEBUG
+            value: ""
+        volumeMounts:
+        - mountPath: "/library"
+          name: library-volume
+          readOnly: false
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "0.5"
+          limits:
+            memory: "512Mi"
+            cpu: "1"
+      volumes:
+      - name: library-volume
+        hostPath:
+          path: /data/library-volatile
+      nodeSelector:
+        k8s.kiwix.org/role: "browser"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: prod-kiwix-browse-backend-app
+  name: prod-kiwix-browse-backend-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: prod-kiwix-browse-backend-app
+  template:
+    metadata:
+      labels:
+        app: prod-kiwix-browse-backend-app
+    spec:
+      containers:
+      # /!\ manually trigger update-kiwixserve-template Job on kiwix-serve upgrade
+      # after having updated the LIBKIWIX_VERSION field in env (and tested!)
+      # /!\ manually purge kiwix-serve cache on kiwix-serve version upgrade
+      # curl -X PURGE -H "X-Purge-Type: kiwix-serve" http://prod-kiwix-browse-frontend-service
+      # also check that varnish hack still necessary (gzip, endpoints)
+      - image: ghcr.io/kiwix/kiwix-tools:3.8.2
+        imagePullPolicy: IfNotPresent
+        name: kiwix-tools
+        args: ["kiwix-serve", "-b", "--library", "--monitorLibrary", "--threads", "16", "--searchLimit", "5", "--nodatealias", "--customIndex", "/data/kiwix-serve-templates/index-template.html", "/data/library/catalog.xml"]
+        ports:
+        - containerPort: 80
+        livenessProbe:
+          httpGet:
+            path: /catalog/search?count=1
+            port: 80
+            httpHeaders:
+              - name: Host
+                value: localhost
+          initialDelaySeconds: 20
+          periodSeconds: 30
+          timeoutSeconds: 25
+        volumeMounts:
+        - mountPath: "/data/zim"
+          name: zim-volume
+          readOnly: true
+        - mountPath: "/data/library"
+          name: library-volume
+          readOnly: true
+        - mountPath: "/data/kiwix-serve-templates"
+          subPath: kiwix-serve-templates
+          name: library-volume
+          readOnly: true
+        resources:
+          requests:
+            memory: "4Gi"
+            cpu: "50m"
+      volumes:
+      - name: zim-volume
+        persistentVolumeClaim:
+          claimName: browser-zim-pvc
+      - name: library-volume
+        hostPath:
+          path: /data/library-volatile
+      nodeSelector:
+        k8s.kiwix.org/role: "browser"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: prod-kiwix-browse-backend-service
+  labels:
+    app: prod-kiwix-browse-backend-app
+spec:
+  selector:
+    app: prod-kiwix-browse-backend-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    name: http

@@ -32,6 +32,14 @@ data:
     /data/nginx-logs/library-kiwix/*.log {
       olddir /data/nginx-logs/archives/library-kiwix
     }
+  opds-library-kiwix.conf: |
+    /data/nginx-logs/opds-library-kiwix/*.log {
+      olddir /data/nginx-logs/archives/opds-library-kiwix
+    }
+  browse-library-kiwix.conf: |
+    /data/nginx-logs/browse-library-kiwix/*.log {
+      olddir /data/nginx-logs/archives/browse-library-kiwix
+    }
   demo-library-kiwix.conf: |
     /data/nginx-logs/demo-library-kiwix/*.log {
       olddir /data/nginx-logs/archives/demo-library-kiwix
