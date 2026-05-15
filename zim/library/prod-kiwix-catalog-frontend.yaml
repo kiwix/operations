@@ -300,7 +300,7 @@ spec:
   - host: opds.library.kiwix.org
     http:
       paths:
-      - path: /catalog/v2
+      - path: /catalog/
         pathType: Prefix
         backend:
           service:
