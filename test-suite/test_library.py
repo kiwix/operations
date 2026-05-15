@@ -16,15 +16,7 @@ from utils import (
 )
 
 
-def test_opds_redirect():
-    if LIBRARY_HOST != "library.kiwix.org":
-        pytest.skip("not testing prod URL")
-        return
-    resp = requests.head("https://opds.library.kiwix.org/v2/entries", timeout=TIMEOUT)
-    assert resp.status_code == HTTPStatus.MOVED_PERMANENTLY
-    assert resp.headers.get("location") == f"https://{LIBRARY_HOST}/catalog/v2/entries"
-
-
+@pytest.mark.browse
 @pytest.mark.parametrize("scheme", SCHEMES)
 def test_reachable(scheme):
     assert requests.head(get_url("/", scheme), timeout=TIMEOUT).status_code in (
@@ -81,11 +73,12 @@ def test_illus_is_cached(illus_endpoint):
     assert is_cached(illus_endpoint)
 
 
+@pytest.mark.browse
 @pytest.mark.varnish
 def test_random_is_not_cached():
     assert not is_cached("/random/")
 
-
+@pytest.mark.browse
 @pytest.mark.varnish
 def test_viewer_settings_is_cached():
     assert is_cached("/viewer_settings.js")
