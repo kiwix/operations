@@ -21,6 +21,8 @@ jobs:
         run: pip install -r test-suite/requirements.txt
       - name: Test opds.library.kiwix.org
         working-directory: test-suite
+        env:
+          LIBRARY_HOST: opds.library.kiwix.org
         run: pytest -vvv -m "not browse" test_library.py
 
   old-library:

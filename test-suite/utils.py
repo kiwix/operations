@@ -10,7 +10,7 @@ from bs4.element import Tag
 TIMEOUT = int(os.getenv("TIMEOUT") or "20")
 SCHEMES = os.getenv("SCHEMES", "https").split(",")
 DEFAULT_SCHEME = SCHEMES[0]
-LIBRARY_HOST = os.getenv("LIBRARY_HOST", "library.kiwix.org")
+LIBRARY_HOST = os.getenv("LIBRARY_HOST", "opds.library.kiwix.org")
 OPDS_NAV_MIMETYPE = (
     "application/atom+xml;profile=opds-catalog;kind=navigation;charset=utf-8"
 )
