@@ -12,7 +12,7 @@ metadata:
       add_header Access-Control-Allow-Credentials "true" always;
 
       # Frame ancestors for both sites
-      add_header Content-Security-Policy "frame-ancestors 'self' https://browser-extension.kiwix.org https://pwa.kiwix.org" always;
+      add_header Content-Security-Policy "frame-ancestors 'self' https://browser-extension.kiwix.org https://pwa.kiwix.org https://kiwix.github.io http://localhost:*" always;
 
       # Handle preflight requests
       if ($request_method = 'OPTIONS') {

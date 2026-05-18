@@ -286,10 +286,25 @@ metadata:
   namespace: zim
   annotations:
     nginx.ingress.kubernetes.io/server-snippet: |
+        # CORS
+        add_header Access-Control-Allow-Origin "*" always;
+        add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Content-Type, Authorization, User-Agent" always;
+        add_header Access-Control-Allow-Credentials "true" always;
+
+        # Frame ancestors for both sites
+        add_header Content-Security-Policy "frame-ancestors 'self' https://browser-extension.kiwix.org https://pwa.kiwix.org https://kiwix.github.io http://localhost:*" always;
+
+        # Handle preflight requests
+        if ($request_method = 'OPTIONS') {
+            return 204;
+        }
+
         location /robots.txt {
           add_header Content-Type "text/plain";
           return 200 "User-agent: *\nDisallow: /";
         }
+        rewrite ^/v2/(.*) /catalog/v2/$1 permanent;
 spec:
   ingressClassName: nginx
   tls:
@@ -301,6 +316,13 @@ spec:
     http:
       paths:
       - path: /catalog/
+        pathType: Prefix
+        backend:
+          service:
+            name: prod-kiwix-catalog-frontend-service
+            port:
+              number: 80
+      - path: /v2/
         pathType: Prefix
         backend:
           service:

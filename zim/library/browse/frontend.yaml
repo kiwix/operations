@@ -601,7 +601,7 @@ metadata:
         add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
         add_header Access-Control-Allow-Headers "Content-Type, Authorization, User-Agent" always;
         add_header Access-Control-Allow-Credentials "true" always;
-        add_header 'Content-Security-Policy' "frame-ancestors 'self' https://library.kiwix.org https://browser-extension.kiwix.org https://pwa.kiwix.org";
+        add_header Content-Security-Policy "frame-ancestors 'self' https://browser-extension.kiwix.org https://pwa.kiwix.org https://kiwix.github.io http://localhost:*" always;
 spec:
   ingressClassName: nginx
   tls:
