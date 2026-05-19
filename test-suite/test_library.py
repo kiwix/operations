@@ -8,6 +8,7 @@ from utils import (
     KIWIX_MIN_CONTENT_SIZE_TO_COMPRESS,
     LIBRARY_HOST,
     OPDS_ENDPOINTS,
+    OPDS_NAV_MIMETYPE,
     SCHEMES,
     TIMEOUT,
     get_response_headers,
@@ -15,14 +16,25 @@ from utils import (
     is_cached,
 )
 
-
 @pytest.mark.browse
 @pytest.mark.parametrize("scheme", SCHEMES)
-def test_reachable(scheme):
+def test_reachable_on_root(scheme):
     assert requests.head(get_url("/", scheme), timeout=TIMEOUT).status_code in (
         HTTPStatus.OK,
         HTTPStatus.MOVED_PERMANENTLY,
     )
+
+@pytest.mark.parametrize("scheme", SCHEMES)
+def test_reachable(scheme):
+    assert requests.head(get_url("/catalog/v2/categories", scheme), timeout=TIMEOUT).status_code in (
+        HTTPStatus.OK,
+        HTTPStatus.MOVED_PERMANENTLY,
+    )
+
+@pytest.mark.parametrize("scheme", SCHEMES)
+@pytest.mark.skipif(LIBRARY_HOST != "opds.library.kiwix.org", reason="only for opds.library")
+def test_reachable_on_v2(scheme):
+    assert get_response_headers("/v2/categories").get("Content-Type") == OPDS_NAV_MIMETYPE
 
 
 @pytest.mark.parametrize("path, mimetype", OPDS_ENDPOINTS.items())
