@@ -103,7 +103,11 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
     for marker in markers:
         skips[marker] = pytest.mark.skip(reason=f"need --run-{marker} option to run")
 
+    default_off = ["browse"]
     for item in items:
+        for mark in item.iter_markers():
+            if mark.name in default_off and mark.name not in config.getoption("markexpr", "").split():
+                item.add_marker(pytest.mark.skip(reason=f"need -m {mark.name} to run"))
         for marker in markers:
             if marker in item.keywords and not config.getoption(f"--run-{marker}"):
                 item.add_marker(skips[marker])
