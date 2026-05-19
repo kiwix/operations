@@ -50,6 +50,9 @@ def test_opds_mimetypes(path, mimetype):
     assert get_response_headers(path).get("Content-Type") == mimetype
 
 
+@pytest.mark.skipif(
+    LIBRARY_HOST == "staging.library.kiwix.org", reason="staging is bare kiwix-serve"
+)
 def test_cors():
     scheme = "https"
     assert (
