@@ -286,6 +286,10 @@ metadata:
   namespace: zim
   annotations:
     nginx.ingress.kubernetes.io/server-snippet: |
+        # kiwix-serve already sets Access-Control-Allow-Origin "*" always;
+        # see https://github.com/kiwix/libkiwix/blob/main/src/server/response.cpp#L130
+        proxy_hide_header Access-Control-Allow-Origin;
+
         # CORS
         add_header Access-Control-Allow-Origin "*" always;
         add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
