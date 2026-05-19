@@ -8,7 +8,8 @@ metadata:
       # CORS
       add_header Access-Control-Allow-Origin "*" always;
       add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
-      add_header Access-Control-Allow-Headers "Content-Type, Authorization, User-Agent" always;
+      add_header Access-Control-Allow-Headers "Content-Type, Authorization, User-Agent, Range" always;
+      add_header Access-Control-Expose-Headers "Content-Range, Content-Length, Accept-Ranges" always;
       add_header Access-Control-Allow-Credentials "true" always;
 
       # Frame ancestors for both sites
