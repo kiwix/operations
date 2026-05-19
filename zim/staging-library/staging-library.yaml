@@ -43,6 +43,8 @@ spec:
             value: staging
           - name: REFRESH_EVERY_SECONDS
             value: "300"
+          - name: ADD_BOOK_PATH_TO_XML
+            value: "/data/dev"
           - name: DEBUG
             value: ""
         volumeMounts:
