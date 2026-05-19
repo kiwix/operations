@@ -2,7 +2,6 @@ from http import HTTPStatus
 
 import pytest
 import requests
-
 from utils import (
     COMPRESSABLE_OPDS_ENDPOINTS,
     KIWIX_MIN_CONTENT_SIZE_TO_COMPRESS,
@@ -16,6 +15,7 @@ from utils import (
     is_cached,
 )
 
+
 @pytest.mark.browse
 @pytest.mark.parametrize("scheme", SCHEMES)
 def test_reachable_on_root(scheme):
@@ -24,22 +24,71 @@ def test_reachable_on_root(scheme):
         HTTPStatus.MOVED_PERMANENTLY,
     )
 
+
 @pytest.mark.parametrize("scheme", SCHEMES)
 def test_reachable(scheme):
-    assert requests.head(get_url("/catalog/v2/categories", scheme), timeout=TIMEOUT).status_code in (
+    assert requests.head(
+        get_url("/catalog/v2/categories", scheme), timeout=TIMEOUT
+    ).status_code in (
         HTTPStatus.OK,
         HTTPStatus.MOVED_PERMANENTLY,
     )
 
+
 @pytest.mark.parametrize("scheme", SCHEMES)
-@pytest.mark.skipif(LIBRARY_HOST != "opds.library.kiwix.org", reason="only for opds.library")
+@pytest.mark.skipif(
+    LIBRARY_HOST != "opds.library.kiwix.org", reason="only for opds.library"
+)
 def test_reachable_on_v2(scheme):
-    assert get_response_headers("/v2/categories").get("Content-Type") == OPDS_NAV_MIMETYPE
+    assert (
+        get_response_headers("/v2/categories").get("Content-Type") == OPDS_NAV_MIMETYPE
+    )
 
 
 @pytest.mark.parametrize("path, mimetype", OPDS_ENDPOINTS.items())
 def test_opds_mimetypes(path, mimetype):
     assert get_response_headers(path).get("Content-Type") == mimetype
+
+
+def test_cors():
+    scheme = "https"
+    assert (
+        requests.options(
+            get_url("/catalog/v2/categories", scheme), timeout=TIMEOUT
+        ).status_code
+        == HTTPStatus.NO_CONTENT
+    )
+    headers = requests.get(
+        get_url("/catalog/v2/categories", scheme), timeout=TIMEOUT
+    ).headers
+    assert headers.get("access-control-allow-origin") == "*"
+    assert {"GET", "HEAD", "OPTIONS"}.issubset(
+        [
+            method.strip()
+            for method in headers.get("access-control-allow-methods", "").split(",")
+        ]
+    )
+    assert {"Content-Type", "Authorization", "User-Agent", "Range"}.issubset(
+        [
+            header.strip()
+            for header in headers.get("access-control-allow-headers", "").split(",")
+        ]
+    )
+    assert {"Content-Range", "Content-Length", "Accept-Ranges"}.issubset(
+        [
+            header.strip()
+            for header in headers.get("access-control-expose-headers", "").split(",")
+        ]
+    )
+    assert headers.get("access-control-allow-credentials") == "true"
+    csp = headers.get("content-security-policy", "")
+    assert csp.startswith("frame-ancestors 'self' ")
+    assert {
+        "https://browser-extension.kiwix.org",
+        "https://pwa.kiwix.org",
+        "https://kiwix.github.io",
+        "http://localhost:*",
+    }.issubset([item.strip() for item in csp.split("self", 1)[1].split(" ")])
 
 
 @pytest.mark.parametrize("path", COMPRESSABLE_OPDS_ENDPOINTS.keys())
@@ -89,6 +138,7 @@ def test_illus_is_cached(illus_endpoint):
 @pytest.mark.varnish
 def test_random_is_not_cached():
     assert not is_cached("/random/")
+
 
 @pytest.mark.browse
 @pytest.mark.varnish
