@@ -1,0 +1,14 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: staging-api-donation-kiwix-org
+  namespace: donation
+spec:
+  secretName: staging-api-donation-kiwix-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: staging.api.donation.kiwix.org
+  dnsNames:
+  - staging.api.donation.kiwix.org
+  renewBefore: 744h # 31d, to escape Apple reminders
