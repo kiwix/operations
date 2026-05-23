@@ -16,7 +16,7 @@ spec:
         app: api-app
     spec:
       containers:
-      - image: ghcr.io/kiwix/donation-api:latest
+      - image: ghcr.io/kiwix/donation-portal:latest
         imagePullPolicy: Always
         name: ui
         envFrom:

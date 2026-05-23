@@ -7,6 +7,10 @@ data:
   # should be 1 to enable
   STRIPE_USE_LIVE: "1"
   STRIPE_WEBHOOK_TESTING_IPS: ""
+  SUPPORT_EMAIL: "contact+donation@kiwix.org"
+  EMAIL_FROM: "Kiwix <contact@kiwix.org>"
+  NEW_SUB_EMAIL_TEMPLATE_NAME: "new-subscription.api.donation.kiwix.org"
+  OWN_PUBLIC_URL: "https://api.donation.kiwix.org/v1"
   APPLEPAY_MERCHANT_IDENTIFIER: "merchant.org.kiwix.apple"
   APPLEPAY_DISPLAYNAME: "Kiwix"
   # initiative: web or in_app
