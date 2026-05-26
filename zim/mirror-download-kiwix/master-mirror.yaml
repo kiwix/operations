@@ -404,8 +404,21 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
     nginx.ingress.kubernetes.io/server-snippet: |
-      # kiwix-js requests
-      add_header Access-Control-Allow-Origin *;
+      # CORS for Kiwix-JS
+      add_header Access-Control-Allow-Origin "*" always;
+      add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
+      add_header Access-Control-Allow-Headers "Content-Type, Authorization, User-Agent, Range" always;
+      add_header Access-Control-Expose-Headers "Content-Range, Content-Length, Accept-Ranges" always;
+      add_header Access-Control-Allow-Credentials "true" always;
+
+      # Frame ancestors for both sites
+      add_header Content-Security-Policy "frame-ancestors 'self' https://browser-extension.kiwix.org https://pwa.kiwix.org https://kiwix.github.io http://localhost:*" always;
+
+      # Handle preflight requests
+      if ($request_method = 'OPTIONS') {
+          return 204;
+      }
+
       gzip on;
       gzip_types
         application/atom+xml
