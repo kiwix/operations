@@ -107,7 +107,11 @@ def test_mirror_zim_contenttype(mirror: Mirror, current_zim_path: str):
     ).headers.get("content-type")
     if ctype is None:
         pytest.xfail("no content-type")
-    assert ctype in ("application/octet-stream", "application/x-openzim")
+    assert ctype in (
+        "application/octet-stream",
+        "application/x-zim",
+        "application/x-openzim",  # not correct but does not harm
+    )
 
 
 def test_apk_exists(permanent_apk_url, current_apk_url):
