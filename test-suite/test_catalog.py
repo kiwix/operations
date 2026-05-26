@@ -1,7 +1,9 @@
 import datetime
+import random
 import re
 import urllib.parse
 from dataclasses import dataclass
+from http import HTTPStatus
 from pathlib import Path
 from uuid import UUID
 
@@ -10,7 +12,7 @@ import regex
 import requests
 import xmltodict
 from conftest import EXCLUDED_BOOKS
-from utils import get_url
+from utils import NB_RANDOM_CATALOG_ENTRIES, TIMEOUT, check_cors_headers_for, get_url
 
 name_fmt = re.compile(
     r"^(?P<project>[a-z0-9\-\.]+?_)(?P<lang>[a-z\-]{2,10}?_|)"
@@ -58,7 +60,9 @@ class Book:
     tags: list[str]
     flavour: str
     size: int
-    url: str
+    url_orig: str
+    # url: str
+    # url_meta4: str
     illustration_relpath: str
     version: str
 
@@ -72,6 +76,14 @@ class Book:
             )
         except StopIteration:
             return ""
+
+    @property
+    def url_meta4(self) -> str:
+        return f"{self.url}.meta4"
+
+    @property
+    def url(self) -> str:
+        return re.sub(r".meta4$", "", self.url_orig)
 
     @property
     def filepath(self) -> Path:
@@ -142,7 +154,9 @@ def get_catalog() -> dict[str, Book]:
             tags=list(set(entry["tags"].split(";"))),
             flavour=flavour,
             size=int(links["application/x-zim"]["@length"]),
-            url=re.sub(r".meta4$", "", links["application/x-zim"]["@href"]),
+            # url=links["application/x-zim"]["@href"],  # not correct yet
+            # url_meta4=links["application/metalink4+xml"]["@href"],  # missing ATM
+            url_orig=links["application/x-zim"]["@href"],  # temp
             illustration_relpath=links.get(
                 "image/png;width=48;height=48;scale=1", {}
             ).get("@href", ""),
@@ -154,6 +168,10 @@ def get_catalog() -> dict[str, Book]:
 catalog = get_catalog()
 
 bookparam = pytest.mark.parametrize("book", catalog.values(), ids=catalog.keys())
+random_ids = random.choices(list(catalog.keys()), k=NB_RANDOM_CATALOG_ENTRIES)
+randombookparam = pytest.mark.parametrize(
+    "book", [catalog[ident] for ident in random_ids], ids=random_ids
+)
 
 
 def test_catalog_has_entries():
@@ -182,6 +200,15 @@ def test_book_filename(book: Book):
 @bookparam
 def test_book_filename_pattern(book: Book):
     assert filename_fmt.match(book.filename)
+
+
+@pytest.mark.url_pattern
+@bookparam
+def test_book_url_pattern(book: Book):
+    assert filename_fmt.match(book.filename)
+    assert book.filename.endswith(".zim")
+    assert book.url.endswith(".zim")
+    assert book.url_meta4.endswith(".meta4")
 
 
 # @pytest.mark.flavours
@@ -253,3 +280,38 @@ def test_book_filename_pattern(book: Book):
 # @bookparam
 # def test_book_has_illustration(book: Book):
 #     assert book.has_illustration
+
+
+@pytest.mark.requests
+@randombookparam
+def test_book_urls(book: Book):
+    # meta4 must not redirect
+    resp = requests.get(
+        book.url_meta4, stream=True, timeout=TIMEOUT, allow_redirects=False
+    )
+    assert resp.status_code == HTTPStatus.OK
+
+    # meta4 url must be metalink
+    assert (
+        resp.headers.get("Content-Type", "").lower()
+        == "application/metalink4+xml; charset=utf-8"
+    )
+    assert '<metalink xmlns="urn:ietf:params:xml:ns:metalink">' in resp.text
+
+    # ensure we can extract a .kiwix.org mirror link in metalink response
+    found = re.search(
+        r'<url location="(?P<country>[a-z]{2})" priority="(?P<priority>\d+)">https://(?P<url_s>[^/]+).kiwix.org/(?P<url_e>[^<]+)</url>',
+        resp.text,
+        re.MULTILINE,
+    )
+    if not found:
+        print(resp.text)
+    assert found
+    country = found.groupdict()["country"]
+    assert country
+    priority = int(found.groupdict()["priority"])
+    assert priority
+    zim_url = f"https://{found.groupdict()['url_s']}.kiwix.org/{found.groupdict()['url_e']}"
+
+    # ensure that final ZIM link is not a redirect
+    assert check_cors_headers_for(zim_url)

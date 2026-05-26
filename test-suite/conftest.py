@@ -78,6 +78,8 @@ markers = (
     "publisher",
     "name_pattern",
     "filename_pattern",
+    "url_pattern",
+    "requests"
 )
 
 

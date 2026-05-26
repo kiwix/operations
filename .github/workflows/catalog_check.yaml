@@ -22,4 +22,4 @@ jobs:
       - name: Test Catalog
         working-directory: test-suite
         # not using: --run-flavours --run-flavour__maxi --run-all_flavour --run-title_len --run-description_len --run-name_pattern
-        run: pytest -vvv test_catalog.py --run-filename_pattern --run-publisher --run-author --run-flavour__mini --run-flavour__nopic
+        run: pytest -vvv test_catalog.py --run-filename_pattern --run-publisher --run-author --run-flavour__mini --run-flavour__nopic --run-url_pattern --run-requests

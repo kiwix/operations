@@ -1,5 +1,6 @@
 # pyright: reportImplicitStringConcatenation=false
 import os
+from http import HTTPStatus
 from typing import Any, NamedTuple
 from urllib.parse import urlsplit
 
@@ -8,6 +9,7 @@ from bs4 import BeautifulSoup, NavigableString
 from bs4.element import Tag
 
 TIMEOUT = int(os.getenv("TIMEOUT") or "20")
+NB_RANDOM_CATALOG_ENTRIES = int(os.getenv("NB_RANDOM_CATALOG_ENTRIES") or "5")
 SCHEMES = os.getenv("SCHEMES", "https").split(",")
 DEFAULT_SCHEME = SCHEMES[0]
 LIBRARY_HOST = os.getenv("LIBRARY_HOST", "opds.library.kiwix.org")
@@ -32,6 +34,43 @@ COMPRESSABLE_OPDS_ENDPOINTS = {
 }
 # https://github.com/kiwix/libkiwix/blob/main/src/server/response.cpp#L47
 KIWIX_MIN_CONTENT_SIZE_TO_COMPRESS = 1400
+
+
+def check_cors_headers_for(url, valid_statuses: tuple[int] = (HTTPStatus.OK,)) -> bool:
+    assert requests.options(url, timeout=TIMEOUT, allow_redirects=False).status_code == HTTPStatus.NO_CONTENT
+    resp = requests.get(url, timeout=TIMEOUT, stream=True, allow_redirects=False)
+    assert resp.status_code in valid_statuses
+    headers = resp.headers
+    assert headers.get("access-control-allow-origin") == "*"
+    assert {"GET", "HEAD", "OPTIONS"}.issubset(
+        [
+            method.strip()
+            for method in headers.get("access-control-allow-methods", "").split(",")
+        ]
+    )
+    assert {"Content-Type", "Authorization", "User-Agent", "Range"}.issubset(
+        [
+            header.strip()
+            for header in headers.get("access-control-allow-headers", "").split(",")
+        ]
+    )
+    assert {"Content-Range", "Content-Length", "Accept-Ranges"}.issubset(
+        [
+            header.strip()
+            for header in headers.get("access-control-expose-headers", "").split(",")
+        ]
+    )
+    assert headers.get("access-control-allow-credentials") == "true"
+    csp = headers.get("content-security-policy", "")
+    assert csp.startswith("frame-ancestors 'self' ")
+    assert {
+        "https://browser-extension.kiwix.org",
+        "https://pwa.kiwix.org",
+        "https://kiwix.github.io",
+        "http://localhost:*",
+    }.issubset([item.strip() for item in csp.split("self", 1)[1].split(" ")])
+
+    return True
 
 
 def get_url(
