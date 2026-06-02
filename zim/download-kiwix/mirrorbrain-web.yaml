@@ -114,6 +114,9 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-redirect-to: "$scheme://download.kiwix.org/"
     # android deep-linking validator (#190)
     nginx.ingress.kubernetes.io/server-snippet: |
+        # sent by MirrorBrain
+        proxy_hide_header Access-Control-Allow-Origin;
+        
         # CORS
         add_header Access-Control-Allow-Origin "*" always;
         add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
