@@ -35,6 +35,10 @@ spec:
                 name: logrotate-configs
                 subPath: wp1-download-openzim.conf
                 readOnly: true
+              - mountPath: "/etc/logrotate.d/browse-library-kiwix.conf"
+                name: logrotate-configs
+                subPath: browse-library-kiwix.conf
+                readOnly: true
               command: ["logrotate", "-v", "--state", "/data/nginx-logs/logrotate.status", "/etc/logrotate.conf"]
           volumes:
           - name: nginx-logs-volume
