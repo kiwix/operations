@@ -44,8 +44,8 @@ tc filter add dev eno1 protocol ip parent 1: prio 1 u32 match ip dst 10.4.0.0/16
 # 1:10 - core traffic (k8s network)
 tc filter add dev eno1 protocol ip parent 1: prio 1 u32 match ip dst 100.64.0.0/16 flowid 1:10
 # 1:10 - core traffic (SSH, port 22)
-iptables -t mangle -A POSTROUTING -o eno1 -p tcp --dport 22 -j MARK --set-mark 10
-iptables -t mangle -A POSTROUTING -o eno1 -p tcp --dport 22 -j RETURN
+iptables -t mangle -A POSTROUTING -o eno1 -p tcp --sport 22 -j MARK --set-xmark 10
+iptables -t mangle -A POSTROUTING -o eno1 -p tcp --sport 22 -j RETURN
 # 1:10 - core traffic (ICMP) so ping is replied fast (we use it only to test online-ness)
 tc filter add dev eno1 protocol ip parent 1: prio 3 flower ip_proto icmp flowid 1:10
 tc filter add dev eno1 protocol ipv6 parent 1: flower ip_proto icmpv6 flowid 1:10
@@ -54,8 +54,8 @@ tc filter add dev eno1 protocol ipv6 parent 1: flower ip_proto icmpv6 flowid 1:1
 # send all packets marked 20 in firewall to go to 1:20
 tc filter add dev eno1 protocol ip parent 1: handle 20 fw classid 1:20
 # mark traffic to port 873 (rsyncd) as 20
-iptables -t mangle -A POSTROUTING -o eno1 -p tcp --dport 873 -j MARK --set-mark 20
-iptables -t mangle -A POSTROUTING -o eno1 -p tcp --dport 873 -j RETURN
+iptables -t mangle -A POSTROUTING -o eno1 -p tcp --sport 873 -j MARK --set-xmark 20
+iptables -t mangle -A POSTROUTING -o eno1 -p tcp --sport 873 -j RETURN
 
 # 1:30 - downloads
 #   1:31 - HTTP
