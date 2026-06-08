@@ -40,7 +40,7 @@ system:
       mounted: /boot/efi
 srv-b:
   label: srv-b
-  instance: scw-kiwix-prod-foreign-1cfce2bf45c04b09a8a057a
+  instance: scw-kiwix-prod-foreign-4ee88b36f37e4e74b01e9dc
   disks:
     md0:
       device: /dev/md0
@@ -215,9 +215,9 @@ duncan:
   label: duncan
   instance: duncan.kiwix.org
   disks:
-    sda1:
-      device: /dev/sda1
-      mounted: /
     sdb1:
       device: /dev/sdb1
+      mounted: /
+    sda1:
+      device: /dev/sda1
       mounted: /data
