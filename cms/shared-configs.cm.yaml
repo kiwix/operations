@@ -12,5 +12,5 @@ data:
   STAGING_VIEW_BASE_URL: https://staging.library.kiwix.org/viewer#
   BACKUP_WAREHOUSE_ID: c6bec3c1-46be-40ff-8bd9-eb789d3b3a22
   BACKUP_BASE_PATH: backup
-  STAGING_DOWNLOAD_BASE_URL: https://staging.download.kiwix.org/zim/backup/
-  STAGING_VIEW_BASE_URL: ""
+  BACKUP_DOWNLOAD_BASE_URL: https://staging.download.kiwix.org/zim/backup/
+  BACKUP_VIEW_BASE_URL: ""
