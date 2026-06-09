@@ -21,7 +21,8 @@ name_fmt = re.compile(
 
 filename_fmt = re.compile(
     r"^(?P<project>[a-z0-9\-\.]+?_)(?P<lang>[a-z\-]{2,10}?_|)"
-    r"(?P<option>[a-z0-9\-\.\_]+_|)(?P<year>[\d]{4}|)\-(?P<month>[\d]{2})\.zim$"
+    r"(?P<option>[a-z0-9\-\.\_]+_|)(?P<year>[\d]{4}|)\-(?P<month>[\d]{2})"
+    r"(?P<suffix>[a-z]{0,2})\.zim$"
 )
 
 
@@ -311,7 +312,9 @@ def test_book_urls(book: Book):
     assert country
     priority = int(found.groupdict()["priority"])
     assert priority
-    zim_url = f"https://{found.groupdict()['url_s']}.kiwix.org/{found.groupdict()['url_e']}"
+    zim_url = (
+        f"https://{found.groupdict()['url_s']}.kiwix.org/{found.groupdict()['url_e']}"
+    )
 
     # ensure that final ZIM link is not a redirect
     assert check_cors_headers_for(zim_url)
