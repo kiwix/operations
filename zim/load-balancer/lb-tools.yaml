@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: lb-tools
+  name: lb-tools
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lb-tools
+  template:
+    metadata:
+      labels:
+        app: lb-tools
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/minibrain-tools:latest
+        imagePullPolicy: Always
+        name: minibrain
+        args: ["/bin/sh", "-c", "sleep Infinity"]
+        volumeMounts:
+        # - name: mb-volume
+        #   subPath: hash
+        #   mountPath: "/usr/share/mirrorbrain"
+        #   readOnly: true
+        # - name: mb-volume
+        #   subPath: geoip
+        #   mountPath: "/usr/local/geoip/share/GeoIP"
+        #   readOnly: true
+        # - name: mb-volume
+        #   subPath: geoip-maxmind
+        #   mountPath: "/usr/share/GeoIP"
+        #   readOnly: true
+        - name: configs
+          subPath: mirrorbrain.conf
+          mountPath: "/etc/mirrorbrain.conf"
+          readOnly: true
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "200m"
+      volumes:
+      # - name: fake-zim-volume
+      #   persistentVolumeClaim:
+      #     claimName: dlservices-fake-zim-pvc
+      - name: configs
+        configMap:
+          name: lb-configs
+      nodeSelector:
+        k8s.kiwix.org/role: "dlservices"

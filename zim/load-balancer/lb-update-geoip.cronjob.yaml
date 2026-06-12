@@ -1,0 +1,42 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: lb-update-geoip
+  namespace: zim
+spec:
+  schedule: "4 0 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - image: ghcr.io/kiwix/geoipupdate:latest
+              imagePullPolicy: Always
+              name: alpine
+              resources:
+                requests:
+                  memory: "64Mi"
+                  cpu: "1000m"
+              volumeMounts:
+                - name: geoip-volume
+                  mountPath: "/usr/local/share/GeoIP"
+                  readOnly: false
+                - name: secrets
+                  mountPath: "/etc/geoip"
+                  readOnly: true
+          volumes:
+          - name: secrets
+            secret:
+              secretName: mirrorbrain-secrets
+              defaultMode: 0600
+              optional: false
+          - name: geoip-volume
+            persistentVolumeClaim:
+              claimName: dlsvc-geoip-pvc
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "dlservices"

@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: lb-configs
+  namespace: zim
+data:
+  mirrorbrain.conf: |
+    [general]
+    instances = main
+
+    [main]
+    dbuser = mirrorbrain
+    dbdriver = postgresql
+    dbhost = lb-db-service
+    dbname = mirrorbrain
+    dbpass =
+
+    # space-separated list of tree root folders (no trailing slash)
+    scan_top_include = zim
+
+    # space separated list of rsync --exclude patterns
+    # scan_exclude_rsync = *.xml
+
+    # space separated list of exclude pattern (regex match, applies to rsync result as well)
+    # scan_exclude = (^.zim)$
+    # scan_exclude = wikipedia/.+_maxi_.+.zim
+
+    chunk_size = 4194304
+    zsync_hashes = 0
+
+    [mirrorprobe]
+    logfile = /var/log/mirrorbrain/mirrorprobe.log
+    loglevel = INFO
