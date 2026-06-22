@@ -22,6 +22,27 @@ data:
       autoindex on;
       autoindex_exact_size off;
       autoindex_localtime off;
+
+      gzip on;
+      gzip_types
+        application/atom+xml
+        application/javascript
+        application/x-javascript
+        application/json
+        application/rss+xml
+        application/vnd.ms-fontobject
+        application/x-font-ttf
+        application/x-web-app-manifest+json
+        application/xhtml+xml
+        application/xml
+        font/opentype
+        image/svg+xml
+        image/x-icon
+        text/css
+        text/plain
+        text/xml
+        text/x-component;
+
       error_page   500 502 503 504  /50x.html;
       location = /50x.html {
           root   /usr/share/nginx/html;
@@ -32,15 +53,17 @@ data:
       location = /mirrors.html {
         types { } default_type "text/html; charset=utf-8";
       }
-      location = /library/library_zim.xml {
-        rewrite ^ https://download.kiwix.org/library/library_zim.xml permanent;
+
+      location /zim {
+        autoindex off;
       }
+
       location / {
         if ($redirect_uri) {
           add_header Cache-Control "no-store, no-cache, must-revalidate";
           rewrite ^ https://$host$redirect_uri permanent;
         }
-      }
+      } 
     }
   README: |
     mirror.download.kiwix.org: Kiwix's own download mirror.
@@ -48,7 +71,7 @@ data:
     /!\ This mirror's main purpose is to serve Kiwix binaries.
     It also serves ZIM files but this is intended only for other mirrors to sync.
 
-    Please use https://lb.download.kiwix.org instead to be redirected to the
+    Please use https://lb.download.kiwix.org/zim/ instead to be redirected to the
     most appropriate mirror.
 
     Please consider downloading via torrents as this spread the bandwidth requirements
@@ -418,31 +441,14 @@ metadata:
       if ($request_method = 'OPTIONS') {
           return 204;
       }
-
-      gzip on;
-      gzip_types
-        application/atom+xml
-        application/javascript
-        application/x-javascript
-        application/json
-        application/rss+xml
-        application/vnd.ms-fontobject
-        application/x-font-ttf
-        application/x-web-app-manifest+json
-        application/xhtml+xml
-        application/xml
-        font/opentype
-        image/svg+xml
-        image/x-icon
-        text/css
-        text/plain
-        text/xml
-        text/x-component;
       
       location /robots.txt {
         add_header Content-Type "text/plain";
         return 200 "User-agent: *\nDisallow: /";
       }
+
+      rewrite ^/zim/$  https://hub.kiwix.org/downloads/ permanent;
+      rewrite ^/$  https://hub.kiwix.org/downloads/ permanent;
 spec:
   ingressClassName: nginx
   tls:
@@ -453,6 +459,13 @@ spec:
   - host: mirror.download.kiwix.org
     http:
       paths:
+      - path: /library/library_zim.xml
+        pathType: Exact
+        backend:
+          service:
+            name: obsolete-library-service
+            port:
+              number: 80
       - path: /
         pathType: Prefix
         backend:

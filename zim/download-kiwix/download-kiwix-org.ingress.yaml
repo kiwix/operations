@@ -33,7 +33,7 @@ metadata:
         # rewrite ^/library/library_zim.xml https://obsolete.library.kiwix.org/library/library_zim.xml permanent;
         rewrite ^/release/(.*)  https://mirror.download.kiwix.org/release/$1 permanent;
         rewrite ^/nightly/(.*)  https://mirror.download.kiwix.org/nightly/$1 permanent;
-        rewrite ^/zim/$  https://browse.library.kiwix.org/ permanent;
+        rewrite ^/zim/$  https://hub.kiwix.org/downloads/ permanent;
         rewrite ^/zim/(.*)  https://lb.download.kiwix.org/zim/$1 permanent;
         rewrite ^/mirrors.html$ https://mirror.download.kiwix.org/mirrors.html permanent;
         rewrite ^/archive/(.*) https://archive.download.kiwix.org/$1 permanent;

@@ -142,6 +142,8 @@ metadata:
         if ($request_method = 'OPTIONS') {
             return 204;
         }
+
+        rewrite ^/$  https://hub.kiwix.org/downloads/ permanent;
 spec:
   ingressClassName: nginx
   tls:

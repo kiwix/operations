@@ -26,25 +26,14 @@ data:
       location = /50x.html {
           root   /usr/share/nginx/html;
       }
-      location = /README {
-        types { } default_type "text/plain; charset=utf-8";
-      }
 
       location / {
         if ($redirect_uri) {
           add_header Cache-Control "no-store, no-cache, must-revalidate";
           rewrite ^ https://$host$redirect_uri permanent;
         }
-        rewrite ^/wp1/(.*) https://wp1.download.openzim.org/$1 permanent;
       }
     }
-  README: |
-    download.openzim.org: openZIM's HTTP download server.
-
-    openZIM binaries are also available via FTP and rsync
-    - ftp://master.download.kiwix.org/openzim/
-    - rsync --list-only master.download.kiwix.org::download.openzim.org/
----
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -209,6 +198,9 @@ metadata:
         add_header Content-Type "text/plain";
         return 200 "User-agent: *\nDisallow: /";
       }
+
+      rewrite ^/wp1/(.*) https://wp1.download.openzim.org/$1 permanent;
+      rewrite ^/$ https://hub.kiwix.org/downloads/ permanent;
 spec:
   ingressClassName: nginx
   tls:

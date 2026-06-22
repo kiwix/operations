@@ -292,9 +292,6 @@ data:
          RewriteCond ${zim-map:$1} !=""
          RewriteRule ^(.*)$ "https://%{HTTP_HOST}${zim-map:$1}" [last,redirect=301,E=NOCACHE:1]
 
-         RewriteRule "^/zim/$" "https://hub.kiwix.org/downloads/" [last,redirect=301]
-         RewriteRule "^/$" "https://hub.kiwix.org/downloads/" [last,redirect=301]
-
          Header always set Cache-Control "no-store, no-cache, must-revalidate" env=NOCACHE
       </IfModule>
 
