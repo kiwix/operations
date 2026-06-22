@@ -140,22 +140,9 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - download.kiwix.org
-      secretName: download-kiwix-org-tls
-    - hosts:
       - lbo.download.kiwix.org
       secretName: lbo-download-kiwix-org-tls
   rules:
-  - host: download.kiwix.org
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: mirrorbrain-web-service
-            port:
-              number: 80
   - host: lbo.download.kiwix.org
     http:
       paths:
