@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: lb-tools-with-files
+  name: lb-tools-with-files
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lb-tools-with-files
+  template:
+    metadata:
+      labels:
+        app: lb-tools-with-files
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/minibrain-tools:latest
+        imagePullPolicy: Always
+        name: minibrain
+        args: ["/bin/sh", "-c", "sleep Infinity"]
+        volumeMounts:
+        - name: zim-volume
+          mountPath: "/data/lb/zim"
+          readOnly: true
+        - name: zim-hashes-volume
+          mountPath: "/data/hashes/zim"
+          readOnly: false
+        - name: configs
+          subPath: mirrorbrain.conf
+          mountPath: "/etc/mirrorbrain.conf"
+          readOnly: true
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "200m"
+      volumes:
+      - name: zim-volume
+        persistentVolumeClaim:
+          claimName: browser-zim-pvc
+      - name: zim-hashes-volume
+        persistentVolumeClaim:
+          claimName: browser-zim-hashes-pvc
+      - name: configs
+        configMap:
+          name: lb-configs
+      nodeSelector:
+        k8s.kiwix.org/role: "browser"

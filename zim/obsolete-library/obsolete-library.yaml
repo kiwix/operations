@@ -1,0 +1,54 @@
+# this service is providing HTTP access to the library_zim.xml
+# for android reader with versions not using the OPDS endpoint.
+# this should be removed at some point.
+# there is no ingres, downoad-kiwix-org ingress directly points here
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: obsolete-library
+  name: obsolete-library
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: obsolete-library
+  template:
+    metadata:
+      labels:
+        app: obsolete-library
+    spec:
+      containers:
+      - image: docker.io/library/nginx:mainline-alpine
+        imagePullPolicy: Always
+        name: nginx
+        volumeMounts:
+        - mountPath: "/usr/share/nginx/html/library"
+          name: library-volume
+          readOnly: true
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+      volumes:
+      - name: library-volume
+        hostPath:
+          path: /data/library-volatile
+      nodeSelector:
+        k8s.kiwix.org/role: "dlservices"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: obsolete-library-service
+  labels:
+    app: obsolete-library
+spec:
+  selector:
+    app: obsolete-library
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80

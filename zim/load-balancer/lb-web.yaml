@@ -1,0 +1,161 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: lb-web
+  name: lb-web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: lb-web
+  template:
+    metadata:
+      labels:
+        app: lb-web
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/fakesync:latest
+        imagePullPolicy: Always
+        name: fakesync  
+        volumeMounts:
+          - name: data-volume
+            mountPath: /var/www/lb/
+            readOnly: false
+        env:
+          - name: SLEEP_DURATION
+            value: "30"
+        args: ["sparse-sync", "rsync://master-rsyncd-service/master.download.kiwix.org/zim/", "/var/www/lb/zim"]
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "100m"
+      - image: ghcr.io/kiwix/minibrain-tools:latest
+        imagePullPolicy: Always
+        name: minibrain-tools
+        volumeMounts:
+          - name: data-volume
+            mountPath: /var/www/lb/
+            readOnly: true
+          - name: maps-volume
+            mountPath: /var/maps/
+            readOnly: false
+        env:
+          - name: SLEEP_DURATION
+            value: "60"
+        args: ["forever", "gen-zim-map", "--prefix", "/zim", "/var/www/lb/zim", "/var/maps/zim.map"]
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "20m"
+      - image: ghcr.io/kiwix/minibrain-server:latest
+        imagePullPolicy: Always
+        name: apache
+        volumeMounts:
+        - name: geoip-volume
+          mountPath: "/usr/share/GeoIP"
+          readOnly: true
+        - name: configs
+          subPath: mirrorbrain.conf
+          mountPath: "/etc/mirrorbrain.conf"
+          readOnly: true
+        - name: configs
+          subPath: httpd.conf
+          mountPath: "/usr/local/apache2/conf/httpd.conf"
+          readOnly: true
+        - name: configs
+          subPath: vhost.conf
+          mountPath: "/usr/local/apache2/conf/extra/vhost.conf"
+          readOnly: true
+        - name: data-volume
+          mountPath: /var/www/lb/
+          readOnly: true
+        - name: maps-volume
+          mountPath: /var/maps/
+          readOnly: true
+        - mountPath: "/usr/local/apache2/logs/custom/"
+          subPath: lb-download-kiwix
+          name: nginx-logs-volume
+          readOnly: false
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "200m"
+      volumes:
+      - name: maps-volume
+        emptyDir:
+          medium: Memory
+      - name: nginx-logs-volume
+        persistentVolumeClaim:
+          claimName: dlsvc-www-logs-pvc
+      - name: data-volume
+        emptyDir:
+          medium: Memory
+      - name: geoip-volume
+        persistentVolumeClaim:
+          claimName: dlsvc-geoip-pvc
+      - name: configs
+        configMap:
+          name: lb-configs
+      nodeSelector:
+        k8s.kiwix.org/role: "dlservices"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: lb-web-service
+  labels:
+    app: lb-web
+spec:
+  selector:
+    app: lb-web
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: lb-web-ingress
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    # android deep-linking validator (#190)
+    nginx.ingress.kubernetes.io/server-snippet: |
+        # in case its sent by MirrorBrain
+        proxy_hide_header Access-Control-Allow-Origin;
+        
+        # CORS
+        add_header Access-Control-Allow-Origin "*" always;
+        add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Content-Type, Authorization, User-Agent, Range" always;
+        add_header Access-Control-Expose-Headers "Content-Range, Content-Length, Accept-Ranges" always;
+        add_header Access-Control-Allow-Credentials "true" always;
+
+        # Frame ancestors for both sites
+        add_header Content-Security-Policy "frame-ancestors 'self' https://browser-extension.kiwix.org https://pwa.kiwix.org https://kiwix.github.io http://localhost:*" always;
+
+        # Handle preflight requests
+        if ($request_method = 'OPTIONS') {
+            return 204;
+        }
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - lb.download.kiwix.org
+      secretName: lb-download-kiwix-org-tls
+  rules:
+  - host: lb.download.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: lb-web-service
+            port:
+              number: 80

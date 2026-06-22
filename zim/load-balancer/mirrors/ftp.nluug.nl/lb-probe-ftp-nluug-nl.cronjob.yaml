@@ -1,0 +1,60 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: lb-probe-scan-ftp-nluug-nl
+  namespace: zim
+spec:
+  schedule: "* * * * *"
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          containers:
+            - image: ghcr.io/kiwix/minibrain-tools:latest
+              args: ["forever", "probe-then-scan", "--fail-on-scan", "ftp.nluug.nl"]
+              imagePullPolicy: IfNotPresent
+              name: alpine
+              env:
+                - name: SLEEP_DURATION
+                  valueFrom:
+                    configMapKeyRef:
+                      name: lb-configs
+                      key: FOREVER_PROBE_SLEEP_DURATION
+                - name: INCIDENTS_FOLDER
+                  value: "/tmp/incidents"
+                - name: ALERTS
+                  valueFrom:
+                    configMapKeyRef:
+                      name: lb-configs
+                      key: PROBE_ALERTS
+                - name: SLACK_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: lb-secrets
+                      key: SLACK_URL
+              resources:
+                requests:
+                  memory: "64Mi"
+                  cpu: "10m"
+              volumeMounts:
+                - name: configs
+                  subPath: mirrorbrain.conf
+                  mountPath: "/etc/mirrorbrain.conf"
+                  readOnly: true
+                - name: incidents-volume
+                  mountPath: "/tmp/incidents"
+                  readOnly: false
+          volumes:
+          - name: configs
+            configMap:
+              name: lb-configs
+          - name: incidents-volume
+            hostPath:
+              path: /data/incidents-volatile
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "dlservices"

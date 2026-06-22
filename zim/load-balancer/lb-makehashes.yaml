@@ -1,0 +1,51 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: lb-makehashes
+  namespace: zim
+spec:
+  schedule: "* * * * *"
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          containers:
+          - image: ghcr.io/kiwix/minibrain-tools:latest
+            imagePullPolicy: Always
+            name: minibrain
+            args: ["forever", "makehashes", "--debug", "/data/hashes/", "/data/lb/", "--include", ".zim$"]
+            volumeMounts:
+            - name: zim-volume
+              mountPath: "/data/lb/zim"
+              readOnly: true
+            - name: zim-hashes-volume
+              mountPath: "/data/hashes/zim"
+              readOnly: false
+            - name: configs
+              subPath: mirrorbrain.conf
+              mountPath: "/etc/mirrorbrain.conf"
+              readOnly: true
+            resources:
+              requests:
+                memory: "512Mi"
+                cpu: "200m"
+              limits:
+                memory: "512Mi"
+                cpu: "2"
+          volumes:
+          - name: zim-volume
+            persistentVolumeClaim:
+              claimName: browser-zim-pvc
+          - name: zim-hashes-volume
+            persistentVolumeClaim:
+              claimName: browser-zim-hashes-pvc
+          - name: configs
+            configMap:
+              name: lb-configs
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "browser"

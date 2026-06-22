@@ -1,0 +1,60 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: download-kiwix-org
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+      # CORS
+      add_header Access-Control-Allow-Origin "*" always;
+      add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
+      add_header Access-Control-Allow-Headers "Content-Type, Authorization, User-Agent, Range" always;
+      add_header Access-Control-Expose-Headers "Content-Range, Content-Length, Accept-Ranges" always;
+      add_header Access-Control-Allow-Credentials "true" always;
+
+      # Frame ancestors for both sites
+      add_header Content-Security-Policy "frame-ancestors 'self' https://browser-extension.kiwix.org https://pwa.kiwix.org https://kiwix.github.io http://localhost:*" always;
+
+      # Handle preflight requests
+      if ($request_method = 'OPTIONS') {
+          return 204;
+      }
+
+      location /robots.txt {
+        add_header Content-Type "text/plain";
+        return 200 "User-agent: *\nDisallow: /";
+      }
+
+      set $shouldRedirect 1;
+      if ($uri ~* "/.well-known/acme-challenge/(.+)") {
+        set $shouldRedirect 0;
+      }
+      if ( $shouldRedirect = 1 ) {
+        # rewrite ^/library/library_zim.xml https://obsolete.library.kiwix.org/library/library_zim.xml permanent;
+        rewrite ^/release/(.*)  https://mirror.download.kiwix.org/release/$1 permanent;
+        rewrite ^/nightly/(.*)  https://mirror.download.kiwix.org/nightly/$1 permanent;
+        rewrite ^/zim/$  https://browse.library.kiwix.org/ permanent;
+        rewrite ^/zim/(.*)  https://lb.download.kiwix.org/zim/$1 permanent;
+        rewrite ^/mirrors.html$ https://mirror.download.kiwix.org/mirrors.html permanent;
+        rewrite ^/archive/(.*) https://archive.download.kiwix.org/$1 permanent;
+        rewrite ^/other/(.*) https://archive.download.kiwix.org/other/$1 permanent;
+        rewrite ^/screenshots/(.*)  https://archive.download.kiwix.org/screenshots/$1 permanent;
+        rewrite ^/$ https://hub.kiwix.org/downloads/ permanent;
+      }
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - download.kiwix.org
+      secretName: download-kiwix-org-tls
+  rules:
+  - host: download.kiwix.org
+    http:
+      paths:
+      - path: /library/library_zim.xml
+        pathType: Exact
+        backend:
+          service:
+            name: obsolete-library-service
+            port:
+              number: 80
