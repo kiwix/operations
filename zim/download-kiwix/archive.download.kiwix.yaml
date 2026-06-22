@@ -83,8 +83,8 @@ spec:
             memory: "64Mi"
             cpu: "1m"
           limits:
-            memory: "1Gi"
-            cpu: "2"
+            memory: "128Mi"
+            cpu: "100m"
       volumes:
       - name: files-volume
         persistentVolumeClaim:
