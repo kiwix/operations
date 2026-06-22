@@ -80,7 +80,8 @@ kiwix_releases = {
 
     "firefox-os/kiwix-firefoxos.zip": "kiwix-firefoxos-*.zip",
 
-    "kiwix-android/kiwix.apk": "kiwix-*.apk",
+    # "kiwix-android/kiwix.apk": "kiwix-*.apk",
+    "kiwix-android/kiwix.apk": "org.kiwix.kiwixmobile.standalone-*.apk",
     "kiwix-android/org.kiwix.kiwixmobile.standalone.apk": "org.kiwix.kiwixmobile.standalone-*.apk",
 
     "kiwix-desktop-macos/kiwix-desktop-macos.dmg": "kiwix-macos_*.dmg",
