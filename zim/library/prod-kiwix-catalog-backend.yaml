@@ -43,10 +43,10 @@ spec:
         resources:
           requests:
             memory: "128Mi"
-            cpu: "0.5"
+            cpu: "100m"
           limits:
-            memory: "512Mi"
-            cpu: "1"
+            memory: "256Mi"
+            cpu: "100m"
       volumes:
       - name: library-volume
         hostPath:
