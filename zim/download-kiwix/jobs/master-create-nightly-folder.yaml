@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: master-create-nightly-folder
+  namespace: zim
+spec:
+  schedule: "0 0 * * *"
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      template:
+        spec:
+          containers:
+            - image: docker.io/alpine:3
+              imagePullPolicy: IfNotPresent
+              name: alpine
+              command: ["/bin/sh", "-c", "mkdir -p -m 3775 /data/kiwix/nightly/$(date +%Y-%m-%d) /data/openzim/nightly/$(date +%Y-%m-%d) ; chown root:100 /data/kiwix/nightly/$(date +%Y-%m-%d) /data/openzim/nightly/$(date +%Y-%m-%d) ; tree /data"]
+              volumeMounts:
+                - name: kiwix-nightly-volume 
+                  mountPath: "/data/kiwix/nightly"
+                  readOnly: false
+                - name: openzim-nightly-volume 
+                  mountPath: "/data/openzim/nightly"
+                  readOnly: false
+              resources:
+                requests:
+                  memory: "128Mi"
+                  cpu: "20m"
+          volumes:
+            - name: kiwix-nightly-volume
+              persistentVolumeClaim:
+                claimName: master-kiwix-nightly-pvc
+            - name: openzim-nightly-volume
+              persistentVolumeClaim:
+                claimName: master-openzim-nightly-pvc
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "master"
