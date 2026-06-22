@@ -35,6 +35,10 @@ spec:
                 name: logrotate-configs
                 subPath: opds-library-kiwix.conf
                 readOnly: true
+              - mountPath: "/etc/logrotate.d/lb-download-kiwix.conf"
+                name: logrotate-configs
+                subPath: lb-download-kiwix.conf
+                readOnly: true
               command: ["logrotate", "-v", "--state", "/data/nginx-logs/logrotate.status", "/etc/logrotate.conf"]
           volumes:
           - name: nginx-logs-volume

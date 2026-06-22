@@ -28,6 +28,10 @@ data:
     /data/nginx-logs/download-openzim/*.log {
       olddir /data/nginx-logs/archives/download-openzim
     }
+  lb-download-kiwix.conf: |
+    /data/nginx-logs/lb-download-kiwix/*.log {
+      olddir /data/nginx-logs/archives/lb-download-kiwix
+    }
   library-kiwix.conf: |
     /data/nginx-logs/library-kiwix/*.log {
       olddir /data/nginx-logs/archives/library-kiwix
