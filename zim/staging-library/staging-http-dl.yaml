@@ -70,8 +70,8 @@ spec:
             memory: "64Mi"
             cpu: "1m"
           limits:
-            memory: "1Gi"
-            cpu: "2"
+            memory: "512Mi"
+            cpu: "100m"
       volumes:
       - name: zim-volume
         persistentVolumeClaim:
