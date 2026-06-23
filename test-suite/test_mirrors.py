@@ -49,7 +49,6 @@ def test_openzim_nightly_map():
 
 
 def test_mirrors_list_reachable(mirrors_list_url):
-    assert requests.head(mirrors_list_url).status_code == HTTPStatus.FOUND
     assert (
         requests.head(mirrors_list_url, allow_redirects=True).status_code
         == HTTPStatus.OK

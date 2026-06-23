@@ -14,7 +14,6 @@ READ_URLS_FROM = os.getenv("READ_URLS_FROM", "")
 RECORDED_URLS: set[str] = set()
 
 # MB only provides the full list of mirrors through this.
-MIRRORS_LIST_URL: str = "https://lbo.download.kiwix.org/mirrors.html"
 CANONICAL_MIRRORS_LIST_URL: str = "https://mirror.download.kiwix.org/mirrors.html"
 # list of mirrors (hostname) not to use in tests
 EXCLUDED_MIRRORS: list[str] = [
@@ -25,7 +24,7 @@ EXCLUDED_MIRRORS: list[str] = [
 # using wikipedia_he_* as this is the only pattern mirrored by all mirrors
 # good enough for now
 PERMANENT_ZIM_URL: str = (
-    "https://lbo.download.kiwix.org/zim/wikipedia_fr_mathematics_maxi.zim"
+    "https://lb.download.kiwix.org/zim/wikipedia_fr_mathematics_maxi.zim"
 )
 # all non-zim-only mirrors mirror all other files
 PERMANENT_APK_URL: str = (
@@ -153,7 +152,7 @@ def illus_endpoint():
 
 @pytest.fixture(scope="session")
 def mirrors_list_url():
-    yield MIRRORS_LIST_URL
+    yield CANONICAL_MIRRORS_LIST_URL
 
 
 @pytest.fixture(scope="session")
