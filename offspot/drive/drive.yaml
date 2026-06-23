@@ -43,9 +43,9 @@ spec:
       volumes:
       - name: data-volume
         persistentVolumeClaim:
-          claimName: drive-local-pvc
+          claimName: browser-hotspot-drive-pvc
       nodeSelector:
-        k8s.kiwix.org/role: "storage"
+        k8s.kiwix.org/role: "browser"
 ---
 apiVersion: v1
 kind: Service
@@ -92,10 +92,10 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - drive.offspot.it
-      secretName: drive-offspot-it-tls
+      - drive.hotspot.kiwix.org
+      secretName: drive-hotspot-kiwix-org-tls
   rules:
-  - host: drive.offspot.it
+  - host: drive.hotspot.kiwix.org
     http:
       paths:
       - path: /
