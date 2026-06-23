@@ -58,4 +58,5 @@ spec:
           secretName: watcher-secrets
           optional: false
       nodeSelector:
+        # /!\ IP must be whitelisted in CardshopWorkers policy on Wasabi
         k8s.kiwix.org/role: "browser"
