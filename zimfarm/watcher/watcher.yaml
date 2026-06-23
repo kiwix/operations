@@ -51,11 +51,11 @@ spec:
             cpu: "200m"
       volumes:
       - name: data-volume
-        persistentVolumeClaim:
-          claimName: watcher-pvc
+        hostPath:
+          path: /data/zimfarm-watcher-volatile
       - name: watcher-secrets
         secret:
           secretName: watcher-secrets
           optional: false
       nodeSelector:
-        k8s.kiwix.org/role: "storage"
+        k8s.kiwix.org/role: "browser"
