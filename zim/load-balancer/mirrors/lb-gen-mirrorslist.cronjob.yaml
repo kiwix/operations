@@ -1,0 +1,43 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: lb-gen-mirrorslist
+  namespace: zim
+spec:
+  schedule: "0 0 * * *"
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          containers:
+            - image: ghcr.io/kiwix/minibrain-tools:latest
+              args: ["genlist", "--to", "/var/www/mirrors.json"]
+              imagePullPolicy: IfNotPresent
+              name: alpine
+              resources:
+                requests:
+                  memory: "32Mi"
+                  cpu: "10m"
+              volumeMounts:
+                - name: configs
+                  subPath: mirrorbrain.conf
+                  mountPath: "/etc/mirrorbrain.conf"
+                  readOnly: true
+                - name: mirrorslist-volume
+                  subPath: mirrors.json
+                  mountPath: /var/www/mirrors.json
+                  readOnly: false
+          volumes:
+          - name: configs
+            configMap:
+              name: lb-configs
+          - name: mirrorslist-volume
+            hostPath:
+              path: /data/mirrorslist-volatile
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "dlservices"

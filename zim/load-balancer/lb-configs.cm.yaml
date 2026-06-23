@@ -234,6 +234,7 @@ data:
       ServerAdmin contact+download@kiwix.org
       DocumentRoot /var/www/lb/
       Alias /static/ /var/www/static/
+      Alias /mirrors.json /var/www/mirrors.json
 
       MirrorBrainMetalinkPublisher "Kiwix project" https://kiwix.org
       MirrorBrainTorrentTrackerURL "https://tracker.openzim.org/announce"

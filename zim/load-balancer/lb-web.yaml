@@ -74,6 +74,10 @@ spec:
         - name: maps-volume
           mountPath: /var/maps/
           readOnly: true
+        - name: mirrorslist-volume
+          subPath: mirrors.json
+          mountPath: /var/www/mirrors.json
+          readOnly: true
         - mountPath: "/usr/local/apache2/logs/custom/"
           subPath: lb-download-kiwix
           name: nginx-logs-volume
@@ -98,6 +102,9 @@ spec:
       - name: configs
         configMap:
           name: lb-configs
+      - name: mirrorslist-volume
+        hostPath:
+          path: /data/mirrorslist-volatile
       nodeSelector:
         k8s.kiwix.org/role: "dlservices"
 ---

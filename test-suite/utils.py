@@ -1,12 +1,9 @@
 # pyright: reportImplicitStringConcatenation=false
 import os
 from http import HTTPStatus
-from typing import Any, NamedTuple
-from urllib.parse import urlsplit
+from typing import NamedTuple
 
 import requests
-from bs4 import BeautifulSoup, NavigableString
-from bs4.element import Tag
 
 TIMEOUT = int(os.getenv("TIMEOUT") or "20")
 NB_RANDOM_CATALOG_ENTRIES = int(os.getenv("NB_RANDOM_CATALOG_ENTRIES") or "5")
@@ -37,7 +34,10 @@ KIWIX_MIN_CONTENT_SIZE_TO_COMPRESS = 1400
 
 
 def check_cors_headers_for(url, valid_statuses: tuple[int] = (HTTPStatus.OK,)) -> bool:
-    assert requests.options(url, timeout=TIMEOUT, allow_redirects=False).status_code == HTTPStatus.NO_CONTENT
+    assert (
+        requests.options(url, timeout=TIMEOUT, allow_redirects=False).status_code
+        == HTTPStatus.NO_CONTENT
+    )
     resp = requests.get(url, timeout=TIMEOUT, stream=True, allow_redirects=False)
     assert resp.status_code in valid_statuses
     headers = resp.headers
@@ -111,31 +111,14 @@ def get_current_mirrors(
 ) -> list[Mirror]:
     """Current mirrors from the mirrors url."""
 
-    def is_country_row(tag: Tag) -> bool:
-        """Filters out table rows that do not contain mirror data."""
-        return tag.name == "tr" and tag.find("td", class_="newregion") is None
-
     resp = requests.get(mirrors_list_url, timeout=TIMEOUT, allow_redirects=True)
     resp.raise_for_status()
-    soup = BeautifulSoup(resp.text, features="html.parser")
-    body = soup.find("tbody")
-
-    if body is None or isinstance(body, NavigableString | int):
-        raise ValueError(f"unable to parse mirrors information from {mirrors_list_url}")
-
-    mirrors: list[Mirror] = []
-
-    for row in body.find_all(is_country_row):
-        base_url = row.find("a", string="HTTP")["href"]
-        hostname: Any = urlsplit(base_url).netloc  # pyright: ignore [reportUnknownMemberType]
-        country_code = row.find("img")["alt"].lower()
-        if hostname in excluded_mirrors:
-            continue
-        mirrors.append(
-            Mirror(
-                hostname=hostname,
-                base_url=base_url,
-                country_code=country_code,
-            )
+    return [
+        Mirror(
+            hostname=mirror["identifier"],
+            base_url=mirror["http_url"],
+            country_code=mirror["country"],
         )
-    return mirrors
+        for mirror in resp.json()["mirrors"]
+        if mirror["enabled"]
+    ]

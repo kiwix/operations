@@ -14,11 +14,9 @@ READ_URLS_FROM = os.getenv("READ_URLS_FROM", "")
 RECORDED_URLS: set[str] = set()
 
 # MB only provides the full list of mirrors through this.
-CANONICAL_MIRRORS_LIST_URL: str = "https://mirror.download.kiwix.org/mirrors.html"
+CANONICAL_MIRRORS_LIST_URL: str = "https://lb.download.kiwix.org/mirrors.json"
 # list of mirrors (hostname) not to use in tests
-EXCLUDED_MIRRORS: list[str] = [
-    "mirror.isoc.org.il",  # not up to date (2026-03-31)
-]
+EXCLUDED_MIRRORS: list[str] = []
 # this is using the permalink pattern
 # from the permalink redirects (no warehouse path, no period in filename)
 # using wikipedia_he_* as this is the only pattern mirrored by all mirrors
@@ -46,9 +44,7 @@ APK_MIRRORS: list[Mirror] = [
     mirror for mirror in ZIM_MIRRORS if mirror.hostname in EXPECTED_APK_MIRRORS
 ]
 APK_MIRRORS_IDS: list[str] = [mirror.hostname for mirror in APK_MIRRORS]
-PERMANENT_KIWIX_RELEASE_URL: str = (
-    "https://mirror.download.kiwix.org/release/kiwix-tools/kiwix-tools_linux-x86_64.tar.gz"
-)
+PERMANENT_KIWIX_RELEASE_URL: str = "https://mirror.download.kiwix.org/release/kiwix-tools/kiwix-tools_linux-x86_64.tar.gz"
 PERMANENT_KIWIX_NIGHTLY_URL: str = (
     "https://mirror.download.kiwix.org/nightly/kiwix-tools_linux-x86_64.tar.gz"
 )
@@ -78,7 +74,7 @@ markers = (
     "name_pattern",
     "filename_pattern",
     "url_pattern",
-    "requests"
+    "requests",
 )
 
 
@@ -107,7 +103,10 @@ def pytest_collection_modifyitems(config: pytest.Config, items: list[pytest.Item
     default_off = ["browse"]
     for item in items:
         for mark in item.iter_markers():
-            if mark.name in default_off and mark.name not in config.getoption("markexpr", "").split():
+            if (
+                mark.name in default_off
+                and mark.name not in config.getoption("markexpr", "").split()
+            ):
                 item.add_marker(pytest.mark.skip(reason=f"need -m {mark.name} to run"))
         for marker in markers:
             if marker in item.keywords and not config.getoption(f"--run-{marker}"):
