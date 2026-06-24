@@ -41,6 +41,7 @@ def check_cors_headers_for(url, valid_statuses: tuple[int] = (HTTPStatus.OK,)) -
     resp = requests.get(url, timeout=TIMEOUT, stream=True, allow_redirects=False)
     assert resp.status_code in valid_statuses
     headers = resp.headers
+    # multiple similar headers (proxies) would turn this into a comma-separated list
     assert headers.get("access-control-allow-origin") == "*"
     assert {"GET", "HEAD", "OPTIONS"}.issubset(
         [
