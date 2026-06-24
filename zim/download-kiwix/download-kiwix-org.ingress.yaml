@@ -30,7 +30,6 @@ metadata:
         set $shouldRedirect 0;
       }
       if ( $shouldRedirect = 1 ) {
-        # rewrite ^/library/library_zim.xml https://obsolete.library.kiwix.org/library/library_zim.xml permanent;
         rewrite ^/release/(.*)  https://mirror.download.kiwix.org/release/$1 permanent;
         rewrite ^/nightly/(.*)  https://mirror.download.kiwix.org/nightly/$1 permanent;
         rewrite ^/zim/$  https://hub.kiwix.org/downloads/ permanent;
