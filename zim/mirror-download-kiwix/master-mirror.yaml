@@ -238,8 +238,12 @@ metadata:
         return 200 "User-agent: *\nDisallow: /";
       }
 
+      # redirect root and zim root to user-friendly page on Hub
       rewrite ^/zim/$  https://hub.kiwix.org/downloads/ permanent;
-      rewrite ^/$  https://hub.kiwix.org/downloads/ permanent;
+      # except the minibrain probe that should go through
+      if ($http_user_agent !~ probe_info) {
+        rewrite ^/$  https://hub.kiwix.org/downloads/ permanent;
+      }
 spec:
   ingressClassName: nginx
   tls:

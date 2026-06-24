@@ -150,6 +150,16 @@ metadata:
             return 204;
         }
 
+        location /robots.txt {
+          add_header Content-Type "text/plain";
+          return 200 "User-agent: *\nDisallow: /";
+        }
+
+        location /probe_info {
+          add_header Content-Type "text/markdown";
+          return 200 "# Minibrain Probe Info\n\nThe Minibrain mirror probe is a script that checks mirrors for responsiveness.\n\nIn the logs, it will show up like this:\n\n  51.159.97.236 - - [24/Jun/2026:14:42:18 +0000] \"GET / HTTP/1.1\" 200 257 \"-\" \"Minibrain Probe (see https://lb.download.kiwix.org/probe_info)\"\n\nThe code is at https://github.com/kiwix/minibrain/\nContact us on https://github.com/kiwix/operations/";
+        }
+
         rewrite ^/$  https://hub.kiwix.org/downloads/ permanent;
 spec:
   ingressClassName: nginx
