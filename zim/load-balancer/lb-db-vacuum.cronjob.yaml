@@ -1,0 +1,36 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: lb-db-vacuum
+  namespace: zim
+spec:
+  schedule: "0 4 * * *"
+  successfulJobsHistoryLimit: 0
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      template:
+        spec:
+          containers:
+            - image: ghcr.io/kiwix/minibrain-tools:latest
+              args: ["/bin/sh", "-c", "cleandb info && cleandb sync-master --master mirror.download.kiwix.org && cleandb vacuum && cleandb info"]
+              imagePullPolicy: IfNotPresent
+              name: alpine
+              resources:
+                requests:
+                  memory: "32Mi"
+                  cpu: "10m"
+              volumeMounts:
+                - name: configs
+                  subPath: mirrorbrain.conf
+                  mountPath: "/etc/mirrorbrain.conf"
+                  readOnly: true
+          volumes:
+          - name: configs
+            configMap:
+              name: lb-configs
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "dlservices"
