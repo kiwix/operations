@@ -14,3 +14,4 @@ data:
   BACKUP_BASE_PATH: backup
   BACKUP_DOWNLOAD_BASE_URL: https://staging.download.kiwix.org/zim/backup/
   BACKUP_VIEW_BASE_URL: ""
+  ZIMCHECK_SCRAPERS_WHITELIST_REGEX: sotoki|zimit
