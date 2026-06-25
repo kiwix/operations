@@ -22,7 +22,7 @@ spec:
               - mountPath: "/data/zim"
                 name: zim-volume
                 readOnly: false
-              args: ["rsync", "--verbose", "--compress", "--recursive", "--links", "--perms", "--times", "--devices", "--specials", "--delete", "--progress", "internal-rsyncd-service::zim/", "/data/zim/"]
+              args: ["rsync", "--verbose", "--compress", "--recursive", "--links", "--perms", "--times", "--devices", "--specials", "--delete", "--progress", "--include", "*.zim", "--include", "*/", "--exclude", "*", "internal-rsyncd-service::zim/", "/data/zim/"]
               resources:
                 limits:
                   cpu: 1000m
