@@ -9,6 +9,16 @@
     - Sleeps until next iteration
 """
 
+# /// script
+# dependencies = [
+#   "requests<3",
+#   "humanfriendly==10.0",
+#   "xmltodict==0.14.2",
+#   "urllib3==2.3.0",
+# ]
+# ///
+
+
 import datetime
 import io
 import logging
@@ -21,7 +31,6 @@ from typing import ClassVar
 from urllib.parse import urlparse
 from uuid import UUID
 
-# humanfriendly==10.0 requests==2.32.3 xmltodict==0.14.2 urllib3==2.3.0
 import humanfriendly
 import requests
 import requests.adapters
@@ -34,9 +43,9 @@ API_STARTUP_DURATION = humanfriendly.parse_timespan(
 )
 CACHE_DIR = pathlib.Path(os.getenv("CACHE_DIR") or os.getenv("TMPDIR") or "/tmp")
 CATALOG_ETAG_FILE = CACHE_DIR / "catalog.etag"
-CATALOG_URL = os.getenv("CATALOG_URL", "") or "https://library.kiwix.org/catalog/v2"
+CATALOG_URL = os.getenv("CATALOG_URL", "") or "https://opds.library.kiwix.org/catalog/v2"
 DEBUG = bool(os.getenv("DEBUG") or "")
-DOWNLOAD_URL = os.getenv("DOWNLOAD_URL", "") or "https://download.kiwix.org"
+DOWNLOAD_URL = os.getenv("DOWNLOAD_URL", "") or "https://lb.download.kiwix.org"
 BTIH_MAP_FOLDER = CACHE_DIR / "btih.map"
 REFRESH_INTERVAL = humanfriendly.parse_timespan(os.getenv("REFRESH_INTERVAL") or "1h")
 TOKEN = os.environ["TOKEN"]
