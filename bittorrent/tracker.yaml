@@ -22,7 +22,7 @@ spec:
           restartPolicy: Always
           image: ghcr.io/kiwix/maintenance:latest
           imagePullPolicy: Always
-          args: ["sh", "-c", "pip install humanfriendly==10.0 requests==2.32.3 xmltodict==0.14.2 urllib3==2.3.0; whitelister"]
+          args: ["sh", "-c", "pip install humanfriendly==10.0 requests==2.32.3 xmltodict==0.14.2 urllib3==2.3.0; sleep 5; whitelister"]
           env:
             - name: INSTALL_SCRIPTS
               value: "whitelister#github://kiwix/operations/bittorrent/whitelister.py"
@@ -41,7 +41,8 @@ spec:
             - name: cache
               mountPath: /cache
       containers:
-      - image: docker.io/torrust/tracker:develop
+      # using digest as this project is not using proper releases
+      - image: docker.io/torrust/tracker:develop@sha256:dce0644c1f77917f15706cd9c3e0e783920aef31f9bbdde9183fc7219c507178
         imagePullPolicy: Always
         name: torrust
         livenessProbe:
@@ -69,7 +70,7 @@ spec:
             value: /etc/tracker.toml
         resources:
           requests:
-            memory: "512Mi"
+            memory: "1Gi"
             cpu: "700m"
         ports:
         # HTTP API

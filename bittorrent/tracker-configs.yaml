@@ -20,7 +20,7 @@ data:
     [core]
     # Interval in seconds that the cleanup job will run
     # to remove inactive peers from the torrent peer list.
-    inactive_peer_cleanup_interval = 600
+    #inactive_peer_cleanup_interval = 600
     # When true only approved torrents can be announced in the tracker.
     listed = true
     # When true clients require a key to connect and use the tracker.
@@ -72,7 +72,8 @@ data:
     # If the client is using a loopback IP address, this IP address will be used instead.
     # If the peer is using a loopback IP address, the tracker assumes that the peer
     # is in the same network as the tracker and will use the tracker’s IP address instead.
-    external_ip = "0.0.0.0"
+    # set to services.k8s.kiwix.org IP as it's the public IP for tracker.openzim.org
+    external_ip = "51.159.30.163"
     # Weather the tracker is behind a reverse proxy or not.
     # If the tracker is behind a reverse proxy, the X-Forwarded-For header
     # sent from the proxy will be used to get the client’s IP address.
