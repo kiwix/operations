@@ -64,7 +64,7 @@ data:
   REQ_TIMEOUT_GHCR: "10"
   # Default publisher to set in ZIMs
   DEFAULT_PUBLISHER: "openZIM"
-  ALLOWED_ORIGINS: https://farm.openzim.org
+  ALLOWED_ORIGINS: https://farm.openzim.org,https://cms.openzim.org
   BLOB_PRIVATE_STORAGE_URL: https://drive.farm.openzim.org/blobs
   BLOB_PUBLIC_STORAGE_URL: https://drive.farm.openzim.org/blobs
   BLOB_STORAGE_USERNAME: admin
