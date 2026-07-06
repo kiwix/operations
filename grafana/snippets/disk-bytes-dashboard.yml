@@ -1,13 +1,3 @@
-storage:
-  label: storage
-  instance: scw-kiwix-prod-foreign-2a079b8a58c44e8e942093d
-  disks:
-    md0:
-      device: /dev/md0
-      mounted: /boot
-    md1:
-      device: /dev/md1
-      mounted: /
 stats:
   label: stats
   instance: scw-kiwix-prod-foreign-7aaa98d57ede4cf0ba95d14
