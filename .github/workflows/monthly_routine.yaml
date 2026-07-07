@@ -78,8 +78,8 @@ jobs:
 
           ## Borgbase
 
-          - [ ] Start compaction of Borgbase repositories manually through the UI (beware `wp1db` which needs you to stop `backup` container on `mwcurator` before to release lock: `sudo docker compose -f /data/code/wp1/docker-compose.yml stop backup`)
-          - [ ] Check compaction completed succesfully on all repositories (and not not forget to restart `backup` container on `mwcurator`
+          - [ ] Start compaction of Borgbase repositories manually through the UI
+          - [ ] Check compaction completed succesfully on all repositories
 
           ## Delayed task
 
