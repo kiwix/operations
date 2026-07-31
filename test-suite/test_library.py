@@ -10,6 +10,8 @@ from utils import (
     OPDS_NAV_MIMETYPE,
     SCHEMES,
     TIMEOUT,
+    USER_AGENT_HEADERS,
+    Headers,
     check_cors_headers_for,
     get_response_headers,
     get_url,
@@ -19,17 +21,19 @@ from utils import (
 
 @pytest.mark.browse
 @pytest.mark.parametrize("scheme", SCHEMES)
-def test_reachable_on_root(scheme):
-    assert requests.head(get_url("/", scheme), timeout=TIMEOUT).status_code in (
+def test_reachable_on_root(scheme, ua_headers: Headers):
+    assert requests.head(
+        get_url("/", scheme), timeout=TIMEOUT, headers=ua_headers
+    ).status_code in (
         HTTPStatus.OK,
         HTTPStatus.MOVED_PERMANENTLY,
     )
 
 
 @pytest.mark.parametrize("scheme", SCHEMES)
-def test_reachable(scheme):
+def test_reachable(scheme, ua_headers: Headers):
     assert requests.head(
-        get_url("/catalog/v2/categories", scheme), timeout=TIMEOUT
+        get_url("/catalog/v2/categories", scheme), timeout=TIMEOUT, headers=ua_headers
     ).status_code in (
         HTTPStatus.OK,
         HTTPStatus.MOVED_PERMANENTLY,
@@ -60,10 +64,12 @@ def test_cors():
 
 @pytest.mark.parametrize("path", COMPRESSABLE_OPDS_ENDPOINTS.keys())
 def test_opds_is_gzipped(path):
+    headers = {"Accept-Encoding": "gzip, deflate, br"}
+    headers.update(USER_AGENT_HEADERS)
     resp = requests.request(
         method="GET",
         url=get_url(path=path),
-        headers={"Accept-Encoding": "gzip, deflate, br"},
+        headers=headers,
         timeout=TIMEOUT,
     )
     encoding = resp.headers.get("Content-Encoding")

@@ -12,7 +12,14 @@ import regex
 import requests
 import xmltodict
 from conftest import EXCLUDED_BOOKS
-from utils import NB_RANDOM_CATALOG_ENTRIES, TIMEOUT, check_cors_headers_for, get_url
+from utils import (
+    NB_RANDOM_CATALOG_ENTRIES,
+    TIMEOUT,
+    USER_AGENT_HEADERS,
+    Headers,
+    check_cors_headers_for,
+    get_url,
+)
 
 name_fmt = re.compile(
     r"^(?P<project>[a-z0-9\-\.]+?_)(?P<lang>[a-z\-]{2,10}?_|)"
@@ -110,7 +117,10 @@ class Book:
 def get_catalog() -> dict[str, Book]:
     books: dict[str, Book] = {}
     resp = requests.get(
-        f"{get_url('/catalog/v2')}/entries", params={"count": "-1"}, timeout=30
+        f"{get_url('/catalog/v2')}/entries",
+        params={"count": "-1"},
+        timeout=30,
+        headers=USER_AGENT_HEADERS,
     )
     resp.raise_for_status()
     catalog = xmltodict.parse(resp.content)
@@ -285,10 +295,14 @@ def test_book_url_pattern(book: Book):
 
 @pytest.mark.requests
 @randombookparam
-def test_book_urls(book: Book):
+def test_book_urls(book: Book, ua_headers: Headers):
     # meta4 must not redirect
     resp = requests.get(
-        book.url_meta4, stream=True, timeout=TIMEOUT, allow_redirects=False
+        book.url_meta4,
+        stream=True,
+        timeout=TIMEOUT,
+        allow_redirects=False,
+        headers=ua_headers,
     )
     assert resp.status_code == HTTPStatus.OK
 

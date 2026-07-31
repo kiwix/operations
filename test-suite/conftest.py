@@ -1,12 +1,13 @@
 import os
 import re
 import urllib.parse
+from collections.abc import Generator
 from pathlib import Path
-from typing import Any, Generator
+from typing import Any
 
 import pytest
 import requests
-from utils import Mirror, get_current_mirrors, get_url
+from utils import USER_AGENT, USER_AGENT_HEADERS, Mirror, get_current_mirrors, get_url
 
 # used for test_urls.py behavior
 RECORD_URLS_TO = os.getenv("RECORD_URLS_TO", "")
@@ -118,6 +119,16 @@ def patched_request(*args, **kwargs):
     url = kwargs.get("url", args[1])
     RECORDED_URLS.add(url)
     return requests.request(*args, **kwargs)
+
+
+@pytest.fixture
+def user_agent() -> str:
+    return USER_AGENT
+
+
+@pytest.fixture
+def ua_headers(user_agent) -> dict[str, str]:
+    return USER_AGENT_HEADERS
 
 
 @pytest.fixture(autouse=True, scope="function")

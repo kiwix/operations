@@ -32,13 +32,27 @@ COMPRESSABLE_OPDS_ENDPOINTS = {
 # https://github.com/kiwix/libkiwix/blob/main/src/server/response.cpp#L47
 KIWIX_MIN_CONTENT_SIZE_TO_COMPRESS = 1400
 
+USER_AGENT: str = (
+    "KiwixOpsCI/1.0 (https://github.com/kiwix/operations/; dev@kiwix.org.org)"
+)
+type Headers = dict[str, str]
+USER_AGENT_HEADERS: Headers = {"User-Agent": USER_AGENT}
+
 
 def check_cors_headers_for(url, valid_statuses: tuple[int] = (HTTPStatus.OK,)) -> bool:
     assert (
-        requests.options(url, timeout=TIMEOUT, allow_redirects=False).status_code
+        requests.options(
+            url, timeout=TIMEOUT, allow_redirects=False, headers=USER_AGENT_HEADERS
+        ).status_code
         == HTTPStatus.NO_CONTENT
     )
-    resp = requests.get(url, timeout=TIMEOUT, stream=True, allow_redirects=False)
+    resp = requests.get(
+        url,
+        timeout=TIMEOUT,
+        stream=True,
+        allow_redirects=False,
+        headers=USER_AGENT_HEADERS,
+    )
     assert resp.status_code in valid_statuses
     headers = resp.headers
     # multiple similar headers (proxies) would turn this into a comma-separated list
@@ -83,10 +97,12 @@ def get_url(
 
 
 def get_response_headers(path, method="HEAD", scheme=DEFAULT_SCHEME):
+    headers = {"Accept-Encoding": "gzip, deflate, br"}
+    headers.update(USER_AGENT_HEADERS)
     return requests.request(
         method=method,
         url=get_url(path=path, scheme=scheme),
-        headers={"Accept-Encoding": "gzip, deflate, br"},
+        headers=headers,
         timeout=TIMEOUT,
     ).headers
 
@@ -112,7 +128,12 @@ def get_current_mirrors(
 ) -> list[Mirror]:
     """Current mirrors from the mirrors url."""
 
-    resp = requests.get(mirrors_list_url, timeout=TIMEOUT, allow_redirects=True)
+    resp = requests.get(
+        mirrors_list_url,
+        timeout=TIMEOUT,
+        allow_redirects=True,
+        headers=USER_AGENT_HEADERS,
+    )
     resp.raise_for_status()
     return [
         Mirror(

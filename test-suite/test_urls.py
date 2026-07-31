@@ -1,13 +1,13 @@
 import os
 from http import HTTPStatus
 from queue import SimpleQueue
-from unittest.mock import patch
 from urllib.parse import urlsplit
 
 import aiodns
 import pycares
 import pytest
 import requests
+from utils import Headers
 
 # purposely using a custom name so it's not picked up automatically
 IP6_PROXY = os.getenv("IP6_PROXY", "")
@@ -27,7 +27,7 @@ def get_proxies(ipv6: bool = False) -> dict[str, str] | None:
 
 
 async def declares_ip6(domain) -> bool:
-    """ whether a domain name has an AAAA record """
+    """whether a domain name has an AAAA record"""
     async with aiodns.DNSResolver() as resolver:
         try:
             result = await resolver.query_dns(domain, "AAAA")
@@ -41,12 +41,12 @@ async def declares_ip6(domain) -> bool:
 
 
 def get_domain_for(url: str) -> str:
-    """ domain name from URL so we can query DNS """
+    """domain name from URL so we can query DNS"""
     return urlsplit(url).hostname or ""
 
 
 @pytest.mark.asyncio
-async def test_all_urls(recorded_urls):
+async def test_all_urls(recorded_urls, ua_headers: Headers):
 
     all_urls = SimpleQueue()
     for url in recorded_urls:
@@ -63,14 +63,20 @@ async def test_all_urls(recorded_urls):
         proxy = get_proxies(ipv6=test_v6)
 
         print(f"[v4] {url}")
-        resp = requests.get(url, stream=True, allow_redirects=False)
+        resp = requests.get(url, stream=True, allow_redirects=False, headers=ua_headers)  # noqa: ASYNC210
         assert resp.status_code in ALLOWED_STATUSES
         if resp.is_redirect and resp.next:
             all_urls.put(resp.next.url)
 
         if test_v6:
             print(f"[v6] {url}")
-            resp = requests.get(url, proxies=proxy, stream=True, allow_redirects=False)
+            resp = requests.get(  # noqa: ASYNC210
+                url,
+                proxies=proxy,
+                stream=True,
+                allow_redirects=False,
+                headers=ua_headers,
+            )
             assert resp.status_code in ALLOWED_STATUSES
             if resp.is_redirect and resp.next:
                 all_urls.put(resp.next.url)
