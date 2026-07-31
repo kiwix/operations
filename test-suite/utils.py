@@ -35,7 +35,7 @@ KIWIX_MIN_CONTENT_SIZE_TO_COMPRESS = 1400
 USER_AGENT: str = (
     "KiwixOpsCI/1.0 (https://github.com/kiwix/operations/; dev@kiwix.org.org)"
 )
-type Headers = dict[str, str]
+Headers = dict[str, str]
 USER_AGENT_HEADERS: Headers = {"User-Agent": USER_AGENT}
 
 
