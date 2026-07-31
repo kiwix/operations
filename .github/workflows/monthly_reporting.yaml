@@ -10,10 +10,9 @@ jobs:
   zimit-tasks:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: 3.14
-          architecture: x64
       - name: Install dependencies
         run: pip install requests==2.32.3 python-dateutil==2.9.0.post0 
       - name: Download script

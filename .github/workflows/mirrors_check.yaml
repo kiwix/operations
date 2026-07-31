@@ -12,7 +12,10 @@ jobs:
   mirrors:
     runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: 3.14
       - name: Setup venv
         run: python3 -m venv .venv
       - name: Install dependencies
