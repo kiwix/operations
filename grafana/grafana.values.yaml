@@ -71,9 +71,6 @@ alloy-logs:
 annotationAutodiscovery:
   enabled: true
   collector: alloy-metrics
-  metricsTuning:
-    includeMetrics:
-      - node_md_.*
 
 prometheusOperatorObjects:
   enabled: true
@@ -146,3 +143,6 @@ hostMetrics:
   collector: alloy-metrics
   linuxHosts:
     enabled: true
+    metricsTuning:
+      includeMetrics:
+        - node_md_.*
