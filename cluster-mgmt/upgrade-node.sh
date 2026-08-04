@@ -44,11 +44,15 @@ echo "Stopping kubelet"
 systemctl stop kubelet.service
 
 echo "Swaping binaries"
-mv /usr/local/bin/kubectl /usr/local/bin/kubectl-old
+if [ -f /usr/local/bin/kubectl ]; then
+  mv /usr/local/bin/kubectl /usr/local/bin/kubectl-old
+fi
 mv /usr/local/bin/kubelet /usr/local/bin/kubelet-old
-mv /usr/local/bin/kubectl-new /usr/local/bin/kubectl
+if [ -f /usr/local/bin/kubectl ]; then
+  mv /usr/local/bin/kubectl-new /usr/local/bin/kubectl
+fi
 mv /usr/local/bin/kubelet-new /usr/local/bin/kubelet
-echo "Staring kubelet"
+echo "Starting kubelet"
 systemctl start kubelet.service
 systemctl status --no-pager kubelet.service
 echo "Upgraded: $(/usr/local/bin/kubelet --version)"
