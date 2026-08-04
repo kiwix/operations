@@ -2,26 +2,94 @@ cluster:
   name: kiwix-prod
 
 destinations: # nota: this is in fact overriden in grafana.values.secret.yaml
-  - name: metricsService
+  metricsService:
     type: prometheus
     url: https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom/push
     auth:
       type: basic
       username: '1172000'
-  - name: logsService
+  logsService:
     type: loki
     url: https://logs-prod-012.grafana.net/loki/api/v1/push
     auth:
       type: basic
       username: '685075'
 
+collectors:
+  alloy-metrics:
+    presets: [medium, clustered, statefulset]
+  alloy-singleton:
+    enabled: false
+    presets: [small, deployment]
+  alloy-logs:
+    presets: [small, filesystem-log-reader, daemonset]
+    liveDebugging:
+      enabled: true
+
 clusterMetrics:
   enabled: true
+  collector: alloy-metrics
   kube-state-metrics:
-    image:
-      tag: v2.17.0
-    deploy: true
     enabled: true
+    metricsTuning:
+      # No filtering, keep all metrics
+      useDefaultAllowList: false
+      includeMetrics:
+        - alloy_build_info
+  kubelet:
+    enabled: true
+  cadvisor:
+    enabled: true
+
+costMetrics:
+  enabled: true
+  collector: alloy-metrics
+
+alloy-metrics:
+  enabled: true
+
+clusterEvents:
+  enabled: true
+  collector: alloy-metrics
+
+alloy-singleton:
+  enabled: true
+
+# podLogs:
+#   enabled: true
+#   excludeNamespaces: [ingress-nginx]
+#   # see https://github.com/grafana/k8s-monitoring-helm/blob/main/charts/k8s-monitoring/charts/feature-pod-logs/templates/_common_pod_discovery.alloy.tpl
+
+podLogsViaLoki:
+  enabled: true
+  collector: alloy-logs
+  excludeNamespaces: [ingress-nginx]
+
+alloy-logs:
+  enabled: true
+
+annotationAutodiscovery:
+  enabled: true
+  collector: alloy-metrics
+  metricsTuning:
+    includeMetrics:
+      - node_md_.*
+
+prometheusOperatorObjects:
+  enabled: true
+  collector: alloy-metrics
+  crds:
+    deploy: true
+  podMonitors:
+    enabled: true
+  serviceMonitors:
+    enabled: true
+
+telemetryServices:
+  kube-state-metrics:
+    deploy: true
+    image:
+      tag: v2.19.1
     collectors:
       # - certificatesigningrequests
       # - configmaps
@@ -56,18 +124,14 @@ clusterMetrics:
       # - clusterroles
       # - roles
   node-exporter:
+    deploy: true
     extraArgs:
       - '--collector.mdadm'
       - '--no-collector.netdev'
       - '--no-collector.netclass'
       - '--no-collector.softnet'
-    deploy: true
-    enabled: true
-    metricsTuning:
-      includeMetrics:
-        - node_md_.*
   opencost:
-    enabled: true
+    deploy: true
     opencost:
       exporter:
         defaultClusterId: kiwix-prod
@@ -76,43 +140,9 @@ clusterMetrics:
           url: https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom
         existingSecretName: metricsservice-grafana-k8s-monitoring
     metricsSource: metricsService
-  kubelet:
+
+hostMetrics:
+  enabled: true
+  collector: alloy-metrics
+  linuxHosts:
     enabled: true
-  cadvisor:
-    enabled: true
-alloy-metrics:
-  enabled: true
-clusterEvents:
-  enabled: true
-alloy-singleton:
-  enabled: true
-podLogs:
-  enabled: true
-  excludeNamespaces: [ingress-nginx]
-  # see https://github.com/grafana/k8s-monitoring-helm/blob/main/charts/k8s-monitoring/charts/feature-pod-logs/templates/_common_pod_discovery.alloy.tpl
-alloy-logs:
-  enabled: true
-annotationAutodiscovery:
-  enabled: true
-prometheusOperatorObjects:
-  enabled: true
-  crds:
-    deploy: true
-  podMonitors:
-    enabled: true
-  serviceMonitors:
-    enabled: true
-integrations:
-  alloy:
-    instances:
-      - name: alloy
-        labelSelectors:
-          app.kubernetes.io/name:
-            - alloy-metrics
-            - alloy-singleton
-            - alloy-logs
-        metrics:
-          tuning:
-            useDefaultAllowList: false
-            includeMetrics:
-              - alloy_build_info
