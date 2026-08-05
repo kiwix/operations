@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-resolvconf
+  namespace: kube-system
+data:
+  resolv-override.conf: |
+    # This file allows you to override system resolvers.
+
+    # To use Cloudflare, uncomment lines bellow:
+    #nameserver 1.1.1.1
+    #nameserver 1.0.0.1
+
+    # To use Google, uncomment lines bellow:
+    #nameserver 8.8.8.8
+    #nameserver 8.8.4.4
+
+    # To use Quad9, uncomment lines bellow:
+    nameserver 9.9.9.9
+    nameserver 149.112.112.112
