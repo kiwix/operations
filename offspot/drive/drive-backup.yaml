@@ -39,7 +39,7 @@ spec:
           volumes:
           - name: files-volume
             persistentVolumeClaim:
-              claimName: drive-local-pvc
+              claimName: browser-hotspot-drive-pvc
           restartPolicy: Never
           nodeSelector:
-            k8s.kiwix.org/role: "storage"
+            k8s.kiwix.org/role: "browser"
