@@ -7,28 +7,44 @@ destinations: # nota: this is in fact overriden in grafana.values.secret.yaml
     url: https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom/push
     auth:
       type: basic
-      username: '1172000'
+      username: "1172000"
   logsService:
     type: loki
     url: https://logs-prod-012.grafana.net/loki/api/v1/push
     auth:
       type: basic
-      username: '685075'
+      username: "685075"
+
+collectorCommon: # nota: this is in fact overriden in grafana.values.secret.yaml
+  alloy:
+    remoteConfig:
+      enabled: true
+      url: https://fleet-management-prod-011.grafana.net
+      auth:
+        type: basic
+        username: "732042"
 
 collectors:
-  alloy-metrics:
-    presets: [medium, clustered, statefulset]
-  alloy-singleton:
-    enabled: false
-    presets: [small, deployment]
+  alloy:
+    presets:
+      [
+        large,
+        root,
+        host-network,
+        host-storage,
+        host-cgroup,
+        clustered,
+        service-discovery,
+        filesystem-log-reader,
+        daemonset,
+        otel-receiver,
+      ]
   alloy-logs:
     presets: [small, filesystem-log-reader, daemonset]
-    liveDebugging:
-      enabled: true
 
 clusterMetrics:
   enabled: true
-  collector: alloy-metrics
+  collector: alloy
   kube-state-metrics:
     enabled: true
     metricsTuning:
@@ -43,22 +59,14 @@ clusterMetrics:
 
 costMetrics:
   enabled: true
-  collector: alloy-metrics
+  collector: alloy
 
-alloy-metrics:
+alloy:
   enabled: true
 
 clusterEvents:
   enabled: true
-  collector: alloy-metrics
-
-alloy-singleton:
-  enabled: true
-
-# podLogs:
-#   enabled: true
-#   excludeNamespaces: [ingress-nginx]
-#   # see https://github.com/grafana/k8s-monitoring-helm/blob/main/charts/k8s-monitoring/charts/feature-pod-logs/templates/_common_pod_discovery.alloy.tpl
+  collector: alloy
 
 podLogsViaLoki:
   enabled: true
@@ -70,11 +78,11 @@ alloy-logs:
 
 annotationAutodiscovery:
   enabled: true
-  collector: alloy-metrics
+  collector: alloy
 
 prometheusOperatorObjects:
   enabled: true
-  collector: alloy-metrics
+  collector: alloy
   crds:
     deploy: true
   podMonitors:
@@ -123,10 +131,15 @@ telemetryServices:
   node-exporter:
     deploy: true
     extraArgs:
-      - '--collector.mdadm'
-      - '--no-collector.netdev'
-      - '--no-collector.netclass'
-      - '--no-collector.softnet'
+      - "--collector.mdadm"
+      - "--no-collector.netdev"
+      - "--no-collector.netclass"
+      - "--no-collector.softnet"
+  beyla:
+    deploy: true
+    k8sCache:
+      replicas: 1
+
   opencost:
     deploy: true
     opencost:
@@ -140,7 +153,7 @@ telemetryServices:
 
 hostMetrics:
   enabled: true
-  collector: alloy-metrics
+  collector: alloy
   linuxHosts:
     enabled: true
     metricsTuning:
