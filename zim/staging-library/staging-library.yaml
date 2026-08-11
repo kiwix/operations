@@ -1,3 +1,12 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: staging-library-basic-auth
+  namespace: zim
+type: Opaque
+data:
+  auth: YW5vOiRhcHIxJEJManU3ZS9FJEdXYzY0ZWRkTjVXVWVyeWxxNUQuRi8K
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -113,6 +122,9 @@ metadata:
     nginx.ingress.kubernetes.io/rewrite-target: /
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
     nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: staging-library-basic-auth
+    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - ano/nymous'
     nginx.ingress.kubernetes.io/server-snippet: |
         location /robots.txt {
           add_header Content-Type "text/plain";
