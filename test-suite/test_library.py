@@ -11,6 +11,7 @@ from utils import (
     SCHEMES,
     TIMEOUT,
     USER_AGENT_HEADERS,
+    Auth,
     Headers,
     check_cors_headers_for,
     get_response_headers,
@@ -21,9 +22,9 @@ from utils import (
 
 @pytest.mark.browse
 @pytest.mark.parametrize("scheme", SCHEMES)
-def test_reachable_on_root(scheme, ua_headers: Headers):
+def test_reachable_on_root(scheme, ua_headers: Headers, library_auth: Auth):
     assert requests.head(
-        get_url("/", scheme), timeout=TIMEOUT, headers=ua_headers
+        get_url("/", scheme), timeout=TIMEOUT, headers=ua_headers, auth=library_auth
     ).status_code in (
         HTTPStatus.OK,
         HTTPStatus.MOVED_PERMANENTLY,
@@ -31,9 +32,12 @@ def test_reachable_on_root(scheme, ua_headers: Headers):
 
 
 @pytest.mark.parametrize("scheme", SCHEMES)
-def test_reachable(scheme, ua_headers: Headers):
+def test_reachable(scheme, ua_headers: Headers, library_auth: Auth):
     assert requests.head(
-        get_url("/catalog/v2/categories", scheme), timeout=TIMEOUT, headers=ua_headers
+        get_url("/catalog/v2/categories", scheme),
+        timeout=TIMEOUT,
+        headers=ua_headers,
+        auth=library_auth,
     ).status_code in (
         HTTPStatus.OK,
         HTTPStatus.MOVED_PERMANENTLY,
@@ -51,19 +55,19 @@ def test_reachable_on_v2(scheme):
 
 
 @pytest.mark.parametrize("path, mimetype", OPDS_ENDPOINTS.items())
-def test_opds_mimetypes(path, mimetype):
-    assert get_response_headers(path).get("Content-Type") == mimetype
+def test_opds_mimetypes(path, mimetype, library_auth: Auth):
+    assert get_response_headers(path, auth=library_auth).get("Content-Type") == mimetype
 
 
 @pytest.mark.skipif(
     LIBRARY_HOST != "opds.library.kiwix.org", reason="only for opds.library"
 )
-def test_cors():
-    assert check_cors_headers_for(get_url("/catalog/v2/categories", "https"))
+def test_cors(library_auth: Auth):
+    assert check_cors_headers_for(get_url("/catalog/v2/categories", "https"), auth=library_auth)
 
 
 @pytest.mark.parametrize("path", COMPRESSABLE_OPDS_ENDPOINTS.keys())
-def test_opds_is_gzipped(path):
+def test_opds_is_gzipped(path, library_auth: Auth):
     headers = {"Accept-Encoding": "gzip, deflate, br"}
     headers.update(USER_AGENT_HEADERS)
     resp = requests.request(
@@ -71,6 +75,7 @@ def test_opds_is_gzipped(path):
         url=get_url(path=path),
         headers=headers,
         timeout=TIMEOUT,
+        auth=library_auth,
     )
     encoding = resp.headers.get("Content-Encoding")
     content_len = int(resp.headers.get("Content-Length", ""))
@@ -94,12 +99,12 @@ def test_opds_is_cached(path):
     assert is_cached(path)
 
 
-def test_illus_mimetypes(illus_endpoint):
-    assert get_response_headers(illus_endpoint).get("Content-Type") == "image/png"
+def test_illus_mimetypes(illus_endpoint, library_auth: Auth):
+    assert get_response_headers(illus_endpoint, auth=library_auth).get("Content-Type") == "image/png"
 
 
-def test_illus_is_not_gzipped(illus_endpoint):
-    assert "Content-Encoding" not in get_response_headers(illus_endpoint)
+def test_illus_is_not_gzipped(illus_endpoint, library_auth: Auth):
+    assert "Content-Encoding" not in get_response_headers(illus_endpoint, auth=library_auth)
 
 
 @pytest.mark.varnish

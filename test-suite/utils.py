@@ -1,9 +1,10 @@
 # pyright: reportImplicitStringConcatenation=false
 import os
 from http import HTTPStatus
-from typing import NamedTuple
+from typing import NamedTuple, Union
 
 import requests
+from requests.auth import HTTPBasicAuth
 
 TIMEOUT = int(os.getenv("TIMEOUT") or "20")
 NB_RANDOM_CATALOG_ENTRIES = int(os.getenv("NB_RANDOM_CATALOG_ENTRIES") or "5")
@@ -37,12 +38,24 @@ USER_AGENT: str = (
 )
 Headers = dict[str, str]
 USER_AGENT_HEADERS: Headers = {"User-Agent": USER_AGENT}
+Auth = Union[HTTPBasicAuth, None]
+LIBRARY_HTTP_AUTH: Auth = (
+    HTTPBasicAuth(*os.getenv("LIBRARY_HTTP_AUTH", "").split(":", 1))
+    if os.getenv("LIBRARY_HTTP_AUTH")
+    else None
+)
 
 
-def check_cors_headers_for(url, valid_statuses: tuple[int] = (HTTPStatus.OK,)) -> bool:
+def check_cors_headers_for(
+    url, valid_statuses: tuple[int] = (HTTPStatus.OK,), auth: Auth = None
+) -> bool:
     assert (
         requests.options(
-            url, timeout=TIMEOUT, allow_redirects=False, headers=USER_AGENT_HEADERS
+            url,
+            timeout=TIMEOUT,
+            allow_redirects=False,
+            headers=USER_AGENT_HEADERS,
+            auth=auth,
         ).status_code
         == HTTPStatus.NO_CONTENT
     )
@@ -52,6 +65,7 @@ def check_cors_headers_for(url, valid_statuses: tuple[int] = (HTTPStatus.OK,)) -
         stream=True,
         allow_redirects=False,
         headers=USER_AGENT_HEADERS,
+        auth=auth,
     )
     assert resp.status_code in valid_statuses
     headers = resp.headers
@@ -96,13 +110,14 @@ def get_url(
     return f"{scheme}://{host}{path}"
 
 
-def get_response_headers(path, method="HEAD", scheme=DEFAULT_SCHEME):
+def get_response_headers(path, method="HEAD", scheme=DEFAULT_SCHEME, auth: Auth = None):
     headers = {"Accept-Encoding": "gzip, deflate, br"}
     headers.update(USER_AGENT_HEADERS)
     return requests.request(
         method=method,
         url=get_url(path=path, scheme=scheme),
         headers=headers,
+        auth=auth,
         timeout=TIMEOUT,
     ).headers
 
@@ -124,7 +139,7 @@ class Mirror(NamedTuple):
 
 
 def get_current_mirrors(
-    mirrors_list_url: str, excluded_mirrors: list[str]
+    mirrors_list_url: str, excluded_mirrors: list[str], auth: Auth = None
 ) -> list[Mirror]:
     """Current mirrors from the mirrors url."""
 
@@ -133,6 +148,7 @@ def get_current_mirrors(
         timeout=TIMEOUT,
         allow_redirects=True,
         headers=USER_AGENT_HEADERS,
+        auth=auth,
     )
     resp.raise_for_status()
     return [

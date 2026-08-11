@@ -7,7 +7,16 @@ from typing import Any
 
 import pytest
 import requests
-from utils import USER_AGENT, USER_AGENT_HEADERS, Mirror, get_current_mirrors, get_url
+from utils import (
+    LIBRARY_HTTP_AUTH,
+    USER_AGENT,
+    USER_AGENT_HEADERS,
+    Auth,
+    Headers,
+    Mirror,
+    get_current_mirrors,
+    get_url,
+)
 
 # used for test_urls.py behavior
 RECORD_URLS_TO = os.getenv("RECORD_URLS_TO", "")
@@ -121,12 +130,17 @@ def patched_request(*args, **kwargs):
     return requests.request(*args, **kwargs)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def user_agent() -> str:
     return USER_AGENT
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
+def library_auth() -> Auth:
+    return LIBRARY_HTTP_AUTH
+
+
+@pytest.fixture(scope="session")
 def ua_headers(user_agent) -> dict[str, str]:
     return USER_AGENT_HEADERS
 
@@ -152,8 +166,13 @@ def recorded_urls(monkeypatch) -> Generator[Any, Any, Any]:
 
 
 @pytest.fixture(scope="session")
-def illus_endpoint():
-    resp = requests.get(get_url(path="/catalog/search?count=1"), timeout=5)
+def illus_endpoint(ua_headers: Headers, library_auth: Auth):
+    resp = requests.get(
+        get_url(path="/catalog/search?count=1"),
+        timeout=5,
+        headers=ua_headers,
+        auth=library_auth,
+    )
     for line in resp.text.splitlines():
         match = re.search(r"/catalog/v2/illustration/([^/]+)/\?size=48", line)
         if match:
@@ -176,8 +195,13 @@ def permanent_zim_url():
 
 
 @pytest.fixture(scope="session")
-def current_zim_url(permanent_zim_url):
-    resp = requests.head(permanent_zim_url, allow_redirects=False, timeout=5)
+def current_zim_url(permanent_zim_url, ua_headers: Headers):
+    resp = requests.head(
+        permanent_zim_url,
+        allow_redirects=False,
+        timeout=5,
+        headers=ua_headers,
+    )
     resp.raise_for_status()
     yield resp.headers["Location"]
 
@@ -193,8 +217,13 @@ def permanent_apk_url():
 
 
 @pytest.fixture(scope="session")
-def current_apk_url(permanent_apk_url):
-    resp = requests.head(permanent_apk_url, allow_redirects=True, timeout=5)
+def current_apk_url(permanent_apk_url, ua_headers: Headers):
+    resp = requests.head(
+        permanent_apk_url,
+        allow_redirects=True,
+        timeout=5,
+        headers=ua_headers,
+    )
     resp.raise_for_status()
     yield resp.url
 
