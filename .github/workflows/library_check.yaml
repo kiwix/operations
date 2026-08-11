@@ -55,6 +55,6 @@ jobs:
         env:
           SCHEMES: http,https
           LIBRARY_HOST: staging.library.kiwix.org
-          LIBRARY_HTTP_AUTH: "ano:nymnous"
+          LIBRARY_HTTP_AUTH: "ano:nymous"
           TIMEOUT: 30
         run: pytest -vvv -m "not varnish" test_library.py
