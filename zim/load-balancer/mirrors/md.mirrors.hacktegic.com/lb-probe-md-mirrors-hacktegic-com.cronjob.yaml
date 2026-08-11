@@ -38,6 +38,16 @@ spec:
                     secretKeyRef:
                       name: lb-secrets
                       key: SLACK_URL
+                - name: IP6_PROXY
+                  valueFrom:
+                    secretKeyRef:
+                      name: lb-secrets
+                      key: IP6_PROXY
+                - name: PROBE_IPV6
+                  valueFrom:
+                    configMapKeyRef:
+                      name: lb-configs
+                      key: PROBE_IPV6
               resources:
                 requests:
                   memory: "64Mi"

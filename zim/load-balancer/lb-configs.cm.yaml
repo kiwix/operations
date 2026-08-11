@@ -6,6 +6,7 @@ metadata:
 data:
   PROBE_ALERTS: ""
   FOREVER_PROBE_SLEEP_DURATION: "60"
+  PROBE_IPV6: "y"
   mirrorbrain.conf: |
     [general]
     instances = main
