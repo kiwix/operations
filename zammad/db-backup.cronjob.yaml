@@ -1,0 +1,38 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: db-backup
+  namespace: zammad
+spec:
+  schedule: "4 10 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - name: borg-backup
+              image: ghcr.io/kiwix/borg-backup:latest
+              imagePullPolicy: Always
+              envFrom:
+              - secretRef:
+                  name: db-backup-credentials
+              env:
+                - name: BITWARDEN_EMAIL
+                  value: "contact+bitwarden-slave@kiwix.org"
+                - name: BORGBASE_NAME
+                  value: "zammad-db-postgres"
+                - name: DATABASES
+                  value: "postgresql://zammad:zammad@zammad-postgres:5432/zammad_production"
+              command: ["single-backup"]
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+          volumes:
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "services"

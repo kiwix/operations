@@ -1,0 +1,890 @@
+image:
+  repository: ghcr.io/zammad/zammad
+  # If not set, appVersion field from Chart.yaml is used as default.
+  # appVersion points to a fixed version. You are responsible to update this to newer patch level versions yourself.
+  # Alternatively, you can also use floating versions that will give you automatic updates:
+  # tag: "6.2"     # all patchlevel updates
+  # tag: "6"       # including minor updates
+  # tag: "latest"  # all updates of stable versions, including major
+  # tag: "develop" # bleeding-edge development version
+  # If you want to use a floating version, you should also set pullPolicy: Always
+  tag: ""
+  pullPolicy: IfNotPresent
+  imagePullSecrets: []
+    # - name: "image-pull-secret"
+
+service:
+  type: ClusterIP
+  port: 8080
+  appProtocol: kubernetes.io/ws
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: zammad.kiwix.org
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts:
+      - zammad.kiwix.org
+      secretName: zammad-kiwix-org-tls
+  labels: {}
+
+
+# Please note that passwords for PostgreSQL, Redis and S3 may not
+#   contain special characters which would require URL encoding.
+# See also https://github.com/zammad/zammad-helm/issues/251
+secrets:
+  autowizard:
+    useExisting: false
+    secretKey: autowizard
+    secretName: autowizard
+  elasticsearch:
+    useExisting: false
+    secretKey: password
+    secretName: elastic-credentials
+  postgresql:
+    useExisting: false
+    secretKey: postgresql-pass
+    secretName: postgresql-pass
+  redis:
+    useExisting: false
+    secretKey: redis-password
+    secretName: redis-pass
+    sentinel:
+      useExisting: false
+      secretKey: redis-sentinel-password
+      secretName: redis-sentinel-pass
+  s3:
+    useExisting: false
+    secretKey: s3-url
+    secretName: s3-url
+
+securityContext:
+  fsGroup: 1000
+  # https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#configure-volume-permission-and-ownership-change-policy-for-pods
+  fsGroupChangePolicy: Always
+  runAsUser: 1000
+  runAsNonRoot: true
+  runAsGroup: 1000
+  seccompProfile:
+    type: RuntimeDefault
+
+podDisruptionBudget:
+  enabled: false
+  # Specify either minAvailable or maxUnavailable, not both.
+  # Note: scheduler and websocket are not horizontally scalable (always 1 replica).
+  # Use maxUnavailable: 1 to avoid blocking node drains on those components.
+  minAvailable: ""
+  maxUnavailable: ""
+
+zammadConfig:
+  elasticsearch:
+    # enable/disable elasticsearch chart dependency
+    enabled: true
+    # host env var is only used when zammadConfig.elasticsearch.enabled is false
+    host: zammad-elasticsearch-master
+    initialisation: true
+    pass: ""
+    port: 9200
+    reindex: false
+    schema: http
+    user: ""
+
+  memcached:
+    # enable/disable memcached chart dependency
+    enabled: true
+    # host env var is only used when zammadConfig.memcached.enabled is false
+    host: zammad-memcached
+    port: 11211
+
+  minio:
+    # enable/disable minio chart dependency
+    enabled: false
+
+    # Uncomment this in case you want to use an external S3 service.
+    # externalS3Url: https://user:pw@external-minio-service/bucket
+
+  nginx:
+    replicas: 1
+    trustedProxies: []
+    extraHeaders: []
+      # - 'HeaderName "Header Value"'
+    websocketExtraHeaders: []
+      # - 'HeaderName "Header Value"'
+    # Maximum upload size
+    clientMaxBodySize: 50M
+    knowledgeBaseUrl: ""
+    listenIpv4: true
+    listenIpv6: true
+    startupProbe:
+      tcpSocket:
+        port: 8080
+      failureThreshold: 20
+      periodSeconds: 4
+    livenessProbe:
+      tcpSocket:
+        port: 8080
+      failureThreshold: 5
+      timeoutSeconds: 5
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 8080
+      failureThreshold: 5
+      timeoutSeconds: 5
+    resources: {}
+      # requests:
+      #   cpu: 50m
+      #   memory: 32Mi
+      # limits:
+      #   cpu: 100m
+      #   memory: 64Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      readOnlyRootFilesystem: true
+      privileged: false
+    # can be used to add additional containers / sidecars
+    sidecars: []
+    # additional environment vars (values should be unique between deployment and global extraEnv)
+    extraEnv: []
+    podLabels: {}
+      # my-label: "value"
+    podAnnotations: {}
+      # my-annotation: "value"
+    nodeSelector:
+      k8s.kiwix.org/role: "services"
+      # node-label: "value"
+    tolerations: []
+      # - key: "key"
+      #   operator: "Equal"
+      #   value: "value"
+      #   effect: "NoSchedule"
+    affinity: {}
+      # nodeAffinity:
+      #   requiredDuringSchedulingIgnoredDuringExecution:
+      #     nodeSelectorTerms:
+      #       - matchExpressions:
+      #           - key: "node-label"
+      #             operator: In
+      #             values:
+      #               - "value"
+      # podAntiAffinity:
+      #   preferredDuringSchedulingIgnoredDuringExecution:
+      #     - weight: 100
+      #       podAffinityTerm:
+      #         topologyKey: kubernetes.io/hostname # For host anti-affinity
+      #         labelSelector:
+      #           matchLabels:
+      #             app.kubernetes.io/component: zammad-nginx
+    topologySpreadConstraints: []
+      # - maxSkew: 1
+      #   topologyKey: "kubernetes.io/hostname"
+      #   whenUnsatisfiable: ScheduleAnyway
+      #   labelSelector:
+      #     matchLabels:
+      #      app.kubernetes.io/name: zammad
+
+  postgresql:
+    # enable/disable postgresql chart dependency
+    enabled: true
+    # needs to be the same as the postgres.auth.database
+    db: zammad_production
+    # Host of an external PostgreSQL server, only used when enabled is false.
+    #   When the subchart is enabled, the host is derived from the release name instead.
+    host: zammad-postgresql
+    # needs to be the same as the postgres.auth.password
+    pass: "zammad"
+    port: 5432
+    # needs to be the same as the postgres.auth.username
+    user: zammad
+    # additional connection options
+    options: "pool=50"
+
+  railsserver:
+    replicas: 1
+    startupProbe:
+      tcpSocket:
+        port: 3000
+      failureThreshold: 20
+      periodSeconds: 4
+    livenessProbe:
+      tcpSocket:
+        port: 3000
+      failureThreshold: 5
+      timeoutSeconds: 5
+    readinessProbe:
+      httpGet:
+        path: /
+        port: 3000
+      failureThreshold: 5
+      timeoutSeconds: 5
+    resources: {}
+      # requests:
+      #   cpu: 100m
+      #   memory: 512Mi
+      # limits:
+      #   cpu: 200m
+      #   memory: 1024Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      readOnlyRootFilesystem: true
+      privileged: false
+    # can be used to add additional containers / sidecars
+    sidecars: []
+    trustedProxies: "['127.0.0.1', '::1']"
+    listenAddress: "[::]"
+    webConcurrency: 0
+    # additional environment vars (values should be unique between deployment and global extraEnv)
+    extraEnv: []
+    # tmpdir will be used by all Zammad/Rails containers
+    tmpdir: "/opt/zammad/tmp"
+    podLabels: {}
+      # my-label: "value"
+    podAnnotations: {}
+      # my-annotation: "value"
+    affinity: {}
+      # nodeAffinity:
+      #   requiredDuringSchedulingIgnoredDuringExecution:
+      #     nodeSelectorTerms:
+      #       - matchExpressions:
+      #           - key: "node-label"
+      #             operator: In
+      #             values:
+      #               - "value"
+      # podAntiAffinity:
+      #   preferredDuringSchedulingIgnoredDuringExecution:
+      #     - weight: 100
+      #       podAffinityTerm:
+      #         topologyKey: kubernetes.io/hostname # For host anti-affinity
+      #         labelSelector:
+      #           matchLabels:
+      #             app.kubernetes.io/component: zammad-railsserver
+    nodeSelector:
+      k8s.kiwix.org/role: "services"
+      # node-label: "value"
+    tolerations: []
+      # - key: "key"
+      #   operator: "Equal"
+      #   value: "value"
+      #   effect: "NoSchedule"
+    topologySpreadConstraints: []
+      # - maxSkew: 1
+      #   topologyKey: "kubernetes.io/hostname"
+      #   whenUnsatisfiable: ScheduleAnyway
+      #   labelSelector:
+      #     matchLabels:
+      #      app.kubernetes.io/name: zammad
+
+  redis:
+    # enable/disable redis chart dependency
+    enabled: true
+    host: zammad-redis-master
+    port: 6379
+    # leave empty if no username is required
+    username:
+    # needs to be the same as the redis.auth.password
+    pass: zammad
+    # set to true to use rediss:// schema (TLS)
+    tls: false
+
+    sentinel:
+      enabled: false  # set to true to enable Redis Sentinel
+      sentinels:
+      - zammad-redis:26379
+      masterName: mymaster
+      # leave empty if no username is required
+      username:
+      pass: zammad
+
+  scheduler:
+    # This component may only run once per cluster, so only 0 (disabled) and 1 are supported.
+    #   Higher values are capped to 1.
+    replicas: 1
+    resources: {}
+      # requests:
+      #   cpu: 100m
+      #   memory: 256Mi
+      # limits:
+      #   cpu: 200m
+      #   memory: 512Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      readOnlyRootFilesystem: true
+      privileged: false
+    # can be used to add additional containers / sidecars
+    sidecars: []
+    # additional environment vars (values should be unique between deployment and global extraEnv)
+    extraEnv: []
+    podLabels: {}
+      # my-label: "value"
+    podAnnotations: {}
+      # my-annotation: "value"
+    affinity: {}
+      # nodeAffinity:
+      #   requiredDuringSchedulingIgnoredDuringExecution:
+      #     nodeSelectorTerms:
+      #       - matchExpressions:
+      #           - key: "node-label"
+      #             operator: In
+      #             values:
+      #               - "value"
+    nodeSelector:
+      k8s.kiwix.org/role: "services"
+      # node-label: "value"
+    tolerations: []
+      # - key: "key"
+      #   operator: "Equal"
+      #   value: "value"
+      #   effect: "NoSchedule"
+    topologySpreadConstraints: []
+      # - maxSkew: 1
+      #   topologyKey: "kubernetes.io/hostname"
+      #   whenUnsatisfiable: ScheduleAnyway
+      #   labelSelector:
+      #     matchLabels:
+      #      app.kubernetes.io/name: zammad
+
+  storageVolume:
+    # Enable this for 'File' based storage in Zammad. You must provide an externally managed 'extistingClaim'
+    #   with 'ReadWriteMany' permisssion in this case.
+    enabled: false
+    ##
+    ## A manually managed Persistent Volume and Claim
+    ## If defined, PVC must be created manually before volume will be bound
+    ## The value is evaluated as a template, so, for example, the name can depend on .Release or .Chart
+    ##
+    # existingClaim:
+
+  tmpDirVolume:
+    emptyDir:
+      sizeLimit: 100Mi
+      # enable "medium: Memory" to Work around problems with world writable tmp dir permissions if volumePermissions.enabled is set to false
+      # see: https://github.com/kubernetes/kubernetes/issues/76158 & https://github.com/kubernetes/kubernetes/issues/110835
+      # medium: Memory
+
+  # Custom volumes for all Zammad Pods.
+  customVolumes:
+    # - name: custom-volume
+    #   configMap:
+    #     name: my-config-map
+
+  # Custom volumeMounts for all Zammad Pods.
+  customVolumeMounts:
+    # - name: custom-volume
+    #   mountPath: "/opt/zammad/config_map"
+    #   readOnly: true
+
+  websocket:
+    # This component may only run once per cluster, so only 0 (disabled) and 1 are supported.
+    #   Higher values are capped to 1.
+    replicas: 1
+    startupProbe:
+      tcpSocket:
+        port: 6042
+      failureThreshold: 20
+      periodSeconds: 4
+    livenessProbe:
+      tcpSocket:
+        port: 6042
+      failureThreshold: 10
+      timeoutSeconds: 5
+    readinessProbe:
+      tcpSocket:
+        port: 6042
+      failureThreshold: 5
+      timeoutSeconds: 5
+    resources: {}
+      # requests:
+      #   cpu: 100m
+      #   memory: 256Mi
+      # limits:
+      #   cpu: 200m
+      #   memory: 512Mi
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+          - ALL
+      readOnlyRootFilesystem: true
+      privileged: false
+    listenAddress: "::"
+    # can be used to add additional containers / sidecars
+    sidecars: []
+    # additional environment vars (values should be unique between deployment and global extraEnv)
+    extraEnv: []
+    podLabels: {}
+      # my-label: "value"
+    podAnnotations: {}
+      # my-annotation: "value"
+    affinity: {}
+      # nodeAffinity:
+      #   requiredDuringSchedulingIgnoredDuringExecution:
+      #     nodeSelectorTerms:
+      #       - matchExpressions:
+      #           - key: "node-label"
+      #             operator: In
+      #             values:
+      #               - "value"
+    nodeSelector:
+      k8s.kiwix.org/role: "services"
+      # node-label: "value"
+    tolerations: []
+      # - key: "key"
+      #   operator: "Equal"
+      #   value: "value"
+      #   effect: "NoSchedule"
+    topologySpreadConstraints: []
+      # - maxSkew: 1
+      #   topologyKey: "kubernetes.io/hostname"
+      #   whenUnsatisfiable: ScheduleAnyway
+      #   labelSelector:
+      #     matchLabels:
+      #      app.kubernetes.io/name: zammad
+
+  initContainers:
+    elasticsearch:
+      resources: {}
+        # requests:
+        #   cpu: 100m
+        #   memory: 256Mi
+        # limits:
+        #   cpu: 200m
+        #   memory: 512Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+        privileged: false
+    postgresql:
+      resources: {}
+        # requests:
+        #   cpu: 100m
+        #   memory: 256Mi
+        # limits:
+        #   cpu: 200m
+        #   memory: 512Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+        privileged: false
+    # VolumePermissions will be used by all Zammad Pods.
+    # We need it to drop global write permission that comes with EmptyDir, otherwise
+    #   Ruby's Tempfile.create raises an error.
+    volumePermissions:
+      enabled: true
+      image:
+        repository: alpine
+        tag: "3.24.1"
+        pullPolicy: IfNotPresent
+      command:
+        - /bin/sh
+        - -cx
+        - |
+          chmod 770 /opt/zammad/tmp
+      resources: {}
+        # requests:
+        #   cpu: 100m
+        #   memory: 256Mi
+        # limits:
+        #   cpu: 200m
+        #   memory: 512Mi
+      securityContext:
+        readOnlyRootFilesystem: true
+        capabilities:
+          drop:
+            - ALL
+        privileged: true
+        runAsNonRoot: false
+        runAsUser: 0
+    zammad:
+      resources: {}
+        # requests:
+        #   cpu: 100m
+        #   memory: 256Mi
+        # limits:
+        #   cpu: 200m
+        #   memory: 512Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+        privileged: false
+      customInit: ""
+        #  bundle exec rails runner '…'
+
+  initJob:
+    # Runs the database/Elasticsearch initialisation on every install and upgrade.
+    # Only disable this temporarily for maintenance tasks that must not have the database
+    #   initialised, e.g. while restoring a dump (see the PostgreSQL migration notes in the README).
+    #   Zammad will not work correctly if this is left disabled permanently.
+    enabled: true
+    randomName: true
+    # specify how long after finish pods are deleted
+    ttlSecondsAfterFinished: 300
+    annotations: {}
+    # my-annotation: "value"
+    podLabels: {}
+      # my-label: "value"
+    podAnnotations: {}
+    # my-annotation: "value"
+    podSpec: {}
+    # my-podspec: "value"
+    affinity: {}
+      # nodeAffinity:
+      #   requiredDuringSchedulingIgnoredDuringExecution:
+      #     nodeSelectorTerms:
+      #       - matchExpressions:
+      #           - key: "node-label"
+      #             operator: In
+      #             values:
+      #               - "value"
+    nodeSelector:
+      k8s.kiwix.org/role: "services"
+      # node-label: "value"
+    tolerations: []
+      # - key: "key"
+      #   operator: "Equal"
+      #   value: "value"
+      #   effect: "NoSchedule"
+
+    topologySpreadConstraints: []
+      # - maxSkew: 1
+      #   topologyKey: "kubernetes.io/hostname"
+      #   whenUnsatisfiable: ScheduleAnyway
+      #   labelSelector:
+      #     matchLabels:
+      #      app.kubernetes.io/name: zammad
+
+  cronJob:
+    reindex:
+      # By default, this cronjob never runs. It can be used to create maintenance jobs with
+      #   kubectl create job my-reindex-job --from=cronjob/zammad-cronjob-reindex
+      # You can change schedule and suspend to run it periodically.
+      schedule: "@weekly"
+      suspend: true
+      annotations: {}
+      # my-annotation: "value"
+      podLabels: {}
+        # my-label: "value"
+      podAnnotations: {}
+      # my-annotation: "value"
+      podSpec: {}
+      # my-podspec: "value"
+
+# additional environment vars added to all zammad services (values should be unique between deployment and global extraEnv)
+extraEnv: []
+  # - name: FOO_BAR
+  #   value: "foobar"
+
+# autowizard config
+# if a token is used the url must look like: http://zammad/#getting_started/auto_wizard/your_token_here
+autoWizard:
+  enabled: false
+  # string with the autowizard config as json
+  # config: |
+  #   {
+  #     "Token": "secret_zammad_autowizard_token",
+  #     "TextModuleLocale": {
+  #       "Locale": "en-us"
+  #     },
+  #     "Users": [
+  #       {
+  #         "login": "email@example.org",
+  #         "firstname": "Zammad",
+  #         "lastname": "Admin",
+  #         "email": "email@example.org",
+  #         "organization": "ZammadTest",
+  #         "password": "..."
+  #       }
+  #     ],
+  #     "Settings": [
+  #       {
+  #         "name": "product_name",
+  #         "value": "ZammadTestSystem"
+  #       },
+  #       {
+  #         "name": "system_online_service",
+  #         "value": true
+  #       }
+  #     ],
+  #     "Organizations": [
+  #       {
+  #         "name": "ZammadTest"
+  #       }
+  #     ]
+  #   }
+
+# Common pod affinity for all Zammad components. Values in .Zammad.*.affinity will override this.
+affinity: {}
+  # nodeAffinity:
+  #   required:
+  #     nodeSelectorTerms:
+  #       - matchExpressions:
+  #           - key: k8s.kiwix.org/role
+  #             operator: In
+  #             values:
+  #             - services
+    # requiredDuringSchedulingIgnoredDuringExecution:
+    #   nodeSelectorTerms:
+    #     - matchExpressions:
+    #         - key: "node-label"
+    #           operator: In
+    #           values:
+    #             - "value"
+
+commonAnnotations: {}
+  # my-annotation: "value"
+
+commonLabels: {}
+  # my-label: "value"
+
+# Common pod nodeSelector for all Zammad components. Values in .Zammad.*.nodeSelector will override this.
+nodeSelector:
+  k8s.kiwix.org/role: "services"
+  # node-label: "value"
+
+podAnnotations: {}
+  # my-annotation: "value"
+
+podLabels: {}
+  # my-label: "value"
+
+# Common pod tolerations for all Zammad components. Values in .Zammad.*.tolerations will override this.
+tolerations: []
+  # - key: "key"
+  #   operator: "Equal"
+  #   value: "value"
+  #   effect: "NoSchedule"
+
+topologySpreadConstraints: []
+  # - maxSkew: 1
+  #   topologyKey: "kubernetes.io/hostname"
+  #   whenUnsatisfiable: ScheduleAnyway
+  #   labelSelector:
+  #     matchLabels:
+  #      app.kubernetes.io/name: zammad
+
+# service account configurations
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+# can be used to add additional init containers
+initContainers: []
+  # - name: s3-restore
+  #   image: some-aws-s3-restore:latest
+  #   env:
+  #     - name: AWS_DEFAULT_REGION
+  #       value: "eu-central-1"
+  #     - name: AWS_ACCESS_KEY_ID
+  #       value: "xxxxxxxxxxxx"
+  #     - name: AWS_SECRET_ACCESS_KEY
+  #       value: "xxxxxxxxxxxx"
+  #     - name: SYNC_DIR
+  #       value: "/opt/zammad"
+  #     - name: AWS_SYNC_BUCKET
+  #       value: "some-backup-bucket"
+  #   volumeMounts:
+  #     - name: help-zammad
+  #       mountPath: /opt/zammad
+
+
+# dependency charts config
+
+# Settings for the elasticsearch subchart
+elasticsearch:
+  # Workaround: switch to bitnami legacy image repository (https://github.com/bitnami/containers/issues/83267)
+  image:
+    repository: bitnamilegacy/elasticsearch
+  sysctlImage:
+    repository: bitnamilegacy/os-shell
+  volumePermissions:
+    image:
+      repository: bitnamilegacy/os-shell
+  metrics:
+    image:
+      repository: bitnamilegacy/elasticsearch-exporter
+
+  clusterName: zammad
+  coordinating:
+    replicaCount: 0
+  data:
+    replicaCount: 0
+  ingest:
+    replicaCount: 0
+  master:
+    heapSize: 512m
+    masterOnly: false
+    replicaCount: 1
+    resourcesPreset: medium
+    resources: {}
+      # requests:
+      #   cpu: 50m
+      #   memory: 512Mi
+      # limits:
+      #   cpu: 100m
+      #   memory: 1024Mi
+    nodeSelector:
+      k8s.kiwix.org/role: "services"
+    persistence:
+      existingClaim: "zammad-elasticsearch-pvc"
+
+  # To use an existing Kubernetes secret containing the credentials,
+  # remove the comments on the lines below and adjust them accordingly
+  #
+  # security:
+  #   existingSecret: elastic-credentials
+
+# settings for the memcached subchart
+memcached:
+  replicaCount: 1
+  resources: {}
+    # requests:
+    #   cpu: 50m
+    #   memory: 64Mi
+    # limits:
+    #   cpu: 100m
+    #   memory: 128Mi
+  nodeSelector:
+    k8s.kiwix.org/role: "services"
+
+# settings for the minio subchart
+minio:
+  # Workaround: switch to bitnami legacy image repository (https://github.com/bitnami/containers/issues/83267)
+  image:
+    repository: bitnamilegacy/minio
+  clientImage:
+    repository: bitnamilegacy/minio-client
+  global:
+    security:
+      allowInsecureImages: true
+  defaultInitContainers:
+    volumePermissions:
+      image:
+        repository: bitnamilegacy/os-shell
+  console:
+    image:
+      repository: bitnamilegacy/minio-object-browser
+
+  auth:
+    rootUser: zammadadmin
+    rootPassword: zammadadmin
+
+    # Use existing secret for credentials details (auth.rootUser and
+    # auth.rootPassword will be ignored and picked up from this secret).
+    # The secret has to contain the keys root-user and root-password)
+    # existingSecret: minio-credentials
+
+  defaultBuckets: zammad
+
+  # You can use this to enable the web UI for debugging.
+  disableWebUI: true
+
+# settings for the postgres subchart
+postgres:
+  persistence:
+    existingClaim: "zammad-postgres-pvc"
+  nodeSelector:
+    k8s.kiwix.org/role: "services"
+
+
+
+  auth:
+    # Creates this user as a superuser and a database with the name from auth.database.
+    # These must match zammadConfig.postgresql.user/pass/db.
+    username: "zammad"
+    password: "zammad"
+    database: "zammad_production"
+
+    # To avoid passwords in your values.yaml, you can comment out the password above
+    # and use an existing Kubernetes secret. Remove the comments on the lines below
+    # and adjust them accordingly.
+    # The subchart reads the password from the key named in secretKeys.adminPasswordKey,
+    # which defaults to 'postgres-password'. The example below overrides it to match the
+    # secret that Zammad itself uses (see secrets.postgresql above), so that a single
+    # secret can serve both. Set secrets.postgresql.useExisting to true in that case.
+    #
+    # existingSecret: postgresql-pass
+    # secretKeys:
+    #   adminPasswordKey: postgresql-pass
+
+  # The user from auth.username above is created via the official image's POSTGRES_USER, which is
+  #   always a superuser. Zammad does not need those privileges (it only requires the plpgsql
+  #   extension, which is present by default). To run Zammad unprivileged instead, point auth.* at
+  #   separate superuser credentials and create Zammad's user through the subchart's customUser:
+  #
+  # auth:
+  #   username: postgres
+  #   database: postgres
+  #   password: "a-superuser-password"
+  # customUser:
+  #   name: zammad             # must match zammadConfig.postgresql.user
+  #   database: zammad_production  # must match zammadConfig.postgresql.db
+  #   password: zammad         # must match zammadConfig.postgresql.pass
+  #
+  # Note that customUser only takes effect on the initial creation of the database. Restore dumps as
+  #   the Zammad user rather than the superuser, so that it owns the restored tables.
+
+  resources: {}
+    # requests:
+    #   cpu: 250m
+    #   memory: 256Mi
+    # limits:
+    #   cpu: 500m
+    #   memory: 512Mi
+
+# settings for the redis subchart
+redis:
+  sentinel:
+    # set to true to enable Redis Sentinel
+    enabled: false
+  architecture: standalone
+  auth:
+    password: zammad
+    # To avoid passwords in your values.yaml, you can comment out the line above
+    # and use an existing Kubernetes secret. Remove the comments on the lines below
+    # and adjust them accordingly
+    #
+    # existingSecret: redis-pass
+    # existingSecretPasswordKey: redis-password
+  resources: {}
+  # limits:
+  #   cpu: 250m
+  #   memory: 256Mi
+  # requests:
+  #   cpu: 250m
+  #   memory: 256Mi
+  nodeSelector:
+    k8s.kiwix.org/role: "services"
+
+  persistence:
+      existingClaim: "zammad-redis-pvc"
+

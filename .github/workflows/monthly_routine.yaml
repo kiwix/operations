@@ -81,6 +81,16 @@ jobs:
           - [ ] Start compaction of Borgbase repositories manually through the UI
           - [ ] Check compaction completed succesfully on all repositories
 
+          ## Zammad
+
+          - [ ] Update Zammad
+
+          ```sh
+          cd zammad/
+          helm repo update zammad
+          helm upgrade --install -n zammad -f values.yaml zammad zammad/zammad
+          ```
+
           ## Delayed task
 
           - [ ] Review [delayed tasks](https://github.com/kiwix/operations/issues?q=is%3Aissue%20state%3Aopen%20label%3Adelayed) and act on them if expiration (set in title) is next month
