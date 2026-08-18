@@ -372,6 +372,13 @@ spec:
             name: prod-kiwix-browse-frontend-service
             port:
               name: http
+      - path: /nojs/
+        pathType: Exact
+        backend:
+          service:
+            name: prod-kiwix-browse-frontend-service
+            port:
+              name: http
       - path: /
         pathType: Prefix
         backend:
