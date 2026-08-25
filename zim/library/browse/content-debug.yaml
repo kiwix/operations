@@ -1,0 +1,41 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: content-debug
+  namespace: zim
+spec:
+  backoffLimit: 1
+  template:
+    spec:
+      containers:
+        - name: content-debug
+          image: ghcr.io/kiwix/maintenance:latest
+          imagePullPolicy: Always
+          volumeMounts:
+            - mountPath: "/data/zim"
+              name: zim-volume
+              readOnly: true
+            - name: hidden-volume
+              mountPath: "/data/hidden-zim"
+              readOnly: true
+            - name: content-debug-volume
+              mountPath: "/data/content-debug"
+              readOnly: false
+          args: ["bash", "-c", "sleep infinity"]
+          resources:
+            requests:
+              cpu: 200m
+              memory: 1Gi
+      volumes:
+      - name: zim-volume
+        persistentVolumeClaim:
+          claimName: browser-zim-pvc
+      - name: hidden-volume
+        persistentVolumeClaim:
+          claimName: browser-hidden-pvc
+      - name: content-debug-volume
+        persistentVolumeClaim:
+          claimName: browser-content-debug-pvc
+      restartPolicy: Never
+      nodeSelector:
+        k8s.kiwix.org/role: "browser"
