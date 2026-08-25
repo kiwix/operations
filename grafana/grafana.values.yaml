@@ -47,11 +47,6 @@ clusterMetrics:
   collector: alloy
   kube-state-metrics:
     enabled: true
-    metricsTuning:
-      # No filtering, keep all metrics
-      useDefaultAllowList: false
-      includeMetrics:
-        - alloy_build_info
   kubelet:
     enabled: true
   cadvisor:
@@ -93,41 +88,6 @@ prometheusOperatorObjects:
 telemetryServices:
   kube-state-metrics:
     deploy: true
-    image:
-      tag: v2.19.1
-    collectors:
-      # - certificatesigningrequests
-      # - configmaps
-      # - cronjobs
-      # - daemonsets
-      # - deployments
-      # - endpoints
-      # - horizontalpodautoscalers
-      # - ingresses
-      - jobs
-      # - leases
-      # - limitranges
-      # - mutatingwebhookconfigurations
-      # - namespaces
-      # - networkpolicies
-      - nodes
-      # - persistentvolumeclaims
-      # - persistentvolumes
-      # - poddisruptionbudgets
-      - pods
-      # - replicasets
-      # - replicationcontrollers
-      # - resourcequotas
-      # - secrets
-      # - services
-      # - statefulsets
-      # - storageclasses
-      # - validatingwebhookconfigurations
-      # - volumeattachments
-      # - ingressclasses
-      # - clusterrolebindings
-      # - clusterroles
-      # - roles
   node-exporter:
     deploy: true
     extraArgs:
