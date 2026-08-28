@@ -20,13 +20,13 @@ services:
       mounted: /
 system:
   label: system (bastion)
-  instance: scw-kiwix-prod-foreign-fd47028c64314d1d98b4cbd
+  instance: scw-kiwix-prod-foreign-3db2fcf4ad054a20af4d83c
   disks:
     sda1:
-      device: /dev/sda1
+      device: /dev/vda1
       mounted: /
     sda15:
-      device: /dev/sda15
+      device: /dev/vda15
       mounted: /boot/efi
 srv-b:
   label: srv-b

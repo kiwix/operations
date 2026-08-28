@@ -128,6 +128,8 @@ for instance_key, instance_data in data.items():
                             "legend": {
                                 "calcs": [],
                                 "displayMode": "list",
+                                "enableFacetedFilter": False,
+                                "overflow": "ellipsis",
                                 "placement": "bottom",
                                 "showLegend": True,
                             },
@@ -138,7 +140,7 @@ for instance_key, instance_data in data.items():
                             },
                         },
                     },
-                    "version": "13.1.0-25365784498",
+                    "version": "13.3.0-32457798232",
                 },
             },
         }
@@ -238,7 +240,7 @@ for instance_key, instance_data in data.items():
                             "textMode": "auto",
                         },
                     },
-                    "version": "13.1.0-25365784498",
+                    "version": "13.3.0-32457798232",
                 },
             },
         }
@@ -275,55 +277,60 @@ for instance_key, instance_data in data.items():
     )
 
 dashboard = {
-    "annotations": [
-        {
-            "kind": "AnnotationQuery",
-            "spec": {
-                "builtIn": True,
-                "enable": True,
-                "hide": True,
-                "iconColor": "rgba(0, 211, 255, 1)",
-                "name": "Annotations & Alerts",
-                "query": {
-                    "datasource": {"name": "-- Grafana --"},
-                    "group": "grafana",
-                    "kind": "DataQuery",
-                    "spec": {},
-                    "version": "v0",
+    "apiVersion": "dashboard.grafana.app/v2",
+    "kind": "Dashboard",
+    "metadata": {"name": "8ee7e349-af68-4aac-8eba-23c561cedbc0"},
+    "spec": {
+        "annotations": [
+            {
+                "kind": "AnnotationQuery",
+                "spec": {
+                    "builtIn": True,
+                    "enable": True,
+                    "hide": True,
+                    "iconColor": "rgba(0, 211, 255, 1)",
+                    "name": "Annotations & Alerts",
+                    "query": {
+                        "datasource": {"name": "-- Grafana --"},
+                        "group": "grafana",
+                        "kind": "DataQuery",
+                        "spec": {},
+                        "version": "v0",
+                    },
                 },
-            },
-        }
-    ],
-    "cursorSync": "Off",
-    "editable": True,
-    "elements": elements,
-    "layout": {"kind": "RowsLayout", "spec": {"rows": rows}},
-    "links": [],
-    "liveNow": False,
-    "preload": False,
-    "tags": [],
-    "timeSettings": {
-        "autoRefresh": "",
-        "autoRefreshIntervals": [
-            "5s",
-            "10s",
-            "30s",
-            "1m",
-            "5m",
-            "15m",
-            "30m",
-            "1h",
-            "2h",
-            "1d",
+            }
         ],
-        "fiscalYearStartMonth": 0,
-        "from": "now-7d",
-        "hideTimepicker": False,
-        "timezone": "browser",
-        "to": "now",
+        "cursorSync": "Off",
+        "editable": True,
+        "elements": elements,
+        "layout": {"kind": "RowsLayout", "spec": {"rows": rows}},
+        "links": [],
+        "liveNow": False,
+        "preload": False,
+        "tags": [],
+        "timeSettings": {
+            "autoRefresh": "",
+            "autoRefreshIntervals": [
+                "5s",
+                "10s",
+                "30s",
+                "1m",
+                "5m",
+                "15m",
+                "30m",
+                "1h",
+                "2h",
+                "1d",
+            ],
+            "fiscalYearStartMonth": 0,
+            "from": "now-7d",
+            "hideTimepicker": False,
+            "timezone": "browser",
+            "to": "now",
+        },
+        "title": "Disk bytes usage",
+        "variables": [],
     },
-    "title": "Disk bytes usage",
-    "variables": [],
 }
 
 with open("disk-bytes-dashboard.json", "w") as fh:
