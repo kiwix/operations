@@ -214,48 +214,6 @@ spec:
         runAsUser: 0
         runAsGroup: 0
       containers:
-      - name: anubis
-        # WARN: update botPolicies.yaml in cm above copying repo (data/botPolicies.yaml)
-        # that's 1.22.0
-        image: ghcr.io/techarohq/anubis@sha256:90eb7eab65b28e63bf11f9dedf4b34d599bcaab9d84e8f3d537f027f9ac96c62
-        imagePullPolicy: Always
-        env:
-          - name: "BIND"
-            value: ":8080"
-          - name: "DIFFICULTY"
-            value: "4"
-          - name: ED25519_PRIVATE_KEY_HEX
-            valueFrom:
-              secretKeyRef:
-                name: browse-anubis-key
-                key: ED25519_PRIVATE_KEY_HEX
-          - name: "SERVE_ROBOTS_TXT"
-            value: "true"
-          - name: "TARGET"
-            value: "http://localhost:80"
-          - name: "OG_PASSTHROUGH"
-            value: "true"
-          - name: "OG_EXPIRY_TIME"
-            value: "24h"
-          - name: "WEBMASTER_EMAIL"
-            value: "abuse@kiwix.org"
-        resources:
-          limits:
-            cpu: 1000m
-            memory: 5Gi
-          requests:
-            cpu: 250m
-            memory: 5Gi
-        securityContext:
-          runAsUser: 1000
-          runAsGroup: 1000
-          runAsNonRoot: true
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          seccompProfile:
-            type: RuntimeDefault
       - image: docker.io/library/varnish:7.3-alpine
         command: ["entrypoint"]
         imagePullPolicy: IfNotPresent
@@ -325,10 +283,6 @@ spec:
     protocol: TCP
     port: 6082
     targetPort: 6082
-  - protocol: TCP
-    port: 8080
-    targetPort: 8080
-    name: anubis
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -353,6 +307,10 @@ metadata:
         add_header Access-Control-Expose-Headers "Content-Range, Content-Length, Accept-Ranges" always;
         add_header Access-Control-Allow-Credentials "true" always;
         add_header Content-Security-Policy "frame-ancestors 'self' https://browser-extension.kiwix.org https://pwa.kiwix.org https://kiwix.github.io http://localhost:*" always;
+
+        if ($http_cookie !~* "confirmed=yes") {
+          rewrite ^ /nanobis-auto-1w.html last;
+        }
 spec:
   ingressClassName: nginx
   tls:
@@ -379,10 +337,24 @@ spec:
             name: prod-kiwix-browse-frontend-service
             port:
               name: http
+      - path: /nanobis-auto-1w.html
+        pathType: Exact
+        backend:
+          service:
+            name: nanobis-service
+            port:
+              name: http
+      - path: /nanobis-manual-1w.html
+        pathType: Exact
+        backend:
+          service:
+            name: nanobis-service
+            port:
+              name: http
       - path: /
         pathType: Prefix
         backend:
           service:
             name: prod-kiwix-browse-frontend-service
             port:
-              name: anubis
+              name: http

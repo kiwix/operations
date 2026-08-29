@@ -1,0 +1,337 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nanobis-configs
+  namespace: zim
+data:
+  nanobis-manual-1w.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <title>Access confirmation</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.O">
+        <meta name="robots" content="noindex,nofollow" />
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            body,
+            html {
+                margin-left: auto;
+                margin-right: auto;
+                font-family: system-ui, sans-serif;
+
+                background-color: #f9f5d7;
+                color: #0c0c0c;
+            }
+
+            main {
+                max-width: min(30rem, 90vw);
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            header {
+                text-align: center;
+                margin: 3rem;
+            }
+
+            header svg {
+                width: 100%;
+                min-height: 1rem;
+                max-height: 2rem;
+            }
+
+            h1 {
+                display: none;
+            }
+
+            .action {
+                margin: 2rem;
+                text-align: center;
+            }
+
+            button {
+                background-color: #02cec0;
+                color: #ffffff;
+                padding: 12px 24px;
+                border-radius: 6px;
+                font-size: 15px;
+                border: none;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            button:hover {
+                background-color: #01ada7;
+            }
+
+            .extra {
+                margin-top: 2rem;
+                padding-top: 1rem;
+                border-top: .01rem solid #0c0c0c;
+                font-size: .85rem;
+            }
+
+            @media (prefers-color-scheme: dark) {
+
+                body,
+                html {
+                    background-color: #0c0c0c;
+                    color: #ffffff;
+                }
+                .extra {
+                    border-color: #c0c0c0;
+                }
+            }
+        </style>
+        <script>
+            function RecordConfirmation() {
+                const expdate = new Date();
+                expdate.setTime(expdate.getTime() + (7 * 24 * 60 * 60 * 1000));
+                document.cookie = "confirmed=yes; expires=" + expdate.toUTCString() + "; path=/";
+            }
+        </script>
+    </head>
+
+    <body>
+        <header>
+            <svg viewBox="0 0 1993 447" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <style>
+                        path {
+                            fill: #060324;
+                        }
+
+                        @media (prefers-color-scheme: dark) {
+                            path {
+                                fill: #ffffff;
+                            }
+                        }
+                    </style>
+                </defs>
+                <path
+                    d="m416.4 0h-131.6l-171.1 193.4v-193.4h-113.7v447h113.7v-109.9l59.4-65.8 118.1 175.7h136l-176.9-261.9z" />
+                <path d="m477 0h113.7v447h-113.7z" />
+                <path
+                    d="m1127.7 328.8-87.5-328.8h-111.1l-85.5 328.8-87.5-328.8h-121.3l146.2 447h117.5l84.3-309.1 83 309.1h116.8l147.5-447h-116.2z" />
+                <path d="m1370.4 0h113.7v447h-113.7z" />
+                <path
+                    d="m1832.7 213.2 147.5-213.2h-133.5l-86.2 130.2-86.2-130.2h-132.2l149.5 218.3-159.7 228.7h132.2l96.4-142.4 96.5 142.4h136z" />
+            </svg>
+        </header>
+        <main>
+            <h1>Please confirm…</h1>
+            <p>Due to unreasonnable traffic from (AI) crawlers, we're requiring an initial confirmation step to continue.
+            </p>
+
+            <div class="action">
+                <button onclick="RecordConfirmation(); location.reload();">Confirm access</button>
+            </div>
+            <div class="extra">
+                <p>This requires Javascript and Cookies to be enabled (content you're looking for already requires
+                    JS).</p>
+                <p>You shall be prompted only once a week, given you keep the cookie.</p>
+            </div>
+        </main>
+    </body>
+
+    </html>
+  nanobis-auto-1w.html: |
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="utf-8">
+        <title>Access confirmation</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.O">
+        <meta name="robots" content="noindex,nofollow" />
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            body,
+            html {
+                margin-left: auto;
+                margin-right: auto;
+                font-family: system-ui, sans-serif;
+
+                background-color: #f9f5d7;
+                color: #0c0c0c;
+            }
+
+            main {
+                max-width: min(30rem, 90vw);
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            header {
+                text-align: center;
+                margin: 3rem;
+            }
+
+            header svg {
+                width: 100%;
+                min-height: 1rem;
+                max-height: 2rem;
+            }
+
+            h1 {
+                display: none;
+            }
+
+            .action {
+                margin: 2rem;
+                text-align: center;
+            }
+
+            button {
+                background-color: #02cec0;
+                color: #ffffff;
+                padding: 12px 24px;
+                border-radius: 6px;
+                font-size: 15px;
+                border: none;
+                cursor: pointer;
+                transition: all 0.2s ease;
+            }
+
+            button:hover {
+                background-color: #01ada7;
+            }
+
+            .extra {
+                margin-top: 2rem;
+                padding-top: 1rem;
+                border-top: .01rem solid #0c0c0c;
+                font-size: .85rem;
+            }
+
+            @media (prefers-color-scheme: dark) {
+
+                body,
+                html {
+                    background-color: #0c0c0c;
+                    color: #ffffff;
+                }
+                .extra {
+                    border-color: #c0c0c0;
+                }
+            }
+        </style>
+        <script>
+            function RecordConfirmation() {
+                const expdate = new Date();
+                expdate.setTime(expdate.getTime() + (7 * 24 * 60 * 60 * 1000));
+                document.cookie = "confirmed=yes; expires=" + expdate.toUTCString() + "; path=/";
+            }
+            document.addEventListener("DOMContentLoaded", function(){
+                RecordConfirmation(); location.reload();
+            });
+        </script>
+    </head>
+
+    <body>
+        <header>
+            <svg viewBox="0 0 1993 447" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <style>
+                        path {
+                            fill: #060324;
+                        }
+
+                        @media (prefers-color-scheme: dark) {
+                            path {
+                                fill: #ffffff;
+                            }
+                        }
+                    </style>
+                </defs>
+                <path
+                    d="m416.4 0h-131.6l-171.1 193.4v-193.4h-113.7v447h113.7v-109.9l59.4-65.8 118.1 175.7h136l-176.9-261.9z" />
+                <path d="m477 0h113.7v447h-113.7z" />
+                <path
+                    d="m1127.7 328.8-87.5-328.8h-111.1l-85.5 328.8-87.5-328.8h-121.3l146.2 447h117.5l84.3-309.1 83 309.1h116.8l147.5-447h-116.2z" />
+                <path d="m1370.4 0h113.7v447h-113.7z" />
+                <path
+                    d="m1832.7 213.2 147.5-213.2h-133.5l-86.2 130.2-86.2-130.2h-132.2l149.5 218.3-159.7 228.7h132.2l96.4-142.4 96.5 142.4h136z" />
+            </svg>
+        </header>
+        <main>
+            <h1>Please confirm…</h1>
+            <p>Due to unreasonnable traffic from (AI) crawlers, we're requiring an initial confirmation step to continue.
+            </p>
+
+            <div class="action">
+                <button onclick="RecordConfirmation(); location.reload();">Confirm access</button>
+            </div>
+            <div class="extra">
+                <p>This requires Javascript and Cookies to be enabled (content you're looking for already requires
+                    JS).</p>
+                <p>You shall be prompted only once a week, given you keep the cookie.</p>
+            </div>
+        </main>
+    </body>
+
+    </html>
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: nanobis-app
+  name: nanobis-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nanobis-app
+  template:
+    metadata:
+      labels:
+        app: nanobis-app
+    spec:
+      containers:
+      - name: nanobis
+        image: nginx:stable
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: configs
+          mountPath: "/usr/share/nginx/html/nanobis-manual-1w.html"
+          subPath: nanobis-manual-1w.html
+          readOnly: true
+        - name: configs
+          mountPath: "/usr/share/nginx/html/nanobis-auto-1w.html"
+          subPath: nanobis-auto-1w.html
+          readOnly: true
+      volumes:
+      - name: configs
+        configMap:
+          name: nanobis-configs
+          defaultMode: 0755
+      nodeSelector:
+        k8s.kiwix.org/role: "browser"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: nanobis-service
+  labels:
+    app: nanobis-app
+spec:
+  selector:
+    app: nanobis-app
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 80
