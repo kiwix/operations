@@ -8,10 +8,12 @@ from typing import Any
 import pytest
 import requests
 from utils import (
+    LIBRARY_COOKIES,
     LIBRARY_HTTP_AUTH,
     USER_AGENT,
     USER_AGENT_HEADERS,
     Auth,
+    Cookies,
     Headers,
     Mirror,
     get_current_mirrors,
@@ -141,6 +143,11 @@ def library_auth() -> Auth:
 
 
 @pytest.fixture(scope="session")
+def library_cookies() -> Cookies:
+    return LIBRARY_COOKIES
+
+
+@pytest.fixture(scope="session")
 def ua_headers(user_agent) -> dict[str, str]:
     return USER_AGENT_HEADERS
 
@@ -166,12 +173,13 @@ def recorded_urls(monkeypatch) -> Generator[Any, Any, Any]:
 
 
 @pytest.fixture(scope="session")
-def illus_endpoint(ua_headers: Headers, library_auth: Auth):
+def illus_endpoint(ua_headers: Headers, library_auth: Auth, library_cookies: Cookie):
     resp = requests.get(
         get_url(path="/catalog/search?count=1"),
         timeout=5,
         headers=ua_headers,
         auth=library_auth,
+        cookies=library_cookies,
     )
     for line in resp.text.splitlines():
         match = re.search(r"/catalog/v2/illustration/([^/]+)/\?size=48", line)

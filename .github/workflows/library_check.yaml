@@ -53,8 +53,7 @@ jobs:
       - name: Test staging.library.kiwix.org
         working-directory: test-suite
         env:
-          SCHEMES: http,https
           LIBRARY_HOST: staging.library.kiwix.org
-          LIBRARY_HTTP_AUTH: "ano:nymous"
+          LIBRARY_COOKIES: "confirmed:yes"
           TIMEOUT: 30
         run: pytest -vvv -m "not varnish" test_library.py

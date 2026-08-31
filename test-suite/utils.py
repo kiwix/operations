@@ -44,6 +44,12 @@ LIBRARY_HTTP_AUTH: Auth = (
     if os.getenv("LIBRARY_HTTP_AUTH")
     else None
 )
+Cookies = Union[dict[str, str], None]
+LIBRARY_COOKIES: Cookies = (
+    dict([tuple(os.getenv("LIBRARY_COOKIES", "").split(":", 1))])
+    if os.getenv("LIBRARY_COOKIES") and ":" in os.getenv("LIBRARY_COOKIES", "")
+    else None
+)
 
 
 def check_cors_headers_for(
@@ -110,7 +116,13 @@ def get_url(
     return f"{scheme}://{host}{path}"
 
 
-def get_response_headers(path, method="HEAD", scheme=DEFAULT_SCHEME, auth: Auth = None):
+def get_response_headers(
+    path,
+    method="HEAD",
+    scheme=DEFAULT_SCHEME,
+    auth: Auth = None,
+    cookies: Cookies = None,
+):
     headers = {"Accept-Encoding": "gzip, deflate, br"}
     headers.update(USER_AGENT_HEADERS)
     return requests.request(
@@ -118,6 +130,7 @@ def get_response_headers(path, method="HEAD", scheme=DEFAULT_SCHEME, auth: Auth 
         url=get_url(path=path, scheme=scheme),
         headers=headers,
         auth=auth,
+        cookies=cookies,
         timeout=TIMEOUT,
     ).headers
 
