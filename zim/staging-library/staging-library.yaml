@@ -1,12 +1,3 @@
-apiVersion: v1
-kind: Secret
-metadata:
-  name: staging-library-basic-auth
-  namespace: zim
-type: Opaque
-data:
-  auth: YW5vOiRhcHIxJEJManU3ZS9FJEdXYzY0ZWRkTjVXVWVyeWxxNUQuRi8K
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -119,16 +110,14 @@ metadata:
   name: staging-library-ingress
   namespace: zim
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "false"
-    nginx.ingress.kubernetes.io/auth-type: basic
-    nginx.ingress.kubernetes.io/auth-secret: staging-library-basic-auth
-    nginx.ingress.kubernetes.io/auth-realm: 'Authentication Required - ano/nymous'
     nginx.ingress.kubernetes.io/server-snippet: |
         location /robots.txt {
           add_header Content-Type "text/plain";
           return 200 "User-agent: *\nDisallow: /";
+        }
+
+        if ($http_cookie !~* "confirmed=yes") {
+          rewrite ^ /nanobis-manual-1w.html last;
         }
 spec:
   ingressClassName: nginx
@@ -140,6 +129,34 @@ spec:
   - host: staging.library.kiwix.org
     http:
       paths:
+      - path: /skin/
+        pathType: Prefix
+        backend:
+          service:
+            name: staging-library-service
+            port:
+              number: 80
+      - path: /nojs/
+        pathType: Exact
+        backend:
+          service:
+            name: staging-library-service
+            port:
+              number: 80
+      - path: /nanobis-auto-1w.html
+        pathType: Exact
+        backend:
+          service:
+            name: nanobis-service
+            port:
+              name: http
+      - path: /nanobis-manual-1w.html
+        pathType: Exact
+        backend:
+          service:
+            name: nanobis-service
+            port:
+              name: http
       - path: /
         pathType: Prefix
         backend:
