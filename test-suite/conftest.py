@@ -173,7 +173,7 @@ def recorded_urls(monkeypatch) -> Generator[Any, Any, Any]:
 
 
 @pytest.fixture(scope="session")
-def illus_endpoint(ua_headers: Headers, library_auth: Auth, library_cookies: Cookie):
+def illus_endpoint(ua_headers: Headers, library_auth: Auth, library_cookies: Cookies):
     resp = requests.get(
         get_url(path="/catalog/search?count=1"),
         timeout=5,
