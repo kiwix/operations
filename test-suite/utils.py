@@ -53,7 +53,10 @@ LIBRARY_COOKIES: Cookies = (
 
 
 def check_cors_headers_for(
-    url, valid_statuses: tuple[int] = (HTTPStatus.OK,), auth: Auth = None
+    url,
+    valid_statuses: tuple[int] = (HTTPStatus.OK,),
+    auth: Auth = None,
+    cookies: Cookies = None,
 ) -> bool:
     assert (
         requests.options(
