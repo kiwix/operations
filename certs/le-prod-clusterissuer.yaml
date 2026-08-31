@@ -15,3 +15,8 @@ spec:
       http01:
         ingress:
           class: nginx
+          podTemplate:
+            spec:
+              nodeSelector:
+                kubernetes.io/os: linux
+                k8s.kiwix.org/role: system
