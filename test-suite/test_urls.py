@@ -7,7 +7,7 @@ import aiodns
 import pycares
 import pytest
 import requests
-from utils import Headers
+from utils import TIMEOUT, Headers
 
 # purposely using a custom name so it's not picked up automatically
 IP6_PROXY = os.getenv("IP6_PROXY", "")
@@ -63,7 +63,9 @@ async def test_all_urls(recorded_urls, ua_headers: Headers):
         proxy = get_proxies(ipv6=test_v6)
 
         print(f"[v4] {url}")
-        resp = requests.get(url, stream=True, allow_redirects=False, headers=ua_headers)  # noqa: ASYNC210
+        resp = requests.get(  # noqa: ASYNC210
+            url, stream=True, allow_redirects=False, headers=ua_headers, timeout=TIMEOUT
+        )
         assert resp.status_code in ALLOWED_STATUSES
         if resp.is_redirect and resp.next:
             all_urls.put(resp.next.url)
@@ -76,6 +78,7 @@ async def test_all_urls(recorded_urls, ua_headers: Headers):
                 stream=True,
                 allow_redirects=False,
                 headers=ua_headers,
+                timeout=TIMEOUT,
             )
             assert resp.status_code in ALLOWED_STATUSES
             if resp.is_redirect and resp.next:
