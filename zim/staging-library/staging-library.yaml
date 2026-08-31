@@ -116,7 +116,16 @@ metadata:
           return 200 "User-agent: *\nDisallow: /";
         }
 
+        set $shouldRewrite 0;
         if ($http_cookie !~* "confirmed=yes") {
+          set $shouldRewrite 1;
+        }
+
+        if ($uri ~* "/.well-known/acme-challenge/(.+)") {
+          set $shouldRewrite 0;
+        }
+
+        if ($shouldRewrite = 1) {
           rewrite ^ /nanobis-manual-1w.html last;
         }
 spec:

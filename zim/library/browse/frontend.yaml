@@ -308,7 +308,16 @@ metadata:
         add_header Access-Control-Allow-Credentials "true" always;
         add_header Content-Security-Policy "frame-ancestors 'self' https://browser-extension.kiwix.org https://pwa.kiwix.org https://kiwix.github.io http://localhost:*" always;
 
+        set $shouldRewrite 0;
         if ($http_cookie !~* "confirmed=yes") {
+          set $shouldRewrite 1;
+        }
+
+        if ($uri ~* "/.well-known/acme-challenge/(.+)") {
+          set $shouldRewrite 0;
+        }
+
+        if ($shouldRewrite = 1) {
           rewrite ^ /nanobis-auto-1w.html last;
         }
 spec:
