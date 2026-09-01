@@ -30,6 +30,10 @@ spec:
             name: zimit-frontend-api-configs
         - secretRef:
             name: zimit-frontend-api-secrets
+      dnsConfig: # temporary workaround, see https://github.com/kiwix/operations/issues/773
+        options:
+          - name: ndots
+            value: "2"
       nodeSelector:
         k8s.kiwix.org/role: "services"
 ---
