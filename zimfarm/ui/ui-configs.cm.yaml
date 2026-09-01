@@ -16,6 +16,8 @@ data:
       "MONITORING_URL": "https://monitoring.openzim.org/v3",
       "BLOB_MAX_SIZE": 1048576,
       "OAUTH_BASE_URL": "https://ory.login.kiwix.org",
-      "OAUTH_MODE": "session",
-      "LOGIN_MODES": ["oauth"]
+      "LOGIN_MODES": ["oauth"],
+      "OAUTH_MODE": "oidc",
+      "OAUTH_CLIENT_ID": "e321964a-d4e6-4350-ada3-95ee2f3e4987",
+      "OAUTH_AUDIENCE": "4c08aee4-d420-45da-b190-c5e713152223"
     }

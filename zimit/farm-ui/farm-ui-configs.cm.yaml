@@ -11,7 +11,9 @@ data:
       "MATOMO_ENABLED": false,
       "BLOB_MAX_SIZE": 1048576,
       "OAUTH_BASE_URL": "https://ory.login.kiwix.org",
-      "OAUTH_MODE": "session",
-      "LOGIN_MODES": ["oauth"]
+      "LOGIN_MODES": ["oauth"],
+      "OAUTH_MODE": "oidc",
+      "OAUTH_CLIENT_ID": "6f4aaf40-6470-4311-ad59-4f176c0a0a53",
+      "OAUTH_AUDIENCE": "5149d75a-c2ae-4441-8d92-d76ab847c488"
     }
 

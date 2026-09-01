@@ -70,9 +70,11 @@ data:
   BLOB_STORAGE_USERNAME: admin
   BLOB_MAX_SIZE: 1MB
   DELETE_ORPHANED_BLOBS_INTERVAL: 24h
-  AUTH_MODES: oauth-session
+  AUTH_MODES: oauth-session,oauth-oidc
   OAUTH_JWKS_URI: https://ory.login.kiwix.org/.well-known/jwks.json
   OAUTH_ISSUER: https://ory.login.kiwix.org
   OAUTH_CREATE_NEW_ACCOUNT: "true"
   OAUTH_SESSION_AUDIENCE: bada4130-5143-4524-a0bb-0d69671beee2
   OAUTH_SESSION_LOGIN_REQUIRE_2FA: "true"
+  OAUTH_OIDC_AUDIENCE: 4c08aee4-d420-45da-b190-c5e713152223
+  OAUTH_OIDC_LOGIN_REQUIRE_2FA: "true"
