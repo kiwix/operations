@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: login
+  labels:
+    app: token-webhook-staging-app
+  name: token-webhook-staging
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: token-webhook-staging-app
+  template:
+    metadata:
+      labels:
+        app: token-webhook-staging-app
+    spec:
+      containers:
+        - name: fastapi-dev
+          image: ghcr.io/kiwix/login-token-webhook:latest
+          envFrom:
+          - configMapRef:
+              name: token-webhook-staging-configs
+          - secretRef:
+              name: token-webhook-staging-secrets
+          ports:
+            - containerPort: 80
+          workingDir: /app
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: login
+  name: token-webhook-staging-service
+  labels:
+    app: token-webhook-staging-app
+spec:
+  selector:
+    app: token-webhook-staging-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: token-webhook-staging-ingress
+  namespace: login
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  tls:
+    - hosts:
+      - token-webhook.login-staging.kiwix.org
+      secretName: token-webhook-login-staging-kiwix-org-tls
+  rules:
+  - host: token-webhook.login-staging.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: token-webhook-staging-service
+            port:
+              number: 80

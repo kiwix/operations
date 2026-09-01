@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: token-webhook-prod-configs
+  namespace: login
+data:
+  # LOG_LEVEL: DEBUG

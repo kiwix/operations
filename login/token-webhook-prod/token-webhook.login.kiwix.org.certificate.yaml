@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: token-webhook-login-kiwix-org
+  namespace: login
+spec:
+  secretName: token-webhook-login-kiwix-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: token-webhook.login.kiwix.org
+  dnsNames:
+  - token-webhook.login.kiwix.org
