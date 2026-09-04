@@ -4,4 +4,5 @@ metadata:
   name: token-webhook-prod-configs
   namespace: login
 data:
+  RESTRICTED_CLIENT_IDS: d4ee6d1e-e4d3-48a6-8d1a-de93278f231d
   # LOG_LEVEL: DEBUG
