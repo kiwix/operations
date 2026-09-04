@@ -1,0 +1,67 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: zim
+  labels:
+    app: qbt-app
+  name: qbt-sts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qbt-app
+  serviceName: qbt-service
+  template:
+    metadata:
+      labels:
+        app: qbt-app
+    spec:
+      containers:
+      - image: lscr.io/linuxserver/qbittorrent:latest
+        imagePullPolicy: Always
+        name: qbittorrent
+        env:
+          - name: "TZ"
+            value: "Etc/UTC"
+          - name: "WEBUI_PORT"
+            value: "8080"
+          - name: "TORRENTING_PORT"
+            value: "6901"
+        volumeMounts:
+        - name: qbt-volume
+          mountPath: "/config"
+          readOnly: false
+        - name: files-volume
+          mountPath: "/downloads"
+          readOnly: false
+        ports:
+        # hostPort 51411
+        - containerPort: 8080
+          name: http-webui
+        - containerPort: 6901
+          hostPort: 6901
+          name: bittorrent
+      volumes:
+      - name: qbt-volume
+        persistentVolumeClaim:
+          claimName: seeder-qbt-pvc
+      - name: files-volume
+        persistentVolumeClaim:
+          claimName: seeder-files-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "seeder"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: qbt-webui-service
+  labels:
+    app: qbt-app
+spec:
+  selector:
+    app: qbt-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: http-webui

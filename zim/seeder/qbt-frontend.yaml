@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: zim
+  labels:
+    app: qbt-frontend-app
+  name: qbt-frontend-sts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qbt-frontend-app
+  serviceName: qbt-frontend-service
+  template:
+    metadata:
+      labels:
+        app: qbt-frontend-app
+    spec:
+      containers:
+      - image: docker.io/library/nginx:mainline-alpine
+        imagePullPolicy: Always
+        name: nginx
+        volumeMounts:
+        - name: configs
+          subPath: default.conf
+          mountPath: "/etc/nginx/conf.d/default.conf"
+          readOnly: true
+        - name: configs
+          subPath: kathrin.kiwix.org.crt
+          mountPath: "/etc/ssl/kathrin.kiwix.org.crt"
+          readOnly: true
+        - name: secrets
+          subPath: kathrin.kiwix.org.key
+          mountPath: "/etc/ssl/kathrin.kiwix.org.key"
+          readOnly: true
+        ports:
+        - containerPort: 80
+          name: http
+        - containerPort: 443
+          name: https
+          hostPort: 51411
+      volumes:
+      - name: configs
+        configMap:
+          name: seeder-configs
+      - name: secrets
+        secret:
+          secretName: seeder-secrets
+      nodeSelector:
+        k8s.kiwix.org/role: "seeder"

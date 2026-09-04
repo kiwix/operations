@@ -1,0 +1,65 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: seeder-configs
+  namespace: zim
+data:
+  default.conf: |
+    server {
+        listen                  80;
+        listen                  443 ssl;
+        server_name             default_server;
+        ssl_certificate         /etc/ssl/kathrin.kiwix.org.crt;
+        ssl_certificate_key     /etc/ssl/kathrin.kiwix.org.key;
+
+        location / {
+            proxy_pass          http://qbt-webui-service/;
+            proxy_http_version  1.1;
+
+            # headers recognized by qBittorrent
+            proxy_set_header    Host               $proxy_host;
+            proxy_set_header    X-Forwarded-For    $proxy_add_x_forwarded_for;
+            proxy_set_header    X-Forwarded-Host   $http_host;
+            proxy_set_header    X-Forwarded-Proto  $scheme;
+            proxy_hide_header   X-Content-Type-Options;
+
+            # client_max_body_size 100M;
+
+            include             /etc/nginx/mime.types;
+            default_type        application/octet-stream;
+            root                /usr/share/nginx/html;
+            index               index.html index.htm;
+        }
+
+        error_page              500 502 503 504  /50x.html;
+        location = /50x.html {
+            root                /usr/share/nginx/html;
+        }
+    }
+  kathrin.kiwix.org.crt: |
+    -----BEGIN CERTIFICATE-----
+    MIIEHTCCAwWgAwIBAgIUWBUhCdqBfnxbcIvLrlI+LIZaNlowDQYJKoZIhvcNAQEL
+    BQAwgYQxCzAJBgNVBAYTAkNIMQ0wCwYDVQQIDARWYXVkMREwDwYDVQQHDAhMYXVz
+    YW5uZTEOMAwGA1UECgwFS2l3aXgxFTATBgNVBAsMDENlcnRpZmljYXRlczEOMAwG
+    A1UEAwwFS2l3aXgxHDAaBgkqhkiG9w0BCQEWDXJlZ0BraXdpeC5vcmcwHhcNMjUw
+    MTE0MTEyNDA1WhcNMjcwNDE5MTEyNDA1WjCBkTELMAkGA1UEBhMCQ0gxDzANBgNV
+    BAgMBlp1cmljaDESMBAGA1UEBwwJWsODwrxyaWNoMQ4wDAYDVQQKDAVLaXdpeDET
+    MBEGA1UECwwKQml0dG9ycmVudDEaMBgGA1UEAwwRa2F0aHJpbi5raXdpeC5vcmcx
+    HDAaBgkqhkiG9w0BCQEWDXJlZ0BraXdpeC5vcmcwggEiMA0GCSqGSIb3DQEBAQUA
+    A4IBDwAwggEKAoIBAQC9tx9dx+eIB91UkmiZAfICRMchUmodZ45570MbKWkPAP5y
+    AzsOtgl7vM2dbbDy3blNhTbh94bJEQIu1YNbI1/lvJ8v6sbF1dRIOWCR84vTDIv/
+    6pvscOHqws/RHi2aJaZkYuTW/iqm7HtEW77817WjlqofeWLlKM+ga4htFhEac0EC
+    Z57BvBN8dqUWeSNsbT6SJybkWKgBWCV4RKtAdqo/ax49VZJMDiKcYAc0Ns9WD+P2
+    GzQicZkwWNmEumSX2GAZNDsA2dUpIJHuXewitMcwuQicwWRqfZG9Vgc/6wi/BzCn
+    tqaCpn7ZvqumXFzGGlQ3WOopFguKPXgBtC/Qo2ytAgMBAAGjeDB2MB8GA1UdIwQY
+    MBaAFCKp6iYY1IvoEyBvq1Oe6ddbLnGSMAkGA1UdEwQCMAAwCwYDVR0PBAQDAgTw
+    MBwGA1UdEQQVMBOCEWthdGhyaW4ua2l3aXgub3JnMB0GA1UdDgQWBBRV5/fRMb5j
+    BEEndYtfRBS2e2NW3zANBgkqhkiG9w0BAQsFAAOCAQEAq0HYR8V2WDYDzVu5BM/J
+    qA2jkkiwJs7TfM53phHV+FGqZ+bLEfm4XPwO3h22dCj2iiUdmwnCoEfptdyLgGk3
+    TFKOISivX/5LQHOJ05HNpNBT8Dz34dily5urmO6Ln0dVo3WK5XXCO53DQxUICNOh
+    w3yg9m3+PGLZJ6Jffq9ctDm9iHyWjb4L3wItUkITd93t73nHPjDr2G5r4qvUsVrA
+    eaxRoqtGEnTDXYBHQQoZ5E0zoWytMCErtFE7Myvhuh47Ar0BSjsGWaOh3QIiDfWR
+    1MnQkK9r9W7+wZ03jx+RuA9hxVVfIVLa6nBrhVdFeN7GN9CjoL807VSR3ZufmRQ3
+    xg==
+    -----END CERTIFICATE-----
+
