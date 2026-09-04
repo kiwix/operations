@@ -25,6 +25,8 @@ spec:
         - configMapRef:
             name: api-configs
         - secretRef:
+            name: shared-secrets
+        - secretRef:
             name: api-secrets
         ports:
         - containerPort: 80

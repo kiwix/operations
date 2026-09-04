@@ -25,6 +25,8 @@ spec:
         - configMapRef:
             name: mill-configs
         - secretRef:
+            name: shared-secrets
+        - secretRef:
             name: mill-secrets
         ports:
         - containerPort: 80
