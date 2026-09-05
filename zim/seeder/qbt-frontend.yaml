@@ -10,7 +10,6 @@ spec:
   selector:
     matchLabels:
       app: qbt-frontend-app
-  serviceName: qbt-frontend-service
   template:
     metadata:
       labels:

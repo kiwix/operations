@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: zim
+  labels:
+    app: seeder-app
+  name: seeder-sts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: seeder-app
+  template:
+    metadata:
+      labels:
+        app: seeder-app
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/bittorrent-seeder:develop
+        imagePullPolicy: Always
+        command: ["kiwix-seeder-loop"]
+        name: seeder
+        env:
+        - name: QBT_USERNAME
+          value: admin
+        - name: QBT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: seeder-secrets
+              key: qbt-password
+        - name: QBT_HOST
+          value: qbt-webui-service
+        - name: QBT_PORT
+          value: "80"
+        - name: QBT_INSECURE
+          value: ""
+        - name: XDG_CACHE_HOME
+          value: "/cache"
+        - name: DEBUG
+          value: ""
+        - name: SEED_WHOLE_CATALOG
+          value: "1"
+        - name: SLEEP_INTERVAL
+          value: "30m"
+        - name: KEEP_FOR
+          value: "12w"
+        - name: MIN_SIZE
+          value: "1GiB"
+        - name: MAX_STORAGE
+          value: "5TiB"
+        volumeMounts:
+        - name: qbt-volume
+          subPath: seeder-cache
+          mountPath: "/cache"
+          readOnly: false
+      volumes:
+      - name: qbt-volume
+        persistentVolumeClaim:
+          claimName: seeder-qbt-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "seeder"
