@@ -65,8 +65,9 @@ jobs:
           - [ ] ondemand
           - [ ] sisyphus
           - [ ] kathrin
-          - [ ] rhys-github-runner
-          - [ ] duncan
+          - [ ] rhys-github-runner-openzim
+          - [ ] rhys-github-runner-openkiwix
+          - [x] ~~duncan~~
 
           **Note**: this is an *automatic reminder* intended for the assignee(s).
 
@@ -81,15 +82,20 @@ jobs:
           - [ ] Start compaction of Borgbase repositories manually through the UI
           - [ ] Check compaction completed succesfully on all repositories
 
-          ## Zammad
+          ## Check for component upgrades
 
-          - [ ] Update Zammad
-
+          - [ ] Check if Zammad needs to be upgraded
+          
           ```sh
           cd zammad/
           helm repo update zammad
           helm upgrade --install -n zammad -f values.yaml zammad zammad/zammad
           ```
+          
+          - [ ] Check if our Debian-based VMs needs to be upgraded
+          - [ ] Check if our PostgreSQL-based DBs needs to be upgraded
+          - [ ] Check if our MySQL-based DBs needs to be upgraded
+          - [ ] Check if our MongoDB-based DBs needs to be upgraded
 
           ## Delayed task
 
