@@ -12,7 +12,7 @@ helm repo add zammad https://zammad.github.io/zammad-helm
 
 ```sh
 helm repo update zammad
-helm upgrade --install -n zammad -f values.yaml zammad zammad/zammad
+helm upgrade --install -n zammad -f values.yaml zammad zammad/zammad --version 17.0.2
 ```
 
 ## Important
