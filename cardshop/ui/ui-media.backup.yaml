@@ -40,7 +40,7 @@ spec:
           volumes:
           - name: data-volume
             persistentVolumeClaim:
-              claimName: cardshop-ui-media-pvc
+              claimName: services-ui-media-pvc
           nodeSelector:
-            k8s.kiwix.org/role: "services"
+            k8s.kiwix.org/role: "services-new"
           restartPolicy: Never

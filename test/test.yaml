@@ -35,7 +35,7 @@ spec:
             memory: "16Mi"
             cpu: "1m"
       containers:
-      - image: docker.io/bitnami/nginx:1.21
+      - image: docker.io/bitnami/nginx:latest
         imagePullPolicy: IfNotPresent
         name: nginx
         ports:
@@ -53,9 +53,9 @@ spec:
       volumes:
       - name: test-webroot-volume
         persistentVolumeClaim:
-          claimName: test-webroot-pvc
+          claimName: services-test-webroot-pvc
       nodeSelector:
-        k8s.kiwix.org/role: "services"
+        k8s.kiwix.org/role: "services-new"
 ---
 apiVersion: v1
 kind: Service

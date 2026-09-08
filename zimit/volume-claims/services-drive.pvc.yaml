@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: services-drive-pvc
+  namespace: zimit
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 64Gi
+  storageClassName: ""
+  volumeName: srv-services-zimit-drive-local-pv

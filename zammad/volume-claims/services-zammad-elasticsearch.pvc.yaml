@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: services-zammad-elasticsearch-pvc
+  namespace: zammad
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+  storageClassName: local-storage
+  volumeName: srv-services-zammad-elasticsearch-local-pv

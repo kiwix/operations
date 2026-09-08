@@ -36,9 +36,9 @@ spec:
       volumes:
       - name: data-volume
         persistentVolumeClaim:
-          claimName: cardshop-ui-db-pvc
+          claimName: services-ui-db-pvc
       nodeSelector:
-        k8s.kiwix.org/role: "services"
+        k8s.kiwix.org/role: "services-new"
 ---
 apiVersion: v1
 kind: Service

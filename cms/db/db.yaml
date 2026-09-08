@@ -39,14 +39,14 @@ spec:
       volumes:
       - name: data-volume
         persistentVolumeClaim:
-          claimName: cms-db-pvc
+          claimName: services-db-pvc
       - name: init-extensions
         configMap:
           name: db-configs
           defaultMode: 0755
           optional: false
       nodeSelector:
-        k8s.kiwix.org/role: "services"
+        k8s.kiwix.org/role: "services-new"
 ---
 apiVersion: v1
 kind: Service

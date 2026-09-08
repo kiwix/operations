@@ -47,7 +47,7 @@ spec:
           volumes:
           - name: data-volume
             persistentVolumeClaim:
-              claimName: kiwix-wiki-pvc
+              claimName: services-kiwix-wiki-pvc
           restartPolicy: Never
           nodeSelector:
-            k8s.kiwix.org/role: "services"
+            k8s.kiwix.org/role: "services-new"

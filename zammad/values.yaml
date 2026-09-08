@@ -162,7 +162,7 @@ zammadConfig:
     podAnnotations: {}
       # my-annotation: "value"
     nodeSelector:
-      k8s.kiwix.org/role: "services"
+      k8s.kiwix.org/role: "services-new"
       # node-label: "value"
     tolerations: []
       # - key: "key"
@@ -273,7 +273,7 @@ zammadConfig:
       #           matchLabels:
       #             app.kubernetes.io/component: zammad-railsserver
     nodeSelector:
-      k8s.kiwix.org/role: "services"
+      k8s.kiwix.org/role: "services-new"
       # node-label: "value"
     tolerations: []
       # - key: "key"
@@ -345,7 +345,7 @@ zammadConfig:
       #             values:
       #               - "value"
     nodeSelector:
-      k8s.kiwix.org/role: "services"
+      k8s.kiwix.org/role: "services-new"
       # node-label: "value"
     tolerations: []
       # - key: "key"
@@ -442,7 +442,7 @@ zammadConfig:
       #             values:
       #               - "value"
     nodeSelector:
-      k8s.kiwix.org/role: "services"
+      k8s.kiwix.org/role: "services-new"
       # node-label: "value"
     tolerations: []
       # - key: "key"
@@ -562,7 +562,7 @@ zammadConfig:
       #             values:
       #               - "value"
     nodeSelector:
-      k8s.kiwix.org/role: "services"
+      k8s.kiwix.org/role: "services-new"
       # node-label: "value"
     tolerations: []
       # - key: "key"
@@ -663,7 +663,7 @@ commonLabels: {}
 
 # Common pod nodeSelector for all Zammad components. Values in .Zammad.*.nodeSelector will override this.
 nodeSelector:
-  k8s.kiwix.org/role: "services"
+  k8s.kiwix.org/role: "services-new"
   # node-label: "value"
 
 podAnnotations: {}
@@ -753,9 +753,9 @@ elasticsearch:
       #   cpu: 100m
       #   memory: 1024Mi
     nodeSelector:
-      k8s.kiwix.org/role: "services"
+      k8s.kiwix.org/role: "services-new"
     persistence:
-      existingClaim: "zammad-elasticsearch-pvc"
+      existingClaim: "services-zammad-elasticsearch-pvc"
 
   # To use an existing Kubernetes secret containing the credentials,
   # remove the comments on the lines below and adjust them accordingly
@@ -774,7 +774,7 @@ memcached:
     #   cpu: 100m
     #   memory: 128Mi
   nodeSelector:
-    k8s.kiwix.org/role: "services"
+    k8s.kiwix.org/role: "services-new"
 
 # settings for the minio subchart
 minio:
@@ -811,9 +811,9 @@ minio:
 # settings for the postgres subchart
 postgres:
   persistence:
-    existingClaim: "zammad-postgres-pvc"
+    existingClaim: "services-zammad-postgres-pvc"
   nodeSelector:
-    k8s.kiwix.org/role: "services"
+    k8s.kiwix.org/role: "services-new"
 
 
 
@@ -883,8 +883,8 @@ redis:
   #   cpu: 250m
   #   memory: 256Mi
   nodeSelector:
-    k8s.kiwix.org/role: "services"
+    k8s.kiwix.org/role: "services-new"
 
   persistence:
-      existingClaim: "zammad-redis-pvc"
+      existingClaim: "services-zammad-redis-pvc"
 

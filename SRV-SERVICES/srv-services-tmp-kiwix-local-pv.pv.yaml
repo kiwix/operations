@@ -23,4 +23,4 @@ spec:
             - key: k8s.kiwix.org/role
               operator: In
               values:
-              - services
+              - services-new

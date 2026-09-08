@@ -43,9 +43,9 @@ spec:
       volumes:
       - name: data-volume
         persistentVolumeClaim:
-          claimName: drive-local-pvc
+          claimName: services-drive-pvc
       nodeSelector:
-        k8s.kiwix.org/role: "services"
+        k8s.kiwix.org/role: "services-new"
 ---
 apiVersion: v1
 kind: Service

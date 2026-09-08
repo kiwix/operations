@@ -96,9 +96,9 @@ spec:
             medium: Memory
         - name: data-volume
           persistentVolumeClaim:
-            claimName: bt-tracker-pvc
+            claimName: services-bt-tracker-pvc
       nodeSelector:
-        k8s.kiwix.org/role: "services"
+        k8s.kiwix.org/role: "services-new"
 ---
 apiVersion: v1
 kind: Service

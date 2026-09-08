@@ -50,4 +50,4 @@ spec:
             configMap:
               name: report-youtube-api-keys
           nodeSelector:
-            k8s.kiwix.org/role: "services"
+            k8s.kiwix.org/role: "services-new"
