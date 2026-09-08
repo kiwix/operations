@@ -100,3 +100,9 @@ jobs:
           ## Delayed task
 
           - [ ] Review [delayed tasks](https://github.com/kiwix/operations/issues?q=is%3Aissue%20state%3Aopen%20label%3Adelayed) and act on them if expiration (set in title) is next month
+
+          ## Refresh Slack invite link
+
+          - [ ] Go to [Slack Admin](https://kiwixoffline.slack.com/admin/invites) and choose *Invite People* then *Copy Invite Link*.
+          - [ ] Edit the `slack-invite.kiwix.org` redirection [at GANDI](https://admin.gandi.net/domain/150b2608-aa91-11e7-b232-00163ec31f40/kiwix.org/redirections/slack-invite.kiwix.org/edit) with the new link.
+
