@@ -28,16 +28,13 @@ collectors:
   alloy:
     presets:
       [
-        large,
-        root,
-        host-network,
+        small,
         host-storage,
         host-cgroup,
         clustered,
         service-discovery,
         filesystem-log-reader,
-        daemonset,
-        otel-receiver,
+        singleton,
       ]
   alloy-logs:
     presets: [small, filesystem-log-reader, daemonset]
@@ -47,20 +44,19 @@ clusterMetrics:
   collector: alloy
   kube-state-metrics:
     enabled: true
+    metricsTuning:
+      useDefaultAllowList: true
+      useIntegrationAllowList: false
   kubelet:
     enabled: true
   cadvisor:
     enabled: true
 
-costMetrics:
-  enabled: true
-  collector: alloy
-
 alloy:
-  enabled: true
+  enabled: false
 
 clusterEvents:
-  enabled: true
+  enabled: false
   collector: alloy
 
 podLogsViaLoki:
@@ -69,45 +65,13 @@ podLogsViaLoki:
   excludeNamespaces: [ingress-nginx]
 
 alloy-logs:
-  enabled: true
-
-annotationAutodiscovery:
-  enabled: true
-  collector: alloy
-
-prometheusOperatorObjects:
-  enabled: true
-  collector: alloy
-  crds:
-    deploy: true
-  podMonitors:
-    enabled: true
-  serviceMonitors:
-    enabled: true
+  enabled: false
 
 telemetryServices:
   kube-state-metrics:
     deploy: true
   node-exporter:
     deploy: true
-    extraArgs:
-      - "--collector.mdadm"
-      - "--no-collector.softnet"
-  beyla:
-    deploy: true
-    k8sCache:
-      replicas: 1
-
-  opencost:
-    deploy: true
-    opencost:
-      exporter:
-        defaultClusterId: kiwix-prod
-      prometheus:
-        external:
-          url: https://prometheus-prod-24-prod-eu-west-2.grafana.net/api/prom
-        existingSecretName: metricsservice-grafana-k8s-monitoring
-    metricsSource: metricsService
 
 hostMetrics:
   enabled: true
@@ -115,5 +79,7 @@ hostMetrics:
   linuxHosts:
     enabled: true
     metricsTuning:
+      useDefaultAllowList: true
+      useIntegrationAllowList: false
       includeMetrics:
         - node_md_.*
