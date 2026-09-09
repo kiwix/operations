@@ -1,3 +1,6 @@
+global:
+  scrapeInterval: 120s
+
 cluster:
   name: kiwix-prod
 
