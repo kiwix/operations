@@ -8,11 +8,12 @@ data:
   DEBUG: "1"
   OAUTH_JWKS_URI: https://ory.login.kiwix.org/.well-known/jwks.json
   OAUTH_ISSUER: https://ory.login.kiwix.org
-  OAUTH_SESSION_AUDIENCE: bada4130-5143-4524-a0bb-0d69671beee2
+  # OAUTH_SESSION_AUDIENCE: bada4130-5143-4524-a0bb-0d69671beee2
+  # OAUTH_SESSION_LOGIN_REQUIRE_2FA: "true"
   OAUTH_CREATE_NEW_ACCOUNT: "true"
   OAUTH_OIDC_AUDIENCE: c62179a4-55ce-494f-8653-8732a25f1a6e
   OAUTH_OIDC_LOGIN_REQUIRE_2FA: "true"
-  AUTH_MODES: oauth-session,oauth-oidc
+  AUTH_MODES: oauth-oidc
   ZIMFARM_OAUTH_CLIENT_ID: c62179a4-55ce-494f-8653-8732a25f1a6e
   ZIMFARM_OAUTH_AUDIENCE_ID: 4c08aee4-d420-45da-b190-c5e713152223
   ZIMWRIGHT_IMAGE: openzim/zimwright:dev
