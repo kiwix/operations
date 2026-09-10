@@ -13,6 +13,9 @@ data:
       "MATOMO_SITE_ID": 12,
       "MATOMO_TRACKER_FILE_NAME": "matomo",
       "OAUTH_BASE_URL": "https://ory.login.kiwix.org",
-      "LOGIN_MODES": ["oauth"]
+      "LOGIN_MODES": ["oauth"],
+      "OAUTH_MODE": "oidc",
+      "OAUTH_CLIENT_ID": "92912e6a-38c4-42ff-a37b-b1560763c73e",
+      "OAUTH_AUDIENCE": "c62179a4-55ce-494f-8653-8732a25f1a6e"
     }
 
