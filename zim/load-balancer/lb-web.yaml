@@ -52,6 +52,10 @@ spec:
       - image: ghcr.io/kiwix/minibrain-server:latest
         imagePullPolicy: Always
         name: apache
+        ports:
+          - name: http
+            containerPort: 80
+            protocol: TCP
         volumeMounts:
         - name: geoip-volume
           mountPath: "/usr/share/GeoIP"
@@ -86,6 +90,22 @@ spec:
           requests:
             memory: "2Gi"
             cpu: "200m"
+      - image: ghcr.io/kiwix/minibrain-tools:latest
+        imagePullPolicy: Always
+        name: minibrain-http
+        args: ["http-server"]
+        env:
+          - name: HTTP_SERVER_PORT
+            value: "5000"
+        volumeMounts:
+          - name: configs
+            subPath: mirrorbrain.conf
+            mountPath: "/etc/mirrorbrain.conf"
+            readOnly: true
+        ports:
+          - name: mb-api
+            containerPort: 5000
+            protocol: TCP
       volumes:
       - name: maps-volume
         emptyDir:
@@ -122,6 +142,11 @@ spec:
   - protocol: TCP
     port: 80
     targetPort: 80
+    name: http
+  - protocol: TCP
+    port: 5000
+    targetPort: 5000
+    name: mb-api
 ---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
@@ -129,7 +154,7 @@ metadata:
   name: lb-web-ingress
   namespace: zim
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/use-regex: "true"
     # android deep-linking validator (#190)
     nginx.ingress.kubernetes.io/server-snippet: |
         # in case its sent by MirrorBrain
@@ -160,6 +185,16 @@ metadata:
           return 200 "# Minibrain Probe Info\n\nThe Minibrain mirror probe is a script that checks mirrors for responsiveness.\n\nIn the logs, it will show up like this:\n\n  51.159.97.236 - - [24/Jun/2026:14:42:18 +0000] \"GET / HTTP/1.1\" 200 257 \"-\" \"Minibrain Probe (see https://lb.download.kiwix.org/probe_info)\"\n\nThe code is at https://github.com/kiwix/minibrain/\nContact us on https://github.com/kiwix/operations/";
         }
 
+        set $shouldRewrite 0;
+        if ($http_cookie !~* "confirmed=yes") {
+          set $shouldRewrite 1;
+        }
+
+        if ($shouldRewrite = 1) {
+          rewrite ^/zim/(.+)\.zim\.lb$ /nanobis-manual-1w.html last;
+          rewrite ^/status.json$ /nanobis-manual-1w.html last;
+        }
+
         rewrite ^/$  https://hub.kiwix.org/downloads/ permanent;
 spec:
   ingressClassName: nginx
@@ -167,9 +202,6 @@ spec:
     - hosts:
       - lb.download.kiwix.org
       secretName: lb-download-kiwix-org-tls
-    - hosts:
-      - lbo.download.kiwix.org
-      secretName: lbo-download-kiwix-org-tls
   rules:
   - host: lb.download.kiwix.org
     http:
@@ -180,14 +212,25 @@ spec:
           service:
             name: lb-web-service
             port:
-              number: 80
-  - host: lbo.download.kiwix.org
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
+              name: http
+      - path: /nanobis-manual-1w.html
+        pathType: Exact
+        backend:
+          service:
+            name: nanobis-service
+            port:
+              name: http
+      - path: /status.json
+        pathType: Exact
         backend:
           service:
             name: lb-web-service
             port:
-              number: 80
+              name: mb-api
+      - path: /zim/(.+)\.zim\.lb$
+        pathType: ImplementationSpecific
+        backend:
+          service:
+            name: lb-web-service
+            port:
+              name: mb-api
