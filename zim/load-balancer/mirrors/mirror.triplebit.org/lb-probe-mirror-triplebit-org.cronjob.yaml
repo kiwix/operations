@@ -8,8 +8,6 @@ spec:
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
-  # disabled as there is a cert issue with no answer from admin
-  suspend: true
   jobTemplate:
     spec:
       backoffLimit: 0
