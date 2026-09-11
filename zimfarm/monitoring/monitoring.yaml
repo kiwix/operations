@@ -73,7 +73,7 @@ spec:
       volumes:
       - name: data-volume
         persistentVolumeClaim:
-          claimName: monitoring-db-pvc
+          claimName: stats-monitoring-db-pvc
       - name: os-release
         hostPath:
           path: /etc/os-release

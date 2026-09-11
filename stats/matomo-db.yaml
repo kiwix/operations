@@ -73,7 +73,7 @@ spec:
       volumes:
       - name: data-volume
         persistentVolumeClaim:
-          claimName: stats-db-pvc
+          claimName: stats-matomo-db-pvc
       - name: mysql-configs
         configMap:
           name: mysql-configs

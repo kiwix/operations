@@ -41,7 +41,7 @@ spec:
           volumes:
           - name: files-volume
             persistentVolumeClaim:
-              claimName: matomo-files-pvc
+              claimName: stats-matomo-files-pvc
           restartPolicy: Never
           nodeSelector:
             k8s.kiwix.org/role: "stats"
