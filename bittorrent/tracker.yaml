@@ -36,7 +36,7 @@ spec:
             - name: CACHE_DIR
               value: /cache
             - name: DEBUG
-              value: "1"
+              value: ""
           volumeMounts:
             - name: cache
               mountPath: /cache
@@ -98,7 +98,7 @@ spec:
           persistentVolumeClaim:
             claimName: services-bt-tracker-pvc
       nodeSelector:
-        k8s.kiwix.org/role: "services-new"
+        k8s.kiwix.org/role: "services"
 ---
 apiVersion: v1
 kind: Service

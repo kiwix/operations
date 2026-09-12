@@ -14,7 +14,9 @@ data:
     [logging]
     # Logging level. Possible values are: Off, Error, Warn, Info, Debug and Trace.
     # Default is Info.
-    threshold = "warn"
+    # using off in general because the logs are flooded with ERROR logs
+    # about stuff not whitelisted
+    threshold = "off"
 
     # Core configuration.
     [core]
