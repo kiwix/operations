@@ -189,7 +189,7 @@ ondemand:
       mounted: /data
 kathrin:
   label: kathrin
-  instance: kathrin.kiwix.org
+  instance: scw-kiwix-prod-foreign-6f13c98e4daf49459e83029
   disks:
     sda1:
       device: /dev/sda1

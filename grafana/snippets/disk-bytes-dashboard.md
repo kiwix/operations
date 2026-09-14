@@ -6,6 +6,10 @@ Data (instances and disks) are defined in `disk-bytes-dashboard.yml`.
 
 You then run `disk-bytes-dashboard.py` and it will create a `disk-bytes-dashboard.json` file.
 
+```sh
+uv run --with pyyaml disk-bytes-dashboard.py
+```
+
 You can then update dashboard definition with this JSON content. Go to the dashboard settings, JSON model, and update code. Or create a new dashboard if you wish.
 
 Adding a new instance (node/server) or disk is simply a matter of updating `disk-bytes-dashboard.yml`, running Python tool again and using JSON to update dashboard.
