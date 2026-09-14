@@ -1,6 +1,6 @@
 stats:
   label: stats
-  instance: scw-kiwix-prod-foreign-7aaa98d57ede4cf0ba95d14
+  instance: scw-kiwix-prod-foreign-7467ee76fd0c4ff387c7b63
   disks:
     md0:
       device: /dev/md0
@@ -10,7 +10,7 @@ stats:
       mounted: /
 services:
   label: services
-  instance: scw-kiwix-prod-foreign-8dd780078597459d8d396a8
+  instance: scw-kiwix-prod-foreign-19b6f92b16164fe9a6107ad
   disks:
     md0:
       device: /dev/md0
@@ -170,7 +170,7 @@ mwcuratorb:
       mounted: /data
 ondemand:
   label: ondemand
-  instance: ondemand
+  instance: ondemand-worker.openzim.org
   disks:
     xvda15:
       device: /dev/xvda15
