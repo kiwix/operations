@@ -31,7 +31,7 @@ spec:
             memory: "1Gi"
             cpu: "100m"
       nodeSelector:
-        k8s.kiwix.org/role: "services-new"
+        k8s.kiwix.org/role: "services"
 ---
 apiVersion: v1
 kind: Service

@@ -39,4 +39,4 @@ spec:
         persistentVolumeClaim:
           claimName: services-api-files-pvc
       nodeSelector:
-        k8s.kiwix.org/role: "services-new"
+        k8s.kiwix.org/role: "services"

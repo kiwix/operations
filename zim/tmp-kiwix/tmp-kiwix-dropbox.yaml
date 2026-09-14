@@ -85,7 +85,7 @@ spec:
           name: dropbox-host-pubkeys
           defaultMode: 0644
       nodeSelector:
-        k8s.kiwix.org/role: "services-new"
+        k8s.kiwix.org/role: "services"
 ---
 apiVersion: v1
 kind: Service

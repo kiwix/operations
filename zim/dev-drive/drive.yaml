@@ -45,7 +45,7 @@ spec:
         persistentVolumeClaim:
           claimName: services-dev-drive-pvc
       nodeSelector:
-        k8s.kiwix.org/role: "services-new"
+        k8s.kiwix.org/role: "services"
 ---
 apiVersion: v1
 kind: Service

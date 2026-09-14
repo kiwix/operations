@@ -33,4 +33,4 @@ spec:
           claimName: services-api-postgres-db-pvc
       restartPolicy: Never
       nodeSelector:
-        k8s.kiwix.org/role: "services-new"
+        k8s.kiwix.org/role: "services"

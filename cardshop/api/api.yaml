@@ -45,7 +45,7 @@ spec:
             secretName: api-secrets
             defaultMode: 0600
       nodeSelector:
-        k8s.kiwix.org/role: "services-new"
+        k8s.kiwix.org/role: "services"
 ---
 apiVersion: v1
 kind: Service
