@@ -1,20 +1,20 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: zimfarm-watcher-local-pv
+  name: srv-stats-matomo-files-local-pv
 spec:
   capacity:
-    storage: 50Gi
+    storage: 100Mi
   volumeMode: Filesystem
   accessModes:
-  - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Delete
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
   storageClassName: local-storage
   local:
-    path: /data/zimfarm-watcher
+    path: /data/matomo/files
   claimRef:
-    name: watcher-pvc
-    namespace: zimfarm
+    name: stats-matomo-files-pvc
+    namespace: stats
   nodeAffinity:
     required:
       nodeSelectorTerms:
@@ -22,4 +22,4 @@ spec:
             - key: k8s.kiwix.org/role
               operator: In
               values:
-              - storage
+              - stats

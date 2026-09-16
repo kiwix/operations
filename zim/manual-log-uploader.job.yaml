@@ -27,7 +27,7 @@ spec:
               volumeMounts:
               - mountPath: "/var/log/nginx"
                 name: nginx-logs-volume
-                subPath: archives
+                subPath: xxxxx
                 readOnly: true
               resources:
                 requests:
@@ -36,7 +36,7 @@ spec:
           volumes:
             - name: nginx-logs-volume
               persistentVolumeClaim:
-                claimName: nginx-logs-pvc
+                claimName: xxx-logs-pvc
           restartPolicy: Never
           nodeSelector:
-            k8s.kiwix.org/role: "storage"
+            k8s.kiwix.org/role: "xxx"

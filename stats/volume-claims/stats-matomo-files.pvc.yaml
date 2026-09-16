@@ -1,13 +1,13 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: kiwix-download-pvc
-  namespace: zim
+  name: stats-matomo-files-pvc
+  namespace: stats
 spec:
   accessModes:
   - ReadWriteMany
   resources:
     requests:
-      storage: 1Ti
+      storage: 100Mi
   storageClassName: ""
-  volumeName: kiwix-download-local-pv
+  volumeName: srv-stats-matomo-files-local-pv

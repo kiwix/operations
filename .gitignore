@@ -21,3 +21,4 @@ kubeconfig-*.yaml
 .vscode
 
 junk/
+conf/
