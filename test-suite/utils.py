@@ -106,6 +106,8 @@ def check_cors_headers_for(
         "https://pwa.kiwix.org",
         "https://kiwix.github.io",
         "http://localhost:*",
+        "moz-extension:",
+        "chrome-extension:",
     }.issubset([item.strip() for item in csp.split("self", 1)[1].split(" ")])
 
     return True
