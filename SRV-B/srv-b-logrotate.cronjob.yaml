@@ -31,6 +31,10 @@ spec:
                 name: logrotate-configs
                 subPath: logrotate.conf
                 readOnly: true
+              - mountPath: "/etc/logrotate.d/archive-download-kiwix.conf"
+                name: logrotate-configs
+                subPath: archive-download-kiwix.conf
+                readOnly: true
               - mountPath: "/etc/logrotate.d/wp1-download-openzim.conf"
                 name: logrotate-configs
                 subPath: wp1-download-openzim.conf

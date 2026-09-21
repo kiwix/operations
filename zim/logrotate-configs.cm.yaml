@@ -16,6 +16,10 @@ data:
     missingok
     nomail
     include /etc/logrotate.d
+  archive-download-kiwix.conf: |
+    /data/nginx-logs/archive-download-kiwix/*.log {
+      olddir /data/nginx-logs/archives/archive-download-kiwix
+    }
   mirror-download-kiwix.conf: |
     /data/nginx-logs/mirror-download-kiwix/*.log {
       olddir /data/nginx-logs/archives/mirror-download-kiwix
