@@ -35,6 +35,10 @@ spec:
                 name: logrotate-configs
                 subPath: mirror-download-kiwix.conf
                 readOnly: true
+              - mountPath: "/etc/logrotate.d/download-openzim.conf"
+                name: logrotate-configs
+                subPath: download-openzim.conf
+                readOnly: true
               command: ["logrotate", "-v", "--state", "/data/nginx-logs/logrotate.status", "/etc/logrotate.conf"]
           volumes:
           - name: nginx-logs-volume
