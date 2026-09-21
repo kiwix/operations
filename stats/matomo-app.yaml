@@ -6,7 +6,12 @@ metadata:
 data:
   www-pool.conf: |
     [www]
-    pm.max_children = 20
+    pm = dynamic
+    pm.max_children = 8192
+    pm.max_requests = 500
+    pm.start_servers = 10
+    pm.min_spare_servers = 10
+    pm.max_spare_servers = 32
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -34,7 +39,7 @@ spec:
           - name: MATOMO_URL
             value: "http://matomo-web-service"
           - name: PHP_MEMORY_LIMIT
-            value: "3096M"
+            value: "4000M"
         volumeMounts:
         - name: files-volume
           mountPath: "/var/www/html/misc/user"
@@ -56,8 +61,8 @@ spec:
         - containerPort: 9000
         resources:
           requests:
-            memory: "128Mi"
-            cpu: "400m"
+            memory: "2Gi"
+            cpu: "1000m"
       volumes:
       - name: files-volume
         persistentVolumeClaim:
