@@ -4,7 +4,7 @@ metadata:
   name: backup
   namespace: stats
 spec:
-  schedule: "0 1 * * 0"
+  schedule: "0 1 * * *"
   successfulJobsHistoryLimit: 1
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
@@ -42,4 +42,4 @@ spec:
               claimName: stats-matomo-files-pvc
           restartPolicy: Never
           nodeSelector:
-            k8s.kiwix.org/role: "stats"
+            k8s.kiwix.org/role: "hotspot-dl"
