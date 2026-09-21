@@ -27,8 +27,6 @@ spec:
               env:
                 - name: BORGBASE_NAME
                   value: "stats"
-                - name: DATABASES
-                  value: "mysql://root:root@matomo-db-service:3306/all"
                 - name: BITWARDEN_EMAIL
                   value: "contact+bitwarden-slave@kiwix.org"
               command: ["single-backup"]
