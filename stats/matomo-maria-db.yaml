@@ -1,0 +1,112 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mariadb-configs
+  namespace: stats
+data:
+  matomo-srv.cnf: |
+    [mariadb]
+    # dont resolve reverse names on clients IPs
+    skip_name_resolve
+    # max size of packet accepted from client. must not below client's conf
+    max_allowed_packet=512M
+    # disable limit of filepath from which it is allowed to LOAD file
+    secure-file-priv = ""
+    # allow load from client's local filesystem
+    local-infile=1
+
+    # size of redo log file. larger means less I/O
+    innodb_log_file_size=4G
+    # recommended 80% of RAM by matomo
+    innodb_buffer_pool_size=20G
+    # recommended at 2 by matomo
+    innodb_flush_log_at_trx_commit=2
+
+    # TMP (for SQL dump import)
+    # innodb_buffer_pool_size = 24G
+    # innodb_flush_log_at_trx_commit=0
+    # innodb_flush_method = O_DIRECT
+
+    # https://matomo.org/faq/on-premise/how-to-configure-matomo-for-speed/
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  namespace: stats
+  labels:
+    app: matomo-maria-db
+  name: matomo-maria-db-sts
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matomo-maria-db
+  serviceName: matomo-maria-db-service
+  template:
+    metadata:
+      labels:
+        app: matomo-maria-db
+    spec:
+      containers:
+      - image: docker.io/mariadb:lts
+        imagePullPolicy: IfNotPresent
+        name: mariadb
+        env:
+        - name: MARIADB_USER
+          value: matomo
+        - name: MARIADB_DATABASE
+          value: matomo
+        - name: MARIADB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: matomo-secrets
+              key: MATOMO_MARIADB_PASSWORD
+        - name: MARIADB_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: matomo-secrets
+              key: MATOMO_MARIADB_ROOT_PASSWORD
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/var/lib/mysql"
+          readOnly: false
+        - name: mariadb-configs
+          subPath: matomo-srv.cnf
+          mountPath: "/etc/mysql/conf.d/matomo-srv.cnf"
+          readOnly: true
+        - mountPath: /tmp
+          name: tmpfs
+        ports:
+        - containerPort: 3306
+        # resources:
+        #   requests:
+        #     memory: "10Gi"
+        #     cpu: "6000m"
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: stats-matomo-maria-db-pvc
+      - name: mariadb-configs
+        configMap:
+          name: mariadb-configs
+      - name: tmpfs
+        emptyDir:
+          sizeLimit: 2Gi
+          medium: Memory
+      nodeSelector:
+        k8s.kiwix.org/role: "stats"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: stats
+  name: matomo-maria-db-service
+  labels:
+    app: matomo-maria-db
+spec:
+  selector:
+    app: matomo-maria-db
+  ports:
+  - protocol: TCP
+    port: 3306
+    targetPort: 3306
