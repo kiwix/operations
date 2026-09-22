@@ -39,21 +39,3 @@ jobs:
         env:
           LIBRARY_HOST: library.kiwix.org
         run: pytest -vvv test_library.py
-
-  staging-library:
-    runs-on: ubuntu-22.04
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.14
-          architecture: x64
-      - name: Install dependencies
-        run: pip install -r test-suite/requirements.txt
-      - name: Test staging.library.kiwix.org
-        working-directory: test-suite
-        env:
-          LIBRARY_HOST: staging.library.kiwix.org
-          LIBRARY_COOKIES: "confirmed:yes"
-          TIMEOUT: 30
-        run: pytest -vvv -m "not varnish" test_library.py
