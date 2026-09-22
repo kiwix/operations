@@ -1,7 +1,7 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: backup
+  name: backup-db
   namespace: stats
 spec:
   schedule: "0 1 * * *"
@@ -26,7 +26,52 @@ spec:
                     name: backup-credentials
               env:
                 - name: BORGBASE_NAME
-                  value: "stats"
+                  value: "stats-db"
+                - name: BITWARDEN_EMAIL
+                  value: "contact+bitwarden-slave@kiwix.org"
+              command: ["single-backup"]
+              resources:
+                requests:
+                  cpu: 300m
+                  memory: 256Mi
+                limits:
+                  memory: 512Mi
+          volumes:
+          - name: files-volume
+            emptyDir: {}
+          restartPolicy: Never
+          nodeSelector:
+            k8s.kiwix.org/role: "hotspot-dl"
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: backup-files
+  namespace: stats
+spec:
+  schedule: "0 1 * * *"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 1
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          containers:
+            - name: borg-backup
+              image: ghcr.io/kiwix/borg-backup:latest
+              imagePullPolicy: Always
+              volumeMounts:
+              - name: files-volume
+                mountPath: "/storage"
+                readOnly: true
+              envFrom:
+                - secretRef:
+                    name: backup-credentials
+              env:
+                - name: BORGBASE_NAME
+                  value: "stats-files"
                 - name: BITWARDEN_EMAIL
                   value: "contact+bitwarden-slave@kiwix.org"
               command: ["single-backup"]
@@ -42,4 +87,4 @@ spec:
               claimName: stats-matomo-files-pvc
           restartPolicy: Never
           nodeSelector:
-            k8s.kiwix.org/role: "hotspot-dl"
+            k8s.kiwix.org/role: "stats"
