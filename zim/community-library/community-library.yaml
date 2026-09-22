@@ -1,0 +1,175 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: community-library-app
+  name: community-library-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: community-library-app
+  template:
+    metadata:
+      labels:
+        app: community-library-app
+    spec:
+      initContainers:
+      - image: docker.io/busybox
+        name: create-empty-library
+        command: ["/bin/sh", "-c", 'echo -e "<library version=\"20110515\">\n</library>" > /library/catalog.xml']
+        volumeMounts:
+        - mountPath: "/library"
+          name: catalog-volume
+          readOnly: false
+        resources:
+          requests:
+            memory: "16Mi"
+            cpu: "1m"
+          limits:
+            memory: "16Mi"
+            cpu: "1m"
+      containers:
+      - image: ghcr.io/kiwix/catalog-retriever:latest
+        imagePullPolicy: Always
+        name: catalog-retriever
+        env:
+          - name: SAVE_TO
+            value: /library/catalog.xml
+          - name: CMS_API_URL
+            value: http://api-service.cms.svc.cluster.local/v1
+          - name: CMS_COLLECTION_ID
+            value: community
+          - name: REFRESH_EVERY_SECONDS
+            value: "300"
+          - name: ADD_BOOK_PATH_TO_XML
+            value: "/data/zim"
+          - name: DEBUG
+            value: ""
+        volumeMounts:
+        - mountPath: "/library"
+          name: catalog-volume
+          readOnly: false
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "20m"
+          limits:
+            memory: "128Mi"
+            cpu: "20m"
+      - image: ghcr.io/kiwix/kiwix-tools-nightly:latest
+        imagePullPolicy: Always
+        command: ["kiwix-serve", "-b", "--library", "--monitorLibrary", "--searchLimit", "5", "/library/catalog.xml"]
+        name: kiwix-tools
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: "/data/zim"
+          name: zim-volume
+          readOnly: true
+        - mountPath: "/library"
+          name: catalog-volume
+          readOnly: true
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "20m"
+          limits:
+            memory: "2.5Gi"
+            cpu: "800m"
+      volumes:
+      - name: catalog-volume
+        emptyDir:
+          sizeLimit: 30Mi
+          medium: Memory
+      - name: zim-volume
+        persistentVolumeClaim:
+          claimName: browser-zim-pvc
+      nodeSelector:
+        k8s.kiwix.org/role: "browser"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: community-library-service
+  labels:
+    app: community-library-app
+spec:
+  selector:
+    app: community-library-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: community-library-ingress
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+        location /robots.txt {
+          add_header Content-Type "text/plain";
+          return 200 "User-agent: *\nDisallow: /";
+        }
+
+        set $shouldRewrite 0;
+        if ($http_cookie !~* "confirmed=yes") {
+          set $shouldRewrite 1;
+        }
+
+        if ($uri ~* "/.well-known/acme-challenge/(.+)") {
+          set $shouldRewrite 0;
+        }
+
+        if ($shouldRewrite = 1) {
+          rewrite ^ /nanobis-manual-1w.html last;
+        }
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - community.library.kiwix.org
+      secretName: community-library-kiwix-org-tls
+  rules:
+  - host: community.library.kiwix.org
+    http:
+      paths:
+      - path: /skin/
+        pathType: Prefix
+        backend:
+          service:
+            name: community-library-service
+            port:
+              number: 80
+      - path: /nojs/
+        pathType: Exact
+        backend:
+          service:
+            name: community-library-service
+            port:
+              number: 80
+      - path: /nanobis-auto-1w.html
+        pathType: Exact
+        backend:
+          service:
+            name: nanobis-service
+            port:
+              name: http
+      - path: /nanobis-manual-1w.html
+        pathType: Exact
+        backend:
+          service:
+            name: nanobis-service
+            port:
+              name: http
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: community-library-service
+            port:
+              number: 80
