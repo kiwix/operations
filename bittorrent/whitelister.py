@@ -50,6 +50,7 @@ BTIH_MAP_FOLDER = CACHE_DIR / "btih.map"
 REFRESH_INTERVAL = humanfriendly.parse_timespan(os.getenv("REFRESH_INTERVAL") or "1h")
 TOKEN = os.environ["TOKEN"]
 TIMEOUT = int(os.getenv("TIMEOUT") or "30")
+USER_AGENT = os.getenv("USER_AGENT", "kiwix-tracker-whitelister/1.0")
 
 logging.basicConfig(level=logging.DEBUG if DEBUG else logging.INFO)
 logging.getLogger("urllib3").setLevel(logging.INFO)
@@ -81,6 +82,7 @@ retries = Retry(
     raise_on_status=False,  # raise on Bad Status or response
     respect_retry_after_header=True,  # respect Retry-After header (status_forcelist)
 )
+session.headers["User-Agent"] = USER_AGENT
 session.mount("http", requests.adapters.HTTPAdapter(max_retries=retries))
 
 
