@@ -116,19 +116,6 @@ metadata:
           return 200 "User-agent: *\nDisallow: /";
         }
 
-        set $shouldRewrite 0;
-        if ($http_cookie !~* "confirmed=yes") {
-          set $shouldRewrite 1;
-        }
-
-        if ($uri ~* "/.well-known/acme-challenge/(.+)") {
-          set $shouldRewrite 0;
-        }
-
-        if ($shouldRewrite = 1) {
-          rewrite ^ /nanobis-manual-1w.html last;
-        }
-
         location = / {
           add_header Content-Type "text/plain";
           return 404 "For staging, you need a direct link to your ZIM, there is nothing here.";
@@ -154,27 +141,6 @@ spec:
   - host: staging.library.kiwix.org
     http:
       paths:
-      - path: /skin/
-        pathType: Prefix
-        backend:
-          service:
-            name: staging-library-service
-            port:
-              number: 80
-      - path: /nanobis-auto-1w.html
-        pathType: Exact
-        backend:
-          service:
-            name: nanobis-service
-            port:
-              name: http
-      - path: /nanobis-manual-1w.html
-        pathType: Exact
-        backend:
-          service:
-            name: nanobis-service
-            port:
-              name: http
       - path: /
         pathType: Prefix
         backend:
