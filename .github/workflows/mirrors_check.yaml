@@ -20,4 +20,6 @@ jobs:
         run: .venv/bin/pip install -r test-suite/requirements.txt
       - name: Test mirrors
         working-directory: test-suite
+        env:
+          TIMEOUT: "40"          
         run: ../.venv/bin/python -m pytest -vvv test_mirrors.py
