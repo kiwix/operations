@@ -1,6 +1,8 @@
 # pyright: reportImplicitStringConcatenation=false
 import os
+import re
 from http import HTTPStatus
+from pathlib import Path
 from typing import NamedTuple, Union
 
 import requests
@@ -178,3 +180,24 @@ def get_current_mirrors(
         for mirror in resp.json()["mirrors"]
         if mirror["enabled"]
     ]
+
+
+def get_permanent_zim_url(
+    load_balancer_url: str, most_mirrored_zims_url: str, auth: Auth = None
+) -> str:
+    resp = requests.get(
+        most_mirrored_zims_url,
+        timeout=TIMEOUT,
+        allow_redirects=True,
+        headers=USER_AGENT_HEADERS,
+        auth=auth,
+    )
+    resp.raise_for_status()
+    # path of most mirrored ZIM (result is a list)
+    path = resp.json()[0]["path"]
+    # permalink is composed of dateless filename
+    dateless = re.sub(r"_\d{4}-\d{2}[a-z]{0,2}(.zim)$", r"\1", path)
+    dlp = Path(dateless)
+    # permalinks are all on root of zim/ with no folder
+    permalink = Path(*dlp.parts[:-2], *dlp.parts[-1:])
+    return f"{load_balancer_url}{permalink}"

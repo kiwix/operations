@@ -17,6 +17,7 @@ from utils import (
     Headers,
     Mirror,
     get_current_mirrors,
+    get_permanent_zim_url,
     get_url,
 )
 
@@ -25,16 +26,17 @@ RECORD_URLS_TO = os.getenv("RECORD_URLS_TO", "")
 READ_URLS_FROM = os.getenv("READ_URLS_FROM", "")
 RECORDED_URLS: set[str] = set()
 
+LOAD_BALANCER_URL: str = "https://lb.download.kiwix.org/"
 # MB only provides the full list of mirrors through this.
-CANONICAL_MIRRORS_LIST_URL: str = "https://lb.download.kiwix.org/mirrors.json"
+CANONICAL_MIRRORS_LIST_URL: str = f"{LOAD_BALANCER_URL}mirrors.json"
 # list of mirrors (hostname) not to use in tests
 EXCLUDED_MIRRORS: list[str] = []
-# this is using the permalink pattern
-# from the permalink redirects (no warehouse path, no period in filename)
-# using wikipedia_he_* as this is the only pattern mirrored by all mirrors
-# good enough for now
-PERMANENT_ZIM_URL: str = (
-    "https://lb.download.kiwix.org/zim/wikipedia_en_all_mini.zim"
+# endpoint listing a few of the most mirrored ZIM files
+# it is expected that every mirrors have those files.
+MOST_MIRRORED_ZIMS_URL: str = f"{LOAD_BALANCER_URL}well-known/most-mirrored.json"
+# permalink to a ZIM present on all mirrors
+PERMANENT_ZIM_URL: str = get_permanent_zim_url(
+    LOAD_BALANCER_URL, MOST_MIRRORED_ZIMS_URL
 )
 # all non-zim-only mirrors mirror all other files
 PERMANENT_APK_URL: str = (

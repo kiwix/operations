@@ -227,6 +227,13 @@ spec:
             name: lb-web-service
             port:
               name: mb-api
+      - path: /well-known/most-mirrored.json
+        pathType: Exact
+        backend:
+          service:
+            name: lb-web-service
+            port:
+              name: mb-api
       - path: /zim/(.+)\.zim\.lb$
         pathType: ImplementationSpecific
         backend:
