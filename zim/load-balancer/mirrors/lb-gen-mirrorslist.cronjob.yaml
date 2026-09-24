@@ -4,7 +4,7 @@ metadata:
   name: lb-gen-mirrorslist
   namespace: zim
 spec:
-  schedule: "0 0 * * *"
+  schedule: "1 * * * *"
   successfulJobsHistoryLimit: 0
   failedJobsHistoryLimit: 1
   concurrencyPolicy: Forbid
