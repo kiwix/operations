@@ -71,7 +71,7 @@ spec:
             cpu: "20m"
       - image: ghcr.io/kiwix/kiwix-tools-nightly:latest
         imagePullPolicy: Always
-        command: ["kiwix-serve", "-b", "--library", "--monitorLibrary", "--nolibrarybutton", "--searchLimit", "5", "/library/catalog.xml"]
+        command: ["kiwix-serve", "-b", "--library", "--monitorLibrary", "--nodatealiases", "--nolibrarybutton", "--searchLimit", "5", "/library/catalog.xml"]
         name: kiwix-tools
         ports:
         - containerPort: 80
