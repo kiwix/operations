@@ -47,6 +47,17 @@ spec:
             value: "/data/dev"
           - name: DEBUG
             value: ""
+          - name: USE_OAUTH
+            value: "y"
+          - name: OAUTH_AUDIENCE
+            value: c62179a4-55ce-494f-8653-8732a25f1a6e
+          - name: OAUTH_CLIENT_ID
+            value: 5471b3a1-20b4-4180-9b12-1dfb9850b34c
+          - name: OAUTH_CLIENT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: staging-secrets
+                key: OAUTH_CLIENT_SECRET
         volumeMounts:
         - mountPath: "/library"
           name: catalog-volume
