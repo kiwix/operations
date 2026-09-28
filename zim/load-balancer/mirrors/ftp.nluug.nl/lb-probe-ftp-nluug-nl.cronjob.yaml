@@ -46,6 +46,10 @@ spec:
                     configMapKeyRef:
                       name: lb-configs
                       key: PROBE_IPV6
+                - name: HTTP_PROBE_TIMEOUT
+                  value: "40"
+                - name: RSYNC_SCAN_TIMEOUT
+                  value: "40"
               resources:
                 requests:
                   memory: "64Mi"
