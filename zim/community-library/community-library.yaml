@@ -40,7 +40,7 @@ spec:
           - name: CMS_API_URL
             value: http://api-service.cms.svc.cluster.local/v1
           - name: CMS_COLLECTION_ID
-            value: community
+            value: Community
           - name: REFRESH_EVERY_SECONDS
             value: "300"
           - name: ADD_BOOK_PATH_TO_XML
