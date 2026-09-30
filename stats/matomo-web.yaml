@@ -89,16 +89,20 @@ spec:
         app: matomo-web
     spec:
       containers:
-      - image: docker.io/nginx:1.21
+      - image: ghcr.io/kiwix/matomo:5.14.0-fpm
         imagePullPolicy: IfNotPresent
+        # our matomo image contains nginx 1.26 that we're using to serve static assets
+        # without passing those requests to matomo-app service (php)
+        args: ["/usr/sbin/nginx", "-g", "daemon off;"]
         name: nginx
         volumeMounts:
         - name: files-volume
           mountPath: "/var/www/html/misc/user"
           subPath: branding
-          readOnly: true
+          # image entrypoint chown's /var/ww/html to running user
+          readOnly: false
         - name: nginx-configs
-          mountPath: "/etc/nginx/conf.d/default.conf"
+          mountPath: "/etc/nginx/sites-enabled/default"
           subPath: matomo.conf
           readOnly: true
         ports:
