@@ -21,14 +21,31 @@ spec:
               - name: files-volume
                 mountPath: "/storage"
                 readOnly: true
-              envFrom:
-                - secretRef:
-                    name: backup-credentials
               env:
                 - name: BORGBASE_NAME
-                  value: "stats-db"
+                  value: "matomo-db"
+                - name: DATABASES
+                  valueFrom:
+                    secretKeyRef:
+                      name: backup-credentials
+                      key: DATABASES
                 - name: BITWARDEN_EMAIL
                   value: "contact+bitwarden-slave@kiwix.org"
+                - name: BW_CLIENTID
+                  valueFrom:
+                    secretKeyRef:
+                      name: backup-credentials
+                      key: BW_CLIENTID
+                - name: BW_CLIENTSECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: backup-credentials
+                      key: BW_CLIENTSECRET
+                - name: BW_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: backup-credentials
+                      key: BW_PASSWORD
               command: ["single-backup"]
               resources:
                 requests:
@@ -66,14 +83,26 @@ spec:
               - name: files-volume
                 mountPath: "/storage"
                 readOnly: true
-              envFrom:
-                - secretRef:
-                    name: backup-credentials
               env:
                 - name: BORGBASE_NAME
-                  value: "stats-files"
+                  value: "matomo-files"
                 - name: BITWARDEN_EMAIL
                   value: "contact+bitwarden-slave@kiwix.org"
+                - name: BW_CLIENTID
+                  valueFrom:
+                    secretKeyRef:
+                      name: backup-credentials
+                      key: BW_CLIENTID
+                - name: BW_CLIENTSECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: backup-credentials
+                      key: BW_CLIENTSECRET
+                - name: BW_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: backup-credentials
+                      key: BW_PASSWORD
               command: ["single-backup"]
               resources:
                 requests:
