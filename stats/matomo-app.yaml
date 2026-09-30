@@ -46,10 +46,6 @@ spec:
           subPath: branding
           readOnly: false
         - name: files-volume
-          mountPath: "/var/www/html"
-          subPath: webroot
-          readOnly: false
-        - name: files-volume
           mountPath: "/var/www/html/config/config.ini.php"
           subPath: config.ini.php
           readOnly: false

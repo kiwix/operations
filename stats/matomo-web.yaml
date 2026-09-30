@@ -94,10 +94,6 @@ spec:
         name: nginx
         volumeMounts:
         - name: files-volume
-          mountPath: "/var/www/html"
-          subPath: webroot
-          readOnly: true
-        - name: files-volume
           mountPath: "/var/www/html/misc/user"
           subPath: branding
           readOnly: true
