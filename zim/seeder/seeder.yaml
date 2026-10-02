@@ -44,10 +44,8 @@ spec:
           value: "30m"
         - name: KEEP_FOR
           value: "12w"
-        - name: MIN_SIZE
-          value: "1GiB"
         - name: MAX_STORAGE
-          value: "5TiB"
+          value: "6TiB"
         volumeMounts:
         - name: qbt-volume
           subPath: seeder-cache
