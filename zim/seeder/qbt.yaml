@@ -65,3 +65,32 @@ spec:
   - protocol: TCP
     port: 80
     targetPort: http-webui
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: qbt-ingress
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/server-snippet: |
+      location /robots.txt {
+        add_header Content-Type "text/plain";
+        return 200 "User-agent: *\nDisallow: /";
+      }
+spec:
+  tls:
+    - hosts:
+      - kathrin.kiwix.org
+      secretName: kathrin-kiwix-org-tls
+  rules:
+  - host: kathrin.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: qbt-webui-service
+            port:
+              number: 80
