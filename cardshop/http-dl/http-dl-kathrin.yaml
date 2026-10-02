@@ -3,17 +3,17 @@ kind: Deployment
 metadata:
   namespace: cardshop
   labels:
-    app: http-dl-app
-  name: http-dl-deployment
+    app: http-dl-kathrin-app
+  name: http-dl-kathrin-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: http-dl-app
+      app: http-dl-kathrin-app
   template:
     metadata:
       labels:
-        app: http-dl-app
+        app: http-dl-kathrin-app
     spec:
       securityContext:
       containers:
@@ -33,20 +33,20 @@ spec:
       volumes:
       - name: bundles-volume
         persistentVolumeClaim:
-          claimName: hotspot-dl-content-bundles-pvc
+          claimName: seeder-content-bundles-pvc
       nodeSelector:
-        k8s.kiwix.org/role: "hotspot-dl"
+        k8s.kiwix.org/role: "seeder"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   namespace: cardshop
-  name: http-dl-service
+  name: http-dl-kathrin-service
   labels:
-    app: http-dl-app
+    app: http-dl-kathrin-app
 spec:
   selector:
-    app: http-dl-app
+    app: http-dl-kathrin-app
   ports:
   - protocol: TCP
     port: 80
@@ -55,7 +55,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: http-dl-ingress
+  name: http-dl-kathrin-ingress
   namespace: cardshop
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /
@@ -69,16 +69,16 @@ spec:
   ingressClassName: nginx
   tls:
     - hosts:
-      - scw.dl.hotspot.kiwix.org
-      secretName: scw-dl-hotspot-kiwix-org-tls
+      - kathrin.dl.hotspot.kiwix.org
+      secretName: kathrin-dl-hotspot-kiwix-org-tls
   rules:
-  - host: scw.dl.hotspot.kiwix.org
+  - host: kathrin.dl.hotspot.kiwix.org
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: http-dl-service
+            name: http-dl-kathrin-service
             port:
               number: 80

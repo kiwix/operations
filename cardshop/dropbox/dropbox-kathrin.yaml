@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: cardshop
+  labels:
+    app: dropbox-kathrin-app
+  name: dropbox-kathrin-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dropbox-kathrin-app
+  template:
+    metadata:
+      labels:
+        app: dropbox-kathrin-app
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/dropbox:latest
+        imagePullPolicy: Always
+        name: dropbox
+        env:
+          - name: USERS
+            valueFrom:
+              configMapKeyRef:
+                name: dropbox-pubkeys
+                key: users
+                optional: false
+        volumeMounts:
+        - name: bundles-volume
+          subPath: "files"
+          mountPath: "/jails/cs-worker/data/content-bundles"
+          readOnly: false
+        - name: host-keys
+          subPath: ecdsa
+          mountPath: "/etc/ssh/ssh_host_ecdsa_key"
+          readOnly: true
+        - name: host-pubkeys
+          subPath: ecdsa
+          mountPath: "/etc/ssh/ssh_host_ecdsa_key.pub"
+          readOnly: true
+        - name: host-keys
+          subPath: ed25519
+          mountPath: "/etc/ssh/ssh_host_ed25519_key"
+          readOnly: true
+        - name: host-pubkeys
+          subPath: ed25519
+          mountPath: "/etc/ssh/ssh_host_ed25519_key.pub"
+          readOnly: true
+        - name: host-keys
+          subPath: rsa
+          mountPath: "/etc/ssh/ssh_host_rsa_key"
+          readOnly: true
+        - name: host-pubkeys
+          subPath: rsa
+          mountPath: "/etc/ssh/ssh_host_rsa_key.pub"
+          readOnly: true
+        ports:
+          - containerPort: 22
+            # kathrin only has this port forwarded to it
+            # which is outside 30000-32767 range so it cannot be used
+            # in a service. thus using an hostPort
+            hostPort: 51411
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "2000m"
+      volumes:
+      - name: bundles-volume
+        persistentVolumeClaim:
+          claimName: seeder-content-bundles-pvc
+      - name: host-keys
+        secret:
+          secretName: dropbox-host-keys
+          defaultMode: 0600
+      - name: host-pubkeys
+        configMap:
+          name: dropbox-host-pubkeys
+          defaultMode: 0644
+      nodeSelector:
+        k8s.kiwix.org/role: "seeder"
