@@ -16,4 +16,5 @@ data:
   BACKUP_VIEW_BASE_URL: ""
   ZIMCHECK_SCRAPERS_WHITELIST_REGEX: sotoki|zimit|mwoffliner|devdocs
   # devdocs|freecodecamp|gutenberg|ifixit|kolibri|maps|mindtouch|mwoffliner|nautilus|openedx|phet|sotoki|ted|wikihow|youtube|zimit
+  DOWNLOAD_STATS_DAYS_AGO: "2"
 
