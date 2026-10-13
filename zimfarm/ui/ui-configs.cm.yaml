@@ -15,6 +15,8 @@ data:
       "MATOMO_TRACKER_FILE_NAME": "matomo",
       "MONITORING_URL": "https://monitoring.openzim.org/v3",
       "BLOB_MAX_SIZE": 1048576,
+      "CMS_API_URL": "https://api.cms.openzim.org/v1",
+      "CMS_UI_URL": "https://cms.openzim.org",
       "OAUTH_BASE_URL": "https://ory.login.kiwix.org",
       "LOGIN_MODES": ["oauth"],
       "OAUTH_MODE": "oidc",
