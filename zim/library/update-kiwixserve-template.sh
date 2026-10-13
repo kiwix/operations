@@ -32,7 +32,7 @@ KIWIX_PATCH=$(cat <<EOF
       <script src="{{root}}/skin/iso6391To3.js?KIWIXCACHEID"></script>
       <script type="text/javascript" src="{{root}}/skin/index.js?KIWIXCACHEID" defer></script>
 +     <link rel="stylesheet" type="text/css" href="https://donorbox.org/animate-popup-donate-button.css">
-+     <script type="text/javascript" id="donorbox-donate-button-installer" src="https://donorbox.org/install-donate-button.js" data-target="_blank" data-href="https://donate.kiwix.org/" data-style="rgb(255, 127, 0); color: rgb(255, 255, 255); text-decoration: none; font-family: Verdana, sans-serif; display: flex; font-size: 16px; padding: 8px 22px 8px 18px; border-radius: 5px 5px 0px 0px; gap: 8px; width: fit-content; line-height: 24px; position: fixed; top: 50%; transform-origin: center center; z-index: 9999; overflow: hidden; right: 20px; transform: translate(50%, -50%) rotate(-90deg);" data-button-cta="Support Kiwix" data-img-src="https://donorbox.org/images/white_logo.svg"></script>
++     <script type="text/javascript" id="donorbox-donate-button-installer" src="https://donorbox.org/install-donate-button.js" data-target="_blank" data-href="https://donate.kiwix.org/" data-style="background: rgb(255, 127, 0); color: rgb(255, 255, 255); text-decoration: none; font-family: Verdana, sans-serif; display: flex; font-size: 16px; padding: 8px 22px 8px 18px; border-radius: 5px 5px 0px 0px; gap: 8px; width: fit-content; line-height: 24px; position: fixed; top: 50%; transform-origin: center center; z-index: 9999; overflow: hidden; right: 20px; transform: translate(50%, -50%) rotate(-90deg);" data-button-cta="Support Kiwix" data-img-src="https://donorbox.org/images/white_logo.svg"></script>
     </head>
     <body>
       <noscript>
