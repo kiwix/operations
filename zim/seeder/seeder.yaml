@@ -41,7 +41,7 @@ spec:
         - name: SEED_WHOLE_CATALOG
           value: "1"
         - name: SLEEP_INTERVAL
-          value: "30m"
+          value: "1m"
         - name: KEEP_FOR
           value: "12w"
         - name: MAX_STORAGE
