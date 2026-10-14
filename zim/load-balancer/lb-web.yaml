@@ -193,6 +193,7 @@ metadata:
         if ($shouldRewrite = 1) {
           rewrite ^/zim/(.+)\.zim\.lb$ /nanobis-manual-1w.html last;
           rewrite ^/status.json$ /nanobis-manual-1w.html last;
+          rewrite ^/well-known/btihs.txt$ /nanobis-manual-1w.html last;
         }
 
         rewrite ^/$  https://hub.kiwix.org/downloads/ permanent;
@@ -228,6 +229,13 @@ spec:
             port:
               name: mb-api
       - path: /well-known/most-mirrored.json
+        pathType: Exact
+        backend:
+          service:
+            name: lb-web-service
+            port:
+              name: mb-api
+      - path: /well-known/btihs.txt
         pathType: Exact
         backend:
           service:
