@@ -24,7 +24,10 @@ spec:
             subPath: kiwix-serve-templates
             name: library-volume
             readOnly: false
-          args: ["/usr/local/bin/update-template"]
+          # for some reason, just running update-template directly doesnt work
+          # the script runs fine but the file on disk is not updated.
+          # not worth investigating ATM
+          args: ["/bin/bash", "-c", "update-template"]
           resources:
             requests:
               cpu: 200m
