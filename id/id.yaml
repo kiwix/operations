@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: id
+  labels:
+    app: id-app
+  name: id-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: id-app
+  template:
+    metadata:
+      labels:
+        app: id-app
+    spec:
+      containers:
+      - image: ghcr.io/openzim/id:latest
+        imagePullPolicy: Always
+        name: id
+        ports:
+        - containerPort: 80
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "1m"
+      nodeSelector:
+        k8s.kiwix.org/role: "services"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: id
+  name: id-service
+  labels:
+    app: id-app
+spec:
+  selector:
+    app: id-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+    name: http
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: id-ingress
+  namespace: id
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+      location /robots.txt {
+        add_header Content-Type "text/plain";
+        return 200 "User-agent: *\nDisallow: /";
+      }
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - id.openzim.org
+      secretName: id-openzim-org-tls
+  rules:
+  - host: id.openzim.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: id-service
+            port:
+              name: http
