@@ -5,3 +5,4 @@ metadata:
   namespace: cms
 data:
   DEBUG: "1"
+  INTERNAL_HOST_MAPPING: lb.download.kiwix.org:lb-web-service.zim,browse.library.kiwix.org:prod-kiwix-browse-frontend-service.zim,community.library.kiwix.org:community-library-service.zim,staging.library.kiwix.org:staging-library-service.zim
