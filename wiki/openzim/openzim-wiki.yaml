@@ -56,7 +56,7 @@ spec:
               - ALL
           seccompProfile:
             type: RuntimeDefault
-      - image: ghcr.io/offspot/mediawiki:1.36.1
+      - image: ghcr.io/offspot/mediawiki:1.43.11
         imagePullPolicy: Always
         name: mediawiki
         envFrom:
