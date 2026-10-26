@@ -4,6 +4,20 @@ metadata:
   name: nanobis-configs
   namespace: zim
 data:
+  default.conf: |
+    server {
+        listen       80;
+        server_name  localhost;
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.html index.htm;
+            add_header Cache-Control "no-store";
+        }
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   /usr/share/nginx/html;
+        }
+    }
   nanobis-manual-1w.html: |
     <!DOCTYPE html>
     <html lang="en">
@@ -91,8 +105,14 @@ data:
         <script>
             function RecordConfirmation() {
                 const expdate = new Date();
+                const value = 'confirmed=yes';
                 expdate.setTime(expdate.getTime() + (7 * 24 * 60 * 60 * 1000));
-                document.cookie = "confirmed=yes; expires=" + expdate.toUTCString() + "; path=/";
+                document.cookie = `${value}; expires=${expdate.toUTCString()}; path=/; SameSite=None; Secure; Partitioned`;
+                return document.cookie.split(/;\s*/).indexOf(value) != -1;
+            }
+            function triggerConfirmation() {
+                if (RecordConfirmation())
+                    location.reload();
             }
         </script>
     </head>
@@ -129,7 +149,7 @@ data:
             </p>
 
             <div class="action">
-                <button onclick="RecordConfirmation(); location.reload();">Confirm access</button>
+                <button onclick="triggerConfirmation();">Confirm access</button>
             </div>
             <div class="extra">
                 <p>This requires Javascript and Cookies to be enabled (content you're looking for already requires
@@ -227,11 +247,17 @@ data:
         <script>
             function RecordConfirmation() {
                 const expdate = new Date();
+                const value = 'confirmed=yes';
                 expdate.setTime(expdate.getTime() + (7 * 24 * 60 * 60 * 1000));
-                document.cookie = "confirmed=yes; expires=" + expdate.toUTCString() + "; path=/";
+                document.cookie = `${value}; expires=${expdate.toUTCString()}; path=/; SameSite=None; Secure; Partitioned`;
+                return document.cookie.split(/;\s*/).indexOf(value) != -1;
+            }
+            function triggerConfirmation() {
+                if (RecordConfirmation())
+                    location.reload();
             }
             document.addEventListener("DOMContentLoaded", function(){
-                RecordConfirmation(); location.reload();
+                triggerConfirmation();
             });
         </script>
     </head>
@@ -268,7 +294,7 @@ data:
             </p>
 
             <div class="action">
-                <button onclick="RecordConfirmation(); location.reload();">Confirm access</button>
+                <button onclick="triggerConfirmation();">Confirm access</button>
             </div>
             <div class="extra">
                 <p>This requires Javascript and Cookies to be enabled (content you're looking for already requires
@@ -304,6 +330,10 @@ spec:
         ports:
         - containerPort: 80
         volumeMounts:
+        - name: configs
+          mountPath: "/etc/nginx/conf.d/default.conf"
+          subPath: default.conf
+          readOnly: true
         - name: configs
           mountPath: "/usr/share/nginx/html/nanobis-manual-1w.html"
           subPath: nanobis-manual-1w.html
