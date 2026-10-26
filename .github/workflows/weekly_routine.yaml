@@ -91,6 +91,10 @@ jobs:
           - [ ] Ensure download.kiwix.org stats are being recorded
           - [ ] Check whether matomo should be upgraded
 
+          ## Wiki
+
+          - [ ] Check if new patch of Mediawiki LTS arrived [upstream](https://releases.wikimedia.org/mediawiki/) vs [local version](https://github.com/offspot/mediawiki-docker/blob/main/Dockerfile#L34); [open issue](https://github.com/offspot/mediawiki-docker/issues/new) if needed
+
           ## Grafana
           
           - [ ] [Disk usage](https://kiwixorg.grafana.net/d/8ee7e349-af68-4aac-8eba-23c561cedbc0/disk-bytes-usage) is normal, no unexpected usage
