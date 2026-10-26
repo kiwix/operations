@@ -89,7 +89,7 @@ spec:
         app: matomo-web
     spec:
       containers:
-      - image: ghcr.io/kiwix/matomo:5.14.0-fpm
+      - image: ghcr.io/kiwix/matomo:5.14.2-fpm
         imagePullPolicy: IfNotPresent
         # our matomo image contains nginx 1.26 that we're using to serve static assets
         # without passing those requests to matomo-app service (php)
