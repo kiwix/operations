@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: services-es-data-pvc
+  namespace: wikifundi
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 12Gi
+  storageClassName: ""
+  volumeName: srv-services-wikifundi-es-data-local-pv

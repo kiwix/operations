@@ -20,16 +20,26 @@ spec:
         imagePullPolicy: Always
         name: wikifundi
         env:
-          - name: CLEAN
-            value: "1"
-          - name: MIRRORING
-            value: "1"
+          # - name: CLEAN
+          #   value: "1"
+          # - name: MIRRORING
+          #   value: "1"
+          - name: DATABASE_NAME
+            value: mw_wikifundi
+        volumeMounts:
+        - name: data-volume
+          mountPath: "/var/www/data"
+          readOnly: false
         ports:
         - containerPort: 80
         resources:
           requests:
             memory: "768Mi"
             cpu: "300m"
+      volumes:
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: services-fr-data-pvc
       nodeSelector:
         k8s.kiwix.org/role: "services"
 ---
