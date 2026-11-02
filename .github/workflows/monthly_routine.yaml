@@ -67,7 +67,7 @@ jobs:
           - [ ] kathrin
           - [ ] rhys-github-runner-openzim
           - [ ] rhys-github-runner-kiwix
-          - [x] ~~duncan~~
+          - [ ] duncan
 
           **Note**: this is an *automatic reminder* intended for the assignee(s).
 
