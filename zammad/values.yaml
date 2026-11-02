@@ -45,6 +45,9 @@ secrets:
     useExisting: false
     secretKey: autowizard
     secretName: autowizard
+  # These values are only used when zammadConfig.elasticsearch.enabled is false
+  # (i.e. for an external Elasticsearch service). For the bundled ECK Elasticsearch,
+  # the operator-generated secret is used automatically and these values are ignored.
   elasticsearch:
     useExisting: false
     secretKey: password
@@ -69,7 +72,7 @@ secrets:
 securityContext:
   fsGroup: 1000
   # https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#configure-volume-permission-and-ownership-change-policy-for-pods
-  fsGroupChangePolicy: Always
+  fsGroupChangePolicy: OnRootMismatch
   runAsUser: 1000
   runAsNonRoot: true
   runAsGroup: 1000
@@ -86,14 +89,20 @@ podDisruptionBudget:
 
 zammadConfig:
   elasticsearch:
-    # enable/disable elasticsearch chart dependency
+    # enable/disable the bundled elasticsearch (ECK) chart dependency
     enabled: true
-    # host env var is only used when zammadConfig.elasticsearch.enabled is false
-    host: zammad-elasticsearch-master
+    # host, user and pass are only used when zammadConfig.elasticsearch.enabled is
+    # false (i.e. when connecting to an external Elasticsearch service). For the
+    # bundled ECK Elasticsearch, the host, the "elastic" user and the operator-
+    # generated password are resolved automatically and these values are ignored.
+    host: external-elasticsearch-host
     initialisation: true
     pass: ""
     port: 9200
     reindex: false
+    # number of parallel worker processes (CPU cores) used when rebuilding the search index
+    # (zammad-init job and reindex cronjob); 0 indexes in a single process without forking
+    reindexWorkers: 0
     schema: http
     user: ""
 
@@ -104,12 +113,21 @@ zammadConfig:
     host: zammad-memcached
     port: 11211
 
-  minio:
-    # enable/disable minio chart dependency
+  rustfs:
+    # enable/disable rustfs chart dependency (S3 storage provider for attachments)
     enabled: false
 
+    # Create the bucket in the bundled rustfs instance if it does not exist yet.
+    # Unlike the former minio subchart, the rustfs chart has no built-in bucket
+    # provisioning, so the zammad-init job takes care of it. Only applies to the
+    # bundled instance; an external S3 service is never modified.
+    bucketInitialisation: true
+
+    # Bucket used for attachment storage in the bundled rustfs instance.
+    bucket: zammad
+
     # Uncomment this in case you want to use an external S3 service.
-    # externalS3Url: https://user:pw@external-minio-service/bucket
+    # externalS3Url: https://user:pw@external-s3-service/bucket
 
   nginx:
     replicas: 1
@@ -301,7 +319,11 @@ zammadConfig:
     tls: false
 
     sentinel:
-      enabled: false  # set to true to enable Redis Sentinel
+      enabled: false  # set to true to enable Redis Sentinel; with the bundled subchart
+                      # (zammadConfig.redis.enabled=true) this also requires
+                      # redis.sentinel.enabled=true and redis.architecture=replication
+      # only used when zammadConfig.redis.enabled=false (external Redis/Sentinel); the
+      # bundled subchart's sentinel service is discovered automatically and ignores this list
       sentinels:
       - zammad-redis:26379
       masterName: mymaster
@@ -310,8 +332,7 @@ zammadConfig:
       pass: zammad
 
   scheduler:
-    # This component may only run once per cluster, so only 0 (disabled) and 1 are supported.
-    #   Higher values are capped to 1.
+    # This component may only run once per cluster, so only 0 (disabled) and 1 are allowed.
     replicas: 1
     resources: {}
       # requests:
@@ -361,8 +382,8 @@ zammadConfig:
       #      app.kubernetes.io/name: zammad
 
   storageVolume:
-    # Enable this for 'File' based storage in Zammad. You must provide an externally managed 'extistingClaim'
-    #   with 'ReadWriteMany' permisssion in this case.
+    # Enable this for 'File' based storage in Zammad. This requires 'existingClaim': an externally
+    #   managed PersistentVolumeClaim with 'ReadWriteMany' access.
     enabled: false
     ##
     ## A manually managed Persistent Volume and Claim
@@ -391,8 +412,7 @@ zammadConfig:
     #   readOnly: true
 
   websocket:
-    # This component may only run once per cluster, so only 0 (disabled) and 1 are supported.
-    #   Higher values are capped to 1.
+    # This component may only run once per cluster, so only 0 (disabled) and 1 are allowed.
     replicas: 1
     startupProbe:
       tcpSocket:
@@ -488,6 +508,23 @@ zammadConfig:
             - ALL
         readOnlyRootFilesystem: true
         privileged: false
+    # Provisions the bucket in the bundled rustfs instance, see
+    #   zammadConfig.rustfs.bucketInitialisation.
+    s3:
+      resources: {}
+        # requests:
+        #   cpu: 100m
+        #   memory: 256Mi
+        # limits:
+        #   cpu: 200m
+        #   memory: 512Mi
+      securityContext:
+        allowPrivilegeEscalation: false
+        capabilities:
+          drop:
+            - ALL
+        readOnlyRootFilesystem: true
+        privileged: false
     # VolumePermissions will be used by all Zammad Pods.
     # We need it to drop global write permission that comes with EmptyDir, otherwise
     #   Ruby's Tempfile.create raises an error.
@@ -495,7 +532,7 @@ zammadConfig:
       enabled: true
       image:
         repository: alpine
-        tag: "3.24.1"
+        tag: "3.24.3"
         pullPolicy: IfNotPresent
       command:
         - /bin/sh
@@ -510,11 +547,12 @@ zammadConfig:
         #   cpu: 200m
         #   memory: 512Mi
       securityContext:
+        allowPrivilegeEscalation: false
         readOnlyRootFilesystem: true
         capabilities:
           drop:
             - ALL
-        privileged: true
+        privileged: false
         runAsNonRoot: false
         runAsUser: 0
     zammad:
@@ -541,7 +579,6 @@ zammadConfig:
     #   initialised, e.g. while restoring a dump (see the PostgreSQL migration notes in the README).
     #   Zammad will not work correctly if this is left disabled permanently.
     enabled: true
-    randomName: true
     # specify how long after finish pods are deleted
     ttlSecondsAfterFinished: 300
     annotations: {}
@@ -719,49 +756,73 @@ initContainers: []
 
 # dependency charts config
 
-# Settings for the elasticsearch subchart
+# Settings for the elasticsearch subchart (eck-elasticsearch).
+#
+# This deploys an Elasticsearch custom resource that is managed by the ECK operator.
+# The ECK operator (and its CRDs) MUST already be installed in the cluster, see README.
+#
+# ECK names the resource "<release name>-es" (nameOverride below), which usually results in
+# the in-cluster service "<release name>-es-es-http" and the auto-generated superuser secret
+# "<release name>-es-es-elastic-user" (user "elastic") - the exact names depend on your release
+# name, since a release name that already contains "es" as a substring (e.g. "zammad-helpdesk")
+# is used as-is instead of getting "-es" appended. The Zammad templates pick these up
+# automatically regardless. Kept short on purpose: ECK caps the Elasticsearch resource name
+# itself at 36 characters, so a short nameOverride leaves more of that budget for the release
+# name.
+#
+# The Elasticsearch version is not pinned here on purpose: it comes from the subchart's
+# default, so it is carried along with the subchart version. Set "version" here if you
+# need to pin a specific Elasticsearch version (it must be supported by the installed
+# ECK operator).
 elasticsearch:
-  # Workaround: switch to bitnami legacy image repository (https://github.com/bitnami/containers/issues/83267)
-  image:
-    repository: bitnamilegacy/elasticsearch
-  sysctlImage:
-    repository: bitnamilegacy/os-shell
-  volumePermissions:
-    image:
-      repository: bitnamilegacy/os-shell
-  metrics:
-    image:
-      repository: bitnamilegacy/elasticsearch-exporter
-
-  clusterName: zammad
-  coordinating:
-    replicaCount: 0
-  data:
-    replicaCount: 0
-  ingest:
-    replicaCount: 0
-  master:
-    heapSize: 512m
-    masterOnly: false
-    replicaCount: 1
-    resourcesPreset: medium
-    resources: {}
-      # requests:
-      #   cpu: 50m
-      #   memory: 512Mi
-      # limits:
-      #   cpu: 100m
-      #   memory: 1024Mi
-    nodeSelector:
-      k8s.kiwix.org/role: "services"
-    persistence:
-      existingClaim: "services-zammad-elasticsearch-pvc"
-
-  # To use an existing Kubernetes secret containing the credentials,
-  # remove the comments on the lines below and adjust them accordingly
-  #
-  # security:
-  #   existingSecret: elastic-credentials
+  nameOverride: es
+  http:
+    tls:
+      selfSignedCertificate:
+        # Disable TLS on the HTTP layer (Variant A): Zammad talks plain http to ES.
+        # Native authentication (user "elastic" + generated password) stays enabled.
+        # Enabling this (selfSignedCertificate.disabled: false) is not supported yet: Zammad
+        # verifies TLS certificates by default and the chart does not mount the ECK-generated
+        # CA into the Zammad pods, so the zammad-init job will fail on certificate verification.
+        disabled: true
+  nodeSets:
+    - name: default
+      count: 1
+      config:
+        # Single-node default deployment without raising vm.max_map_count.
+        # For production, raise the kernel setting vm.max_map_count to 1048576 at
+        # the node level and remove this line instead. See:
+        # https://www.elastic.co/guide/en/cloud-on-k8s/current/k8s-virtual-memory.html
+        node.store.allow_mmap: false
+      # volumeClaimTemplates:
+      #   - metadata:
+      #       name: elasticsearch-data
+      #     spec:
+      #       accessModes:
+      #         - ReadWriteOnce
+      #       resources:
+      #         requests:
+      #           storage: 5Gi
+      #       # storageClassName: ""
+      podTemplate:
+        spec:
+          containers:
+            - name: elasticsearch
+              env:
+                - name: ES_JAVA_OPTS
+                  value: "-Xms512m -Xmx512m"
+              resources:
+                requests:
+                  cpu: 500m
+                  memory: 2Gi
+                limits:
+                  memory: 2Gi
+          nodeSelector:
+            k8s.kiwix.org/role: "services"
+          volumes:
+            - name: elasticsearch-data
+              persistentVolumeClaim:
+                claimName: services-zammad-elasticsearch-pvc
 
 # settings for the memcached subchart
 memcached:
@@ -776,37 +837,50 @@ memcached:
   nodeSelector:
     k8s.kiwix.org/role: "services"
 
-# settings for the minio subchart
-minio:
-  # Workaround: switch to bitnami legacy image repository (https://github.com/bitnami/containers/issues/83267)
-  image:
-    repository: bitnamilegacy/minio
-  clientImage:
-    repository: bitnamilegacy/minio-client
-  global:
-    security:
-      allowInsecureImages: true
-  defaultInitContainers:
-    volumePermissions:
-      image:
-        repository: bitnamilegacy/os-shell
-  console:
-    image:
-      repository: bitnamilegacy/minio-object-browser
+# settings for the rustfs subchart
+rustfs:
+  # Run a single node with a single data volume. The subchart itself defaults to a
+  # distributed, erasure-coded cluster of four pods, which is far more than Zammad's
+  # attachment store needs and would also be a big jump from the previous minio
+  # default. Scale this out via mode.distributed if you need the redundancy.
+  mode:
+    standalone:
+      enabled: true
+    distributed:
+      enabled: false
+  replicaCount: 1
 
-  auth:
-    rootUser: zammadadmin
-    rootPassword: zammadadmin
+  secret:
+    rustfs:
+      access_key: zammadadmin
+      secret_key: zammadadmin
 
-    # Use existing secret for credentials details (auth.rootUser and
-    # auth.rootPassword will be ignored and picked up from this secret).
-    # The secret has to contain the keys root-user and root-password)
-    # existingSecret: minio-credentials
+    # Use an existing secret for the credentials (secret.rustfs.access_key and
+    # secret.rustfs.secret_key will be ignored and picked up from this secret).
+    # The secret has to contain the keys RUSTFS_ACCESS_KEY and RUSTFS_SECRET_KEY.
+    # existingSecret: rustfs-credentials
 
-  defaultBuckets: zammad
+  config:
+    rustfs:
+      # The chart builds the region into the S3 URL from this value, so the server
+      # and what Zammad signs its requests with stay in sync if you change it.
+      # (rustfs does not currently reject a mismatch, but do not rely on that.)
+      region: zammad
+      # Web UI, you can enable this for debugging.
+      console_enable: "false"
+      # Log to stdout rather than into a second PersistentVolumeClaim.
+      obs_log_directory: ""
+      obs_environment: production
 
-  # You can use this to enable the web UI for debugging.
-  disableWebUI: true
+  # Zammad talks to rustfs cluster-internally, so no ingress is needed. The subchart
+  # would otherwise create one for its example.rustfs.com default host.
+  ingress:
+    enabled: false
+
+  storageclass:
+    # Empty means the cluster's default StorageClass is used.
+    name: ""
+    dataStorageSize: 10Gi
 
 # settings for the postgres subchart
 postgres:
