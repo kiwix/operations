@@ -60,6 +60,7 @@ jobs:
           - [ ] check for and apply important security upgrade on worker nodes asap (imager-worker, ondemand, sisyphus, ...)
 
           (regular workers updates are done separately on a monthly basis for worker nodes to not impact production)
+          (should upgrade of `demo` machine cause an issue, there is a `redeploy-demo` command available on the machine to attempt)
 
           ## Backups
 
