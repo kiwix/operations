@@ -60,7 +60,7 @@ spec:
             cpu: "20m"
       - image: ghcr.io/kiwix/kiwix-tools-nightly:latest
         imagePullPolicy: Always
-        command: ["kiwix-serve", "-b", "--library", "--monitorLibrary", "--searchLimit", "5", "/library/catalog.xml"]
+        command: ["kiwix-serve", "-b", "--library", "--monitorLibrary", "--threads", "16", "--searchLimit", "5", "--nodatealias", "--customIndex", "/data/kiwix-serve-templates/index-template.html", "/library/catalog.xml"]
         name: kiwix-tools
         ports:
         - containerPort: 80
@@ -70,6 +70,10 @@ spec:
           readOnly: true
         - mountPath: "/library"
           name: catalog-volume
+          readOnly: true
+        - mountPath: "/data/kiwix-serve-templates"
+          subPath: kiwix-serve-templates
+          name: community-volume
           readOnly: true
         resources:
           requests:
@@ -86,6 +90,9 @@ spec:
       - name: zim-volume
         persistentVolumeClaim:
           claimName: browser-zim-pvc
+      - name: community-volume
+        hostPath:
+          path: /data/community-volatile
       nodeSelector:
         k8s.kiwix.org/role: "browser"
 ---

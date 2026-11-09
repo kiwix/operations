@@ -1,0 +1,52 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: community-library-ingress-opds
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+        # kiwix-serve already sets Access-Control-Allow-Origin "*" always;
+        # see https://github.com/kiwix/libkiwix/blob/main/src/server/response.cpp#L130
+        proxy_hide_header Access-Control-Allow-Origin;
+
+        # CORS
+        add_header Access-Control-Allow-Origin "*" always;
+        add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Content-Type, Authorization, User-Agent, Range" always;
+        add_header Access-Control-Expose-Headers "Content-Range, Content-Length, Accept-Ranges" always;
+        add_header Access-Control-Allow-Credentials "true" always;
+
+        # Frame ancestors
+        add_header Content-Security-Policy "frame-ancestors 'self' https://browser-extension.kiwix.org https://pwa.kiwix.org https://kiwix.github.io http://localhost:* moz-extension: chrome-extension:" always;
+
+        # Handle preflight requests
+        if ($request_method = 'OPTIONS') {
+            return 204;
+        }
+        
+        location /robots.txt {
+          add_header Content-Type "text/plain";
+          return 200 "User-agent: *\nDisallow: /";
+        }
+        
+        if ($uri !~* "^/catalog/(.+)") {
+          return 404 "Only the catalog is served here, you probably want to go to browse.community.library.kiwix.org";
+        }
+
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - opds.community.library.kiwix.org
+      secretName: opds-community-library-kiwix-org-tls
+  rules:
+  - host: opds.community.library.kiwix.org
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: community-library-service
+            port:
+              number: 80

@@ -1,0 +1,84 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: community-library-ingress-browse
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+        # kiwix-serve already sets Access-Control-Allow-Origin "*" always;
+        # see https://github.com/kiwix/libkiwix/blob/main/src/server/response.cpp#L130
+        proxy_hide_header Access-Control-Allow-Origin;
+
+        # CORS
+        add_header Access-Control-Allow-Origin "*" always;
+        add_header Access-Control-Allow-Methods "GET, HEAD, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Content-Type, Authorization, User-Agent, Range" always;
+        add_header Access-Control-Expose-Headers "Content-Range, Content-Length, Accept-Ranges" always;
+        add_header Access-Control-Allow-Credentials "true" always;
+
+        # Frame ancestors
+        add_header Content-Security-Policy "frame-ancestors 'self' https://browser-extension.kiwix.org https://pwa.kiwix.org https://kiwix.github.io http://localhost:* moz-extension: chrome-extension:" always;
+
+        location /robots.txt {
+          add_header Content-Type "text/plain";
+          return 200 "User-agent: *\nDisallow: /";
+        }
+
+        set $shouldRewrite 0;
+        if ($http_cookie !~* "confirmed=yes") {
+          set $shouldRewrite 1;
+        }
+
+        if ($uri ~* "/.well-known/acme-challenge/(.+)") {
+          set $shouldRewrite 0;
+        }
+
+        if ($shouldRewrite = 1) {
+          rewrite ^ /nanobis-manual-1w.html last;
+        }
+        
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - browse.community.library.kiwix.org
+      secretName: browse-community-library-kiwix-org-tls
+  rules:
+  - host: browse.community.library.kiwix.org
+    http:
+      paths:
+      - path: /skin/
+        pathType: Prefix
+        backend:
+          service:
+            name: community-library-service
+            port:
+              number: 80
+      - path: /nojs/
+        pathType: Exact
+        backend:
+          service:
+            name: community-library-service
+            port:
+              number: 80
+      - path: /nanobis-auto-1w.html
+        pathType: Exact
+        backend:
+          service:
+            name: nanobis-service
+            port:
+              name: http
+      - path: /nanobis-manual-1w.html
+        pathType: Exact
+        backend:
+          service:
+            name: nanobis-service
+            port:
+              name: http
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: community-library-service
+            port:
+              number: 80
