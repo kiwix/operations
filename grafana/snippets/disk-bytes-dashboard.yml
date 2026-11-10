@@ -73,6 +73,19 @@ srv-m:
     md2:
       device: /dev/md2
       mounted: /data
+srv-r:
+  label: srv-r
+  instance: scw-kiwix-prod-foreign-e68d70a4fb8c4bf9b37c019
+  disks:
+    md0:
+      device: /dev/md0
+      mounted: /boot
+    md1:
+      device: /dev/md1
+      mounted: /
+    md2:
+      device: /dev/md2
+      mounted: /data
 demo.hotspot:
   label: demo.hotspot.kiwix.org
   instance: demo.hotspot.kiwix.org
