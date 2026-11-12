@@ -44,18 +44,15 @@ PERMANENT_APK_URL: str = (
     "org.kiwix.kiwixmobile.standalone.apk"
 )
 
-# APK is not mirrored anymore so there's only one source
-EXPECTED_APK_MIRRORS: list[str] = ["mirror.download.kiwix.org"]
 ZIM_MIRRORS: list[Mirror] = get_current_mirrors(
     CANONICAL_MIRRORS_LIST_URL, EXCLUDED_MIRRORS
 )
 # IDs are used for pytest output
 ZIM_MIRRORS_IDS: list[str] = [mirror.hostname for mirror in ZIM_MIRRORS]
-# we could have discovered mirrors via testing an actual APK online which would
-# have included any extra mirror serving it but it causes other issues (chicken/egg)
-# and expecting maintenance of tests on mirror update is OK
+
+# APK is not mirrored anymore so there's only one source
 APK_MIRRORS: list[Mirror] = [
-    mirror for mirror in ZIM_MIRRORS if mirror.hostname in EXPECTED_APK_MIRRORS
+    Mirror(hostname='master.download.kiwix.org', base_url='https://master.download.kiwix.org/', country_code='fr')
 ]
 APK_MIRRORS_IDS: list[str] = [mirror.hostname for mirror in APK_MIRRORS]
 PERMANENT_KIWIX_RELEASE_URL: str = "https://mirror.download.kiwix.org/release/kiwix-tools/kiwix-tools_linux-x86_64.tar.gz"

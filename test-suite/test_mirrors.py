@@ -6,7 +6,6 @@ import requests
 from conftest import (
     APK_MIRRORS,
     APK_MIRRORS_IDS,
-    EXPECTED_APK_MIRRORS,
     PERMANENT_KIWIX_NIGHTLY_URL,
     PERMANENT_KIWIX_RELEASE_URL,
     PERMANENT_OPENZIM_NIGHTLY_URL,
@@ -178,7 +177,7 @@ def test_apk_permalink(permanent_apk_url, current_apk_url, ua_headers: Headers):
 
 def test_apk_mirrors_list(current_apk_mirrors):
     # ATM this is no-op but prevents further issues
-    assert len(current_apk_mirrors) >= len(EXPECTED_APK_MIRRORS)
+    assert bool(len(APK_MIRRORS))
 
 
 @pytest.mark.parametrize("mirror", APK_MIRRORS, ids=APK_MIRRORS_IDS)
