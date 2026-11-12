@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: mirror-rsyncd-app
+  name: mirror-rsyncd-deployment
+spec:
+  strategy:
+    type: Recreate
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mirror-rsyncd-app
+  template:
+    metadata:
+      labels:
+        app: mirror-rsyncd-app
+    spec:
+      containers:
+      - image: ghcr.io/kiwix/rsyncd:latest
+        imagePullPolicy: IfNotPresent
+        name: rsyncd
+        command: ["rsync", "--daemon", "--no-detach", "--log-file", "/dev/stdout", "--config", "/etc/rsyncd.conf"]
+        securityContext:
+          capabilities:
+            add:
+              - SYS_NICE
+        volumeMounts:
+        - mountPath: "/var/www/download.kiwix.org/zim"
+          name: zim-volume
+          readOnly: true
+        - mountPath: "/etc/rsyncd.conf"
+          name: rsyncd-configs
+          subPath: rsyncd.conf
+          readOnly: true
+        resources:
+          limits:
+            memory: "512Mi"
+            cpu: "1000m"
+        ports:
+        # we don't want to request mirrors to use an alternate port
+        - containerPort: 873
+          hostPort: 873
+      volumes:
+      - name: zim-volume
+        persistentVolumeClaim:
+          claimName: mirror-zim-pvc
+      - name: rsyncd-configs
+        configMap:
+          name: rsyncd-configs
+      nodeSelector:
+        k8s.kiwix.org/role: "mirror"
+---
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: mirror-rsyncd-service
+  labels:
+    app: mirror-rsyncd-app
+spec:
+  selector:
+    app: mirror-rsyncd-app
+  ports:
+  - protocol: TCP
+    port: 873
+    targetPort: 873

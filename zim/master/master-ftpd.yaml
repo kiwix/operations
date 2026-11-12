@@ -23,9 +23,6 @@ spec:
         name: pureftpd
         command: ["/usr/sbin/pure-ftpd", "-4", "-H", "-p", "2000:2050", "-S", "0.0.0.0,21", "-P", "master.download.kiwix.org"]
         volumeMounts:
-        - mountPath: "/var/lib/ftp/zim"
-          name: zim-volume
-          readOnly: true
         - mountPath: "/var/lib/ftp/kiwix/release"
           name: kiwix-release-volume
           readOnly: true
@@ -153,9 +150,6 @@ spec:
         - containerPort: 2050
           hostPort: 2050
       volumes:
-      - name: zim-volume
-        persistentVolumeClaim:
-          claimName: master-zim-pvc
       - name: kiwix-release-volume
         persistentVolumeClaim:
           claimName: master-kiwix-release-pvc

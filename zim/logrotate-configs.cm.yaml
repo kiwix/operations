@@ -20,6 +20,10 @@ data:
     /data/nginx-logs/archive-download-kiwix/*.log {
       olddir /data/nginx-logs/archives/archive-download-kiwix
     }
+  master-download-kiwix.conf: |
+    /data/nginx-logs/master-download-kiwix/*.log {
+      olddir /data/nginx-logs/archives/master-download-kiwix
+    }
   mirror-download-kiwix.conf: |
     /data/nginx-logs/mirror-download-kiwix/*.log {
       olddir /data/nginx-logs/archives/mirror-download-kiwix

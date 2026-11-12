@@ -46,7 +46,7 @@ spec:
           volumes:
             - name: nginx-logs-volume
               persistentVolumeClaim:
-                claimName: master-www-logs-pvc
+                claimName: mirror-www-logs-pvc
           restartPolicy: Never
           nodeSelector:
-            k8s.kiwix.org/role: "master"
+            k8s.kiwix.org/role: "mirror"

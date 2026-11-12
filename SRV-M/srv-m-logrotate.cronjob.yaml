@@ -31,9 +31,9 @@ spec:
                 name: logrotate-configs
                 subPath: logrotate.conf
                 readOnly: true
-              - mountPath: "/etc/logrotate.d/mirror-download-kiwix.conf"
+              - mountPath: "/etc/logrotate.d/master-download-kiwix.conf"
                 name: logrotate-configs
-                subPath: mirror-download-kiwix.conf
+                subPath: master-download-kiwix.conf
                 readOnly: true
               - mountPath: "/etc/logrotate.d/download-openzim.conf"
                 name: logrotate-configs
