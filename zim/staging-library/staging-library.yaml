@@ -70,7 +70,6 @@ spec:
             memory: "128Mi"
             cpu: "20m"
       - image: ghcr.io/kiwix/kiwix-tools:3.8.2
-        # image: ghcr.io/kiwix/kiwix-tools-nightly:latest
         imagePullPolicy: Always
         command: ["kiwix-serve", "-b", "--library", "--monitorLibrary", "--nodatealiases", "--nolibrarybutton", "--searchLimit", "5", "/library/catalog.xml"]
         name: kiwix-tools
