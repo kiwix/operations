@@ -18,7 +18,7 @@ spec:
           - name: LIBKIWIX_VERSION
             value: "14.2.0"
           - name: INSTALL_SCRIPTS
-            value: "update-template#github://kiwix/operations/zim/library/update-kiwixserve-template.sh\n"
+            value: "update-template#github://kiwix/operations/zim/community-library/update-kiwixserve-template.sh\n"
           volumeMounts:
           - mountPath: "/data"
             subPath: kiwix-serve-templates
