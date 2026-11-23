@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: nightly-library-kiwix-org
+  namespace: zim
+spec:
+  secretName: nightly-library-kiwix-org-tls
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  commonName: nightly.library.kiwix.org
+  dnsNames:
+  - nightly.library.kiwix.org

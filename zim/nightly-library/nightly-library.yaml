@@ -1,0 +1,186 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: zim
+  labels:
+    app: nightly-library-app
+  name: nightly-library-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nightly-library-app
+  template:
+    metadata:
+      labels:
+        app: nightly-library-app
+    spec:
+      initContainers:
+      - image: docker.io/busybox
+        name: create-empty-library
+        command: ["/bin/sh", "-c", 'echo -e "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<feed xmlns=\"http://www.w3.org/2005/Atom\" xmlns:dc=\"http://purl.org/dc/terms/\" xmlns:kiwix=\"https://kiwix.org/namespace/opds\" xmlns:opds=\"https://specs.opds.io/opds-1.2\">\n<id>urn:uuid:c8961a08-9804-43e7-b435-173083fb8eef</id>\n<title>Kiwix library</title>\n<updated>2026-01-01T00:00:00Z</updated>\n</feed>" > /library/catalog.xml']
+        volumeMounts:
+        - mountPath: "/library"
+          # name: catalog-volume
+          readOnly: false
+          subPath: library
+          name: nightly-volume
+        resources:
+          requests:
+            memory: "16Mi"
+            cpu: "1m"
+          limits:
+            memory: "16Mi"
+            cpu: "1m"
+      containers:
+      # - image: ghcr.io/kiwix/catalog-retriever:latest
+      #   imagePullPolicy: Always
+      #   name: catalog-retriever
+      #   env:
+      #     - name: SAVE_TO
+      #       value: /library/catalog.xml
+      #     - name: CMS_API_URL
+      #       value: http://api-service.cms.svc.cluster.local/v1
+      #     - name: CMS_COLLECTION_ID
+      #       value: nightly
+      #     - name: REFRESH_EVERY_SECONDS
+      #       value: "300"
+      #     - name: ADD_BOOK_PATH_TO_XML
+      #       value: "/data/zim"
+      #     - name: DEBUG
+      #       value: ""
+      #   volumeMounts:
+      #   - mountPath: "/library"
+      #     name: catalog-volume
+      #     readOnly: false
+      #   resources:
+      #     requests:
+      #       memory: "128Mi"
+      #       cpu: "20m"
+      #     limits:
+      #       memory: "128Mi"
+      #       cpu: "20m"
+      - image: ghcr.io/kiwix/kiwix-tools-nightly:latest
+        imagePullPolicy: Always
+        command: ["kiwix-serve", "-b", "--library", "--monitorLibrary", "--threads", "16", "--searchLimit", "5", "--nodatealias", "--customIndex", "/data/kiwix-serve-templates/index-template.html", "/library/catalog.xml"]
+        name: kiwix-tools
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - mountPath: "/data/zim"
+          name: zim-volume
+          readOnly: true
+        - mountPath: "/library"
+          # name: catalog-volume
+          subPath: library
+          name: nightly-volume
+          readOnly: true
+        - mountPath: "/data/kiwix-serve-templates"
+          subPath: kiwix-serve-templates
+          name: nightly-volume
+          readOnly: true
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "20m"
+          limits:
+            memory: "2.5Gi"
+            cpu: "800m"
+      volumes:
+      - name: catalog-volume
+        emptyDir:
+          sizeLimit: 30Mi
+          medium: Memory
+      - name: zim-volume
+        persistentVolumeClaim:
+          claimName: browser-zim-pvc
+      - name: nightly-volume
+        hostPath:
+          path: /data/nightly-volatile
+      nodeSelector:
+        k8s.kiwix.org/role: "browser"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  namespace: zim
+  name: nightly-library-service
+  labels:
+    app: nightly-library-app
+spec:
+  selector:
+    app: nightly-library-app
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nightly-library-ingress
+  namespace: zim
+  annotations:
+    nginx.ingress.kubernetes.io/server-snippet: |
+        location /robots.txt {
+          add_header Content-Type "text/plain";
+          return 200 "User-agent: *\nDisallow: /";
+        }
+
+        set $shouldRewrite 0;
+        if ($http_cookie !~* "confirmed=yes") {
+          set $shouldRewrite 1;
+        }
+
+        if ($uri ~* "/.well-known/acme-challenge/(.+)") {
+          set $shouldRewrite 0;
+        }
+
+        if ($shouldRewrite = 1) {
+          rewrite ^ /nanobis-manual-1w.html last;
+        }
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+      - nightly.library.kiwix.org
+      secretName: nightly-library-kiwix-org-tls
+  rules:
+  - host: nightly.library.kiwix.org
+    http:
+      paths:
+      - path: /skin/
+        pathType: Prefix
+        backend:
+          service:
+            name: nightly-library-service
+            port:
+              number: 80
+      - path: /nojs/
+        pathType: Exact
+        backend:
+          service:
+            name: nightly-library-service
+            port:
+              number: 80
+      - path: /nanobis-auto-1w.html
+        pathType: Exact
+        backend:
+          service:
+            name: nanobis-service
+            port:
+              name: http
+      - path: /nanobis-manual-1w.html
+        pathType: Exact
+        backend:
+          service:
+            name: nanobis-service
+            port:
+              name: http
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: nightly-library-service
+            port:
+              number: 80
