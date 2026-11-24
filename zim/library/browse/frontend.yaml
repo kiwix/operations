@@ -61,6 +61,9 @@ data:
       "100.64.0.0"/16; // k8s cluster
     }
 
+
+    import directors;
+
     # data backend (HTML) is first (and thus default) – and only now
     backend data {
         .host = "prod-kiwix-browse-backend-service";
@@ -220,7 +223,9 @@ spec:
         name: varnish
         env:
         - name: VARNISHSIZE
-          value: "8G"
+          # this is net cache usage (what will be stored)
+          # actual RAM consumption about twice this value
+          value: "16G"
         - name: VARNISH_SECRET_PATH
           value: /etc/varnish/secret
         - name: VARNISH_ADMIN_IP
@@ -251,8 +256,8 @@ spec:
           readOnly: false
         resources:
           requests:
-            memory: "12Gi"
-            cpu: "30m"
+            memory: "24Gi"
+            cpu: "100m"
       volumes:
       - name: configs
         configMap:

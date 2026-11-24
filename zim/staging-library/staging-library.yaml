@@ -19,6 +19,7 @@ spec:
       - image: docker.io/busybox
         name: create-empty-library
         command: ["/bin/sh", "-c", 'echo -e "<library version=\"20110515\">\n</library>" > /library/catalog.xml']
+        # command: ["/bin/sh", "-c", 'echo -e "<?xml version="1.0" encoding="UTF-8"?><feed></feed>" > /library/catalog.xml']
         volumeMounts:
         - mountPath: "/library"
           name: catalog-volume
@@ -31,7 +32,7 @@ spec:
             memory: "16Mi"
             cpu: "1m"
       containers:
-      - image: ghcr.io/kiwix/catalog-retriever:latest
+      - image: ghcr.io/kiwix/catalog-retriever:kiwix-catalog
         imagePullPolicy: Always
         name: catalog-retriever
         env:

@@ -16,7 +16,7 @@ spec:
         app: prod-kiwix-catalog-backend-retriever-app
     spec:
       containers:
-      - image: ghcr.io/kiwix/catalog-retriever:latest
+      - image: ghcr.io/kiwix/catalog-retriever:kiwix-catalog
         imagePullPolicy: Always
         name: catalog-retriever
         env:
@@ -25,9 +25,9 @@ spec:
           - name: CMS_API_URL
             value: "http://api-service.cms.svc.cluster.local/v1"
           - name: CMS_COLLECTION_ID
-            value: "96fb60c0-2de6-46bd-8e67-41213298a5e8"
+            value: Kiwix
           - name: REFRESH_EVERY_SECONDS
-            value: "300"
+            value: "60"
           - name: KIWIX_SERVE_RELOAD_DELAY
             value: "10"
           - name: ADD_BOOK_PATH_TO_XML
