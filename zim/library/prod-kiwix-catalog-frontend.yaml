@@ -177,6 +177,16 @@ data:
 
     sub vcl_backend_response {
 
+      # do not cache large assets (2MB), storing them eats up most 
+      # of the cache space, leading to malloc storage exhaustion and 
+      # random "Could not get storage" fetch failures for everyone.
+      # see https://github.com/kiwix/operations/issues/789
+      if (std.integer(beresp.http.Content-Length, 0) > 2097152) {
+          set beresp.uncacheable = true;
+          set beresp.ttl = 120s;
+          return (deliver);
+      }
+      
       # make sure to not cache backend errors
       if (beresp.status >= 500 && bereq.is_bgfetch) {
           return (abandon);
